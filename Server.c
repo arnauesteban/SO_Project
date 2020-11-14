@@ -7,6 +7,12 @@
 #include <fcntl.h>
 #include <stdio.h>
 #include <mysql.h>
+#include <pthread.h>
+
+//Lista de nombres de los usuarios conectados
+char lista_conectados [500];
+//Estructura necesario para el acceso excluyente
+pthread_mutex_t mutex = PTHREAD_MUTEX_INITIALIZER;
 
 //Función que registra al usuario en la base de datos
 int Registrarse (char usuario[20], char clave[20]) {	
@@ -113,6 +119,12 @@ int IniciarSesion(char usuario[20], char clave[20]) {
 		printf("Error. Los datos no coinciden.");
 		return -5;
 	}
+	
+	//Anadimos el nombre del usuario conectado a lista_conectados
+	pthread_mutex_lock(&mutex);
+	sprintf(lista_conectados, "%s%s/", lista_conectados, usuario);
+	pthread_mutex_unlock(&mutex);
+	
 	// cerrar la conexion con el servidor MYSQL 
 	mysql_close (conn);
 	return 0;
@@ -259,12 +271,128 @@ int DameRecord() {
 	return 0;
 	mysql_close(conn);
 }
+
+void *AtenderCliente (void *socket)
+{
+	int sock_conn;
+	int *s;
+	s= (int *) socket;
+	sock_conn= *s;
+	
+	//int socket_conn = * (int *) socket;
+	char buff[512];
+	char buff2[512];
+	int ret;
+	
+	int terminar = 0;
+	while(terminar == 0) {
+		// Ahora recibimos su nombre, que dejamos en buff
+		ret=read(sock_conn,buff, sizeof(buff));
+		printf ("Recibido\n");
+		
+		// Tenemos que anadirle la marca de fin de string 
+		// para que no escriba lo que hay despues en el buffer
+		buff[ret]='\0';
+		
+		//Escribimos el nombre en la consola
+		
+		printf ("Se ha conectado: %s\n",buff);
+		
+		
+		char *p = strtok(buff, "/");
+		int codigo =  atoi (p);
+		if (codigo ==1)  {
+			p = strtok(NULL, "/");
+			char usuario[20];
+			strcpy(usuario, p);
+			p = strtok(NULL, "/");
+			char clave[20];
+			strcpy(clave, p);
+			int res = Registrarse(usuario, clave);
+			if(res ==0)
+				strcpy (buff2,"Se ha registrado correctamente.");
+			else if(res == -5)
+				strcpy (buff2,"Error. Ya hay alguien con ese nombre.");
+			else
+				printf("Error.");
+		}
+		else if (codigo == 2) {
+			p = strtok(NULL, "/");
+			char usuario[20];
+			strcpy(usuario, p);
+			p = strtok(NULL, "/");
+			char clave[20];
+			strcpy(clave, p);
+			int res = IniciarSesion(usuario, clave);
+			if(res ==0)
+				strcpy (buff2,"Se ha iniciado sesion correctamente.");
+			else if(res == -5)
+				strcpy (buff2,"Error. Los datos no coinciden.");
+		}
+		else if (codigo == 3) {
+			char lista[100];
+			strcpy(lista, "");
+			int res = PuntuacionPerdedores(lista);
+			printf("%s\n", lista);
+			if(res == 0)
+				strcpy (buff2, lista);
+		}
+		else if (codigo == 4) {
+			char lista[100];
+			int res = NombresPartidaLarga(lista);
+			if(res == 0)
+				strcpy (buff2, lista);
+		}	
+		else if (codigo == 5) {
+			int res = DameRecord();
+			if(res > 0)
+				sprintf (buff2, "%d", res);
+		}
+		//Entregar lista conectados
+		else if (codigo == 6)
+		{
+			strcpy(buff2, lista_conectados);
+			buff2[strlen(buff2)-1] = '\0';
+		}
+		//Desconexion: 0/nombre
+		else if (codigo == 0) {
+			
+			p = strtok(NULL, "/");
+			char nombre[20];
+			strcpy(nombre, p);
+			
+			//Creamos una nueva lista SIN el ususario desconectado
+			pthread_mutex_lock(&mutex);
+			char *t;
+			t = strtok(lista_conectados, "/");
+			char nueva_lista[500];
+			strcpy(nueva_lista, "");
+			while(t != NULL)
+			{
+				if(strcmp(t, nombre) != 0)
+					sprintf(nueva_lista, "%s%s/", nueva_lista, t);
+				
+				t = strtok(NULL, "/");
+			}
+			//Asignamos esta nueva lista a lista_conectados
+			strcpy(lista_conectados, nueva_lista);
+			pthread_mutex_unlock(&mutex);
+			
+			terminar=1;
+		}
+		printf ("%s\n", buff2);
+		// Y lo enviamos
+		write (sock_conn,buff2, strlen(buff2));
+	}
+	// Se acabo el servicio para este cliente
+	close(sock_conn);
+}
+
 int main(int argc, char *argv[])
 {
 	int sock_conn, sock_listen, ret;
 	struct sockaddr_in serv_adr;
-	char buff[512];
-	char buff2[512];
+	
 	// INICIALITZACIONS
 	// Obrim el socket
 	if ((sock_listen = socket(AF_INET, SOCK_STREAM, 0)) < 0)
@@ -287,86 +415,23 @@ int main(int argc, char *argv[])
 		printf("Error en el Listen");
 	
 	int i;
-	// Atenderemos solo 5 peticione
+	int sockets[i];
+	pthread_t thread;
+	i=0;
+	
+	// Atendemos peticiones
 	for(;;){
 		printf ("Escuchando\n");
 		
 		sock_conn = accept(sock_listen, NULL, NULL);
 		printf ("He recibido conexi?n\n");
+		
 		//sock_conn es el socket que usaremos para este cliente
-		int terminar = 0;
-		while(terminar == 0) {
-			// Ahora recibimos su nombre, que dejamos en buff
-			ret=read(sock_conn,buff, sizeof(buff));
-			printf ("Recibido\n");
-			
-			// Tenemos que a?adirle la marca de fin de string 
-			// para que no escriba lo que hay despues en el buffer
-			buff[ret]='\0';
-			
-			//Escribimos el nombre en la consola
-			
-			printf ("Se ha conectado: %s\n",buff);
-			
-			
-			char *p = strtok(buff, "/");
-			int codigo =  atoi (p);
-			if (codigo ==1)  {
-				p = strtok(NULL, "/");
-				char usuario[20];
-				strcpy(usuario, p);
-				p = strtok(NULL, "/");
-				char clave[20];
-				strcpy(clave, p);
-				int res = Registrarse(usuario, clave);
-				if(res ==0)
-					strcpy (buff2,"Se ha registrado correctamente.");
-				else if(res == -5)
-					strcpy (buff2,"Error. Ya hay alguien con ese nombre.");
-				else
-					printf("Error.");
-			}
-			else if (codigo == 2) {
-				p = strtok(NULL, "/");
-				char usuario[20];
-				strcpy(usuario, p);
-				p = strtok(NULL, "/");
-				char clave[20];
-				strcpy(clave, p);
-				int res = IniciarSesion(usuario, clave);
-				if(res ==0)
-					strcpy (buff2,"Se ha iniciado sesion correctamente.");
-				else if(res == -5)
-					strcpy (buff2,"Error. Los datos no coinciden.");
-			}
-			else if (codigo == 3) {
-				char lista[100];
-				strcpy(lista, "");
-				int res = PuntuacionPerdedores(lista);
-				printf("%s\n", lista);
-				if(res == 0)
-					strcpy (buff2, lista);
-			}
-			else if (codigo == 4) {
-				char lista[100];
-				int res = NombresPartidaLarga(lista);
-				if(res == 0)
-					strcpy (buff2, lista);
-			}	
-			else if (codigo == 5) {
-				int res = DameRecord();
-				if(res > 0)
-					sprintf (buff2, "%d", res);
-			}
-			else if (codigo == 0) {
-				terminar=1;
-			}
-			printf ("%s\n", buff2);
-			// Y lo enviamos
-			write (sock_conn,buff2, strlen(buff2));
-		}
-		// Se acabo el servicio para este cliente
-		close(sock_conn); 
+		sockets[i] = sock_conn;
+		
+		// Crear thead y decirle lo que tiene que hacer
+		pthread_create (&thread, NULL, AtenderCliente,&sockets[i]);
+		i=i+1;
 	}
 }
 

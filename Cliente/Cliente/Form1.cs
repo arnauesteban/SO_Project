@@ -121,6 +121,32 @@ namespace Cliente
                 mensaje = Encoding.ASCII.GetString(msg2).Split('\0')[0];
                 MessageBox.Show("ID del jugador con más puntos: " + mensaje);
             }
+            // Dame los nombres de los usuarios conectados
+            else if (nombresConectados.Checked)
+            {
+                // Quiere saber la longitud
+                string mensaje = "6/";
+                // Enviamos al servidor el nombre tecleado
+                byte[] msg = System.Text.Encoding.ASCII.GetBytes(mensaje);
+                server.Send(msg);
+
+                //Recibimos la respuesta del servidor
+                byte[] msg2 = new byte[80];
+                server.Receive(msg2);
+                mensaje = Encoding.ASCII.GetString(msg2).Split('\0')[0];
+
+                //Recogemos los nombres de los usuarios conectados
+                string[] nombres = mensaje.Split('/');
+
+                string mensajeFinal = "Usuarios conectados: ";
+                for (int i = 0; i<nombres.Length - 1; i++)
+                {
+                    mensajeFinal += nombres[i] += ", ";
+                }
+                mensajeFinal += nombres[nombres.Length - 1];
+                MessageBox.Show(mensajeFinal);
+
+            }
         }
 
         private void conectar_Btn_Click(object sender, EventArgs e)
@@ -149,7 +175,7 @@ namespace Cliente
         private void desconectar_Btn_Click(object sender, EventArgs e)
         {
             //Mensaje de desconexión
-            string mensaje = "0/";
+            string mensaje = "0/" + usuario.Text;
 
             byte[] msg = System.Text.Encoding.ASCII.GetBytes(mensaje);
             server.Send(msg);

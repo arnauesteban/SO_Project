@@ -40,6 +40,7 @@
             this.dameRecord = new System.Windows.Forms.RadioButton();
             this.conectar_Btn = new System.Windows.Forms.Button();
             this.desconectar_Btn = new System.Windows.Forms.Button();
+            this.nombresConectados = new System.Windows.Forms.RadioButton();
             this.SuspendLayout();
             // 
             // enviar_Btn
@@ -159,11 +160,23 @@
             this.desconectar_Btn.UseVisualStyleBackColor = true;
             this.desconectar_Btn.Click += new System.EventHandler(this.desconectar_Btn_Click);
             // 
+            // nombresConectados
+            // 
+            this.nombresConectados.AutoSize = true;
+            this.nombresConectados.Location = new System.Drawing.Point(325, 78);
+            this.nombresConectados.Name = "nombresConectados";
+            this.nombresConectados.Size = new System.Drawing.Size(217, 17);
+            this.nombresConectados.TabIndex = 12;
+            this.nombresConectados.TabStop = true;
+            this.nombresConectados.Text = "Dame la lista de los usuarios conectados";
+            this.nombresConectados.UseVisualStyleBackColor = true;
+            // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(812, 301);
+            this.Controls.Add(this.nombresConectados);
             this.Controls.Add(this.desconectar_Btn);
             this.Controls.Add(this.conectar_Btn);
             this.Controls.Add(this.dameRecord);
@@ -197,6 +210,7 @@
         private System.Windows.Forms.RadioButton dameRecord;
         private System.Windows.Forms.Button conectar_Btn;
         private System.Windows.Forms.Button desconectar_Btn;
+        private System.Windows.Forms.RadioButton nombresConectados;
     }
 }
 
