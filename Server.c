@@ -11,45 +11,35 @@
 
 //Lista de nombres de los usuarios conectados
 char lista_conectados [500];
-//Estructura necesario para el acceso excluyente
+//Estructura necesaria para el acceso excluyente
 pthread_mutex_t mutex = PTHREAD_MUTEX_INITIALIZER;
 
 //Funci�n que registra al usuario en la base de datos
-int Registrarse (char usuario[20], char clave[20]) {	
-	MYSQL *conn;
+int Registrarse (char usuario[20], char clave[20], MYSQL *conn) {	
 	MYSQL_RES *resultado;
 	MYSQL_ROW row;
 	int err;
-	char consulta [80];
-	//Creamos una conexion al servidor MYSQL 
-	conn = mysql_init(NULL);
-	if (conn==NULL) {
-		printf ("Error al crear la conexion: %u %s\n",
-				mysql_errno(conn), mysql_error(conn));
-		return -1;
-	}
-	//inicializar la conexiￃﾳn, entrando nuestras claves de acceso y
-	//el nombre de la base de datos a la que queremos acceder 
-	conn = mysql_real_connect (conn, "localhost","root", "mysql", "bd",0, NULL, 0);
-	if (conn==NULL) {
-		printf ("Error al inicializar la conexion: %u %s\n",
-				mysql_errno(conn), mysql_error(conn));
-		return -2;
-	}
 	
+	//Antes de nada, obtenemos el numero de jugadores que hay en la base de datos para dar el identificador correcto al nuevo jugador
+	char consulta [80];
 	err=mysql_query (conn, "SELECT * FROM JUGADOR");
 	if (err!=0) {
 		printf ("Error al consultar datos de la base %u %s\n",
 				mysql_errno(conn), mysql_error(conn));
-		return -3;
+		return -1;
 	}
 	resultado = mysql_store_result (conn);
-	int i = 0;
 	row = mysql_fetch_row (resultado);
+	
+	//Guardaremos el numero de usuarios en el parametro i
+	int i = 0;
 	while(row != NULL) {
 		i++;
 		row = mysql_fetch_row (resultado);
 	}
+	
+	//Ahora pedimos a la base de datos que busque si hay algun nombre con el nombre que ha introducido el usuario.
+	//Si es asi, no se podra registrar y tendra que introducir un nombre distinto
 	strcpy(consulta, "SELECT * FROM JUGADOR WHERE JUGADOR.NOMBRE='");
 	strcat(consulta, usuario);
 	strcat(consulta, "'");
@@ -57,67 +47,55 @@ int Registrarse (char usuario[20], char clave[20]) {
 	if (err!=0) {
 		printf ("Error al consultar datos de la base %u %s\n",
 				mysql_errno(conn), mysql_error(conn));
-		return -3;
+		return -1;
 	}
 	resultado = mysql_store_result (conn);
 	row = mysql_fetch_row (resultado);
+	
+	//Si la consulta tiene algun resultado, el nombre de usuario ya esta en uso.
 	if(row != NULL) {
 		printf("Error. Ya hay alguien con ese nombre.");
-		return -5;
+		return -2;
 	}
-	sprintf(consulta, "INSERT INTO JUGADOR VALUES (%d,'%s','%s',0);", i + 1, usuario, clave);
 	
-	printf("consulta = %s\n", consulta);
 	// Ahora ya podemos realizar la insercion 
+	sprintf(consulta, "INSERT INTO JUGADOR VALUES (%d,'%s','%s',0);", i + 1, usuario, clave);
 	err = mysql_query(conn, consulta);
 	if (err!=0) {
 		printf ("Error al introducir datos la base %u %s\n", 
 		mysql_errno(conn), mysql_error(conn));
-		return -4;
+		return -3;
 	}
-	// cerrar la conexion con el servidor MYSQL 
-	mysql_close (conn);
 	return 0;
-	
 }
 
-int IniciarSesion(char usuario[20], char clave[20]) {
-	MYSQL *conn;
+
+int IniciarSesion(char usuario[20], char clave[20], MYSQL *conn) {
 	MYSQL_RES *resultado;
 	MYSQL_ROW row;
 	int err;
+	
+	//Para iniciar sesion, pedimos a la base de datos que busque jugadores que tengan el nombre y contrase�a introducidos
 	char consulta [80];
-	//Creamos una conexion al servidor MYSQL 
-	conn = mysql_init(NULL);
-	if (conn==NULL) {
-		printf ("Error al crear la conexion: %u %s\n",
-				mysql_errno(conn), mysql_error(conn));
-		return -1;
-	}
-	//inicializar la conexiￃﾳn, entrando nuestras claves de acceso y
-	//el nombre de la base de datos a la que queremos acceder 
-	conn = mysql_real_connect (conn, "localhost","root", "mysql", "bd",0, NULL, 0);
-	if (conn==NULL) {
-		printf ("Error al inicializar la conexion: %u %s\n",
-				mysql_errno(conn), mysql_error(conn));
-		return -2;
-	}
 	strcpy(consulta, "SELECT * FROM JUGADOR WHERE JUGADOR.NOMBRE='");
 	strcat(consulta, usuario);
 	strcat(consulta, "' AND JUGADOR.CONTRASENA='");
 	strcat(consulta, clave);
 	strcat(consulta, "'");
+	
 	err=mysql_query (conn, consulta);
 	if (err!=0) {
 		printf ("Error al consultar datos de la base %u %s\n",
 				mysql_errno(conn), mysql_error(conn));
-		return -3;
+		return -1;
 	}
 	resultado = mysql_store_result (conn);
 	row = mysql_fetch_row (resultado);
+	
+	//Si la consulta no da resultados, el usuario esta introduciendo datos erroneos
 	if(row == NULL) {
 		printf("Error. Los datos no coinciden.");
-		return -5;
+		return -2;
 	}
 	
 	//Anadimos el nombre del usuario conectado a lista_conectados
@@ -125,32 +103,16 @@ int IniciarSesion(char usuario[20], char clave[20]) {
 	sprintf(lista_conectados, "%s%s/", lista_conectados, usuario);
 	pthread_mutex_unlock(&mutex);
 	
-	// cerrar la conexion con el servidor MYSQL 
-	mysql_close (conn);
 	return 0;
 }
 
-int PuntuacionPerdedores(char lista[100]) {
-	MYSQL *conn;
+
+int PuntuacionPerdedores(char lista[100], MYSQL *conn) {
 	MYSQL_RES *resultado;
 	MYSQL_ROW row;	
 	int err;
 	// Estructura especial para almacenar resultados de consultas 
 	char consulta [500];
-	//Creamos una conexion al servidor MYSQL 
-	conn = mysql_init(NULL);
-	if (conn==NULL) {
-		printf ("Error al crear la conexion: %u %s\n", 
-				mysql_errno(conn), mysql_error(conn));
-		return -1;
-	}
-	//inicializar la conexion
-	conn = mysql_real_connect (conn, "localhost","root", "mysql", "bd",0, NULL, 0);
-	if (conn==NULL) {
-		printf ("Error al inicializar la conexion: %u %s\n", 
-				mysql_errno(conn), mysql_error(conn));
-		return -2;
-	}
 	
 	//SELECT  DISTINCT JUGADOR.PUNTUACION FROM (PARTIDA,JUGADOR,PARTICIPACION) 
 	//WHERE	PARTIDA.GANADOR = 'Arnau'
@@ -180,30 +142,13 @@ int PuntuacionPerdedores(char lista[100]) {
 			printf("%s\n", lista);
 			row = mysql_fetch_row(resultado);
 	}
-		mysql_close (conn);
 		return 0;
 }
 
-int NombresPartidaLarga(char lista[100]) {
-	MYSQL *conn;
+int NombresPartidaLarga(char lista[100], MYSQL *conn) {
 	int err;
 	MYSQL_RES *resultado;
 	MYSQL_ROW row;
-	
-	//Creamos y abrimos conexion con la DB
-	conn = mysql_init(NULL);
-	if (conn==NULL) {
-		printf ("Error al crear la conexion: %u %s\n", 
-				mysql_errno(conn), mysql_error(conn));
-		return -1;
-	}
-	
-	conn = mysql_real_connect (conn, "localhost","root", "mysql", "bd",0, NULL, 0);
-	if (conn==NULL) {
-		printf ("Error al inicializar la conexion: %u %s\n", 
-				mysql_errno(conn), mysql_error(conn));
-		return -1;
-	}
 	
 	char consulta[200];
 	strcpy(consulta, "SELECT JUGADOR.NOMBRE FROM(PARTIDA, JUGADOR, PARTICIPACION) WHERE PARTIDA.DURACION = (SELECT MAX(DURACION) FROM PARTIDA) AND PARTIDA.ID = PARTICIPACION.ID_P AND PARTICIPACION.ID_J = JUGADOR.ID;");
@@ -231,27 +176,13 @@ int NombresPartidaLarga(char lista[100]) {
 			row = mysql_fetch_row(resultado);
 		}
 	}
-	mysql_close(conn);
 	return 0;
 }
 
-int DameRecord() {
-	MYSQL *conn;
+int DameRecord(MYSQL *conn) {
+	
 	MYSQL_RES *resultado;
 	MYSQL_ROW row;
-	
-	conn = mysql_init(NULL);
-	if (conn == NULL){
-		printf("Error al crear la conexion %u %s\n", mysql_errno(conn), mysql_error(conn));
-		return -1;
-	}
-	
-	conn = mysql_real_connect(conn, "localhost", "root", "mysql", "bd", 0, NULL, 0);
-	if(conn == NULL){
-		printf("Error al inicializar la conexion %u %s\n", mysql_errno(conn), mysql_error(conn));
-		return -2;
-	}
-	
 	int err;
 	err = mysql_query(conn, "SELECT JUGADOR.ID FROM JUGADOR ORDER BY JUGADOR.RECORD DESC;");
 	if(err != 0){
@@ -269,7 +200,6 @@ int DameRecord() {
 		return ID;
 	}
 	return 0;
-	mysql_close(conn);
 }
 
 void *AtenderCliente (void *socket)
@@ -279,6 +209,22 @@ void *AtenderCliente (void *socket)
 	s= (int *) socket;
 	sock_conn= *s;
 	
+	MYSQL *conn;
+	//Creamos una conexion al servidor MYSQL 
+	conn = mysql_init(NULL);
+	if (conn==NULL) {
+		printf ("Error al crear la conexion: %u %s\n",
+				mysql_errno(conn), mysql_error(conn));
+		exit(1);
+	}
+	//inicializar la conexiￃﾳn, entrando nuestras claves de acceso y
+	//el nombre de la base de datos a la que queremos acceder 
+	conn = mysql_real_connect (conn, "localhost","root", "mysql", "bd",0, NULL, 0);
+	if (conn==NULL) {
+		printf ("Error al inicializar la conexion: %u %s\n",
+				mysql_errno(conn), mysql_error(conn));
+		exit(1);
+	}
 	//int socket_conn = * (int *) socket;
 	char buff[512];
 	char buff2[512];
@@ -308,13 +254,17 @@ void *AtenderCliente (void *socket)
 			p = strtok(NULL, "/");
 			char clave[20];
 			strcpy(clave, p);
-			int res = Registrarse(usuario, clave);
-			if(res ==0)
-				strcpy (buff2,"Se ha registrado correctamente.");
-			else if(res == -5)
-				strcpy (buff2,"Error. Ya hay alguien con ese nombre.");
+			int res = Registrarse(usuario, clave, conn);
+			if(res == 0)
+				strcpy (buff2, "Se ha registrado correctamente.");
+			else if(res == -1)
+				strcpy (buff2, "Error al consultar la base de datos.");
+			else if(res == -2)
+				strcpy (buff2, "Lo sentimos, ya hay alguien con ese nombre. Introduce un nombre distinto.");
+			else if(res == -3)
+				strcpy (buff2, "Error al introducir tus datos en la base.");
 			else
-				printf("Error.");
+				printf("Error inesperado al registar al usuario.");
 		}
 		else if (codigo == 2) {
 			p = strtok(NULL, "/");
@@ -323,28 +273,30 @@ void *AtenderCliente (void *socket)
 			p = strtok(NULL, "/");
 			char clave[20];
 			strcpy(clave, p);
-			int res = IniciarSesion(usuario, clave);
+			int res = IniciarSesion(usuario, clave, conn);
 			if(res ==0)
-				strcpy (buff2,"Se ha iniciado sesion correctamente.");
-			else if(res == -5)
-				strcpy (buff2,"Error. Los datos no coinciden.");
+				strcpy (buff2, "Se ha iniciado sesion correctamente.");
+			else if(res == -1)
+				strcpy (buff2, "Error al consultar la base de datos.");
+			else if(res == -2)
+				strcpy (buff2, "Error. Los datos introducidos no coinciden.");
 		}
 		else if (codigo == 3) {
 			char lista[100];
 			strcpy(lista, "");
-			int res = PuntuacionPerdedores(lista);
+			int res = PuntuacionPerdedores(lista, conn);
 			printf("%s\n", lista);
 			if(res == 0)
 				strcpy (buff2, lista);
 		}
 		else if (codigo == 4) {
 			char lista[100];
-			int res = NombresPartidaLarga(lista);
+			int res = NombresPartidaLarga(lista, conn);
 			if(res == 0)
 				strcpy (buff2, lista);
 		}	
 		else if (codigo == 5) {
-			int res = DameRecord();
+			int res = DameRecord(conn);
 			if(res > 0)
 				sprintf (buff2, "%d", res);
 		}
@@ -430,7 +382,7 @@ int main(int argc, char *argv[])
 		sockets[i] = sock_conn;
 		
 		// Crear thead y decirle lo que tiene que hacer
-		pthread_create (&thread, NULL, AtenderCliente,&sockets[i]);
+		pthread_create (&thread, NULL, AtenderCliente, &sockets[i]);
 		i=i+1;
 	}
 }
