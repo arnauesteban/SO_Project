@@ -11,6 +11,7 @@
 
 //Lista de nombres de los usuarios conectados
 char lista_conectados [500];
+
 //Estructura necesaria para el acceso excluyente
 pthread_mutex_t mutex = PTHREAD_MUTEX_INITIALIZER;
 
@@ -70,6 +71,8 @@ int Registrarse (char usuario[20], char clave[20], MYSQL *conn) {
 }
 
 
+
+//Funcion que inicia la sesion del usuario
 int IniciarSesion(char usuario[20], char clave[20], MYSQL *conn) {
 	MYSQL_RES *resultado;
 	MYSQL_ROW row;
@@ -107,103 +110,106 @@ int IniciarSesion(char usuario[20], char clave[20], MYSQL *conn) {
 }
 
 
+
+//Funcion que retorna los record de los jugadores que han perdido partidas contra Arnau
 int PuntuacionPerdedores(char lista[100], MYSQL *conn) {
 	MYSQL_RES *resultado;
 	MYSQL_ROW row;	
 	int err;
-	// Estructura especial para almacenar resultados de consultas 
+	
+	//Realizamos la consulta necesaria en MYSQL
 	char consulta [500];
-	
-	//SELECT  DISTINCT JUGADOR.PUNTUACION FROM (PARTIDA,JUGADOR,PARTICIPACION) 
-	//WHERE	PARTIDA.GANADOR = 'Arnau'
-	//AND  	PARTIDA.ID = PARTICIPACION.ID_P
-	//AND 	PARTICIPACION.ID_J=JUGADOR.ID
-	//AND 	JUGADOR.NOMBRE NOT IN ('Arnau');
-	
 	strcpy(consulta,"SELECT  DISTINCT JUGADOR.RECORD FROM (PARTIDA,JUGADOR,PARTICIPACION) WHERE PARTIDA.GANADOR = 'Arnau' AND  PARTIDA.ID = PARTICIPACION.ID_P AND PARTICIPACION.ID_J=JUGADOR.ID AND JUGADOR.NOMBRE NOT IN ('Arnau');");
-	// consulta SQL para obtener una tabla con todos los datos
-	// de la base de datos
 	err=mysql_query (conn, consulta);
 	if (err!=0) {
 		printf ("Error al consultar datos de la base %u %s\n", mysql_errno(conn), mysql_error(conn));
-		return -3;
+		return -1;
 	}
-	
 	resultado = mysql_store_result (conn);
 	row = mysql_fetch_row (resultado);
 	
+	//Si no hay resultados en la consulta significa que nunca nadie ha perdido contra Arnau
 	if (row == NULL) {
 		printf ("No se han obtenido datos en la consulta\n");
 		strcpy(lista, "Nadie ha perdido nunca contra Arnau.");
 	}
+	
+	//Si hay resultados, se crean a la lista que ha entrado a la funcion como parametro
 	else
 		while (row !=NULL) {
 			sprintf(lista, "%s%s/", lista, row[0]);
 			printf("%s\n", lista);
 			row = mysql_fetch_row(resultado);
 	}
-		return 0;
+	return 0;
 }
 
+
+//Funcion que retorna los nombres de los jugadores que han jugado la partida mas larga
 int NombresPartidaLarga(char lista[100], MYSQL *conn) {
 	int err;
 	MYSQL_RES *resultado;
 	MYSQL_ROW row;
 	
+	//Hacemos la consulta necesaria a la base de datos.
 	char consulta[200];
 	strcpy(consulta, "SELECT JUGADOR.NOMBRE FROM(PARTIDA, JUGADOR, PARTICIPACION) WHERE PARTIDA.DURACION = (SELECT MAX(DURACION) FROM PARTIDA) AND PARTIDA.ID = PARTICIPACION.ID_P AND PARTICIPACION.ID_J = JUGADOR.ID;");
 	err = mysql_query(conn, consulta);
-	
-	if(err != 0)
-	{
+	if(err != 0){
 		printf ("Error al consultar datos de la base: %u %s\n",
 				mysql_errno(conn), mysql_error(conn));
+		return -1;
+	}
+	resultado = mysql_store_result(conn);
+	row = mysql_fetch_row(resultado);
+	strcpy(lista, "");
+	
+	//Si la consulta no da resultados hay un error, ya que hay partidas en la base
+	if(row == NULL) {
+		printf("No se han obtenido resultados en la consulta.\n");
 		return -2;
 	}
 	
-	resultado = mysql_store_result(conn);
-	
-	row = mysql_fetch_row(resultado);
-	strcpy(lista, "");
-	if(row == NULL) {
-		printf("No se han obtenido resultados en la consulta.\n");
-	}
-	else {
-		while(row != NULL)
-		{
-			
+	//Incorporamos los resultados en la lista que entra a la funcion como parametro
+	else
+		while(row != NULL){
 			sprintf(lista, "%s%s/", lista, row[0]);
 			row = mysql_fetch_row(resultado);
 		}
-	}
 	return 0;
 }
 
+
+//Funcion que devuelve la mayor puntuacion record registrada en la base de datos
 int DameRecord(MYSQL *conn) {
-	
 	MYSQL_RES *resultado;
 	MYSQL_ROW row;
 	int err;
+	
+	//Consulta que se debe hacer en la base
 	err = mysql_query(conn, "SELECT JUGADOR.ID FROM JUGADOR ORDER BY JUGADOR.RECORD DESC;");
 	if(err != 0){
 		printf("Error al consultar la base %u %s\n", mysql_errno(conn), mysql_error(conn));
-		return -3;
+		return -1;
 	}
-	
 	resultado = mysql_store_result(conn);
 	row = mysql_fetch_row(resultado);
-	int ID;
-	if(row == NULL)
-		printf("No se ha obtenido datos en la consulta\n");
-	else{
-		ID = atoi(row[0]);
-		return ID;
+	
+	//Si no hay resultados hay un error en la consulta a la base, pues en ella hay partidas guardadas
+	if(row == NULL){
+		printf("No se ha obtenido datos en la consulta.\n");
+		return -2;
 	}
-	return 0;
+	
+	//Se guarda el resultado en la variable ID y la devolvemos como resultado
+	int ID;
+	ID = atoi(row[0]);
+	return ID;
 }
 
-void *AtenderCliente (void *socket)
-{
+
+//Funcion que realiza cada thread
+void *AtenderCliente (void *socket){
 	int sock_conn;
 	int *s;
 	s= (int *) socket;
@@ -217,43 +223,47 @@ void *AtenderCliente (void *socket)
 				mysql_errno(conn), mysql_error(conn));
 		exit(1);
 	}
-	//inicializar la conexiï¿ƒï¾³n, entrando nuestras claves de acceso y
-	//el nombre de la base de datos a la que queremos acceder 
+	//inicializar la conexion, entrando nuestras claves de acceso y el nombre de la base de datos a la que queremos acceder 
 	conn = mysql_real_connect (conn, "localhost","root", "mysql", "bd",0, NULL, 0);
 	if (conn==NULL) {
 		printf ("Error al inicializar la conexion: %u %s\n",
 				mysql_errno(conn), mysql_error(conn));
 		exit(1);
 	}
-	//int socket_conn = * (int *) socket;
+	
+	//Variables necesarias en la counicacion con el cliente. 
+	//En buff se guarda el mensaje que se lee del cliente.
+	//En buff2 se guarda el mensaje que se debe enviar al cliente
 	char buff[512];
 	char buff2[512];
 	int ret;
 	
 	int terminar = 0;
 	while(terminar == 0) {
-		// Ahora recibimos su nombre, que dejamos en buff
+		// Ahora recibimos el mensaje del cliente, que dejamos en buff
 		ret=read(sock_conn,buff, sizeof(buff));
 		printf ("Recibido\n");
 		
-		// Tenemos que anadirle la marca de fin de string 
-		// para que no escriba lo que hay despues en el buffer
+		// Tenemos que anadirle la marca de fin de string para que no escriba lo que hay despues en el buffer
 		buff[ret]='\0';
 		
-		//Escribimos el nombre en la consola
-		
+		//Escribimos el nombre en la consola del servidor
 		printf ("Se ha conectado: %s\n",buff);
 		
-		
+		//Extraemos el codigo de peticion que nos ha enviado el cliente
 		char *p = strtok(buff, "/");
 		int codigo =  atoi (p);
-		if (codigo ==1)  {
+		
+		//Quiere que lo registremos en la base de datos
+		if (codigo ==1){
 			p = strtok(NULL, "/");
 			char usuario[20];
 			strcpy(usuario, p);
 			p = strtok(NULL, "/");
 			char clave[20];
 			strcpy(clave, p);
+			
+			//Registramos al cliente con los datos que ha enviado y analizamos resultados
 			int res = Registrarse(usuario, clave, conn);
 			if(res == 0)
 				strcpy (buff2, "Se ha registrado correctamente.");
@@ -266,6 +276,8 @@ void *AtenderCliente (void *socket)
 			else
 				printf("Error inesperado al registar al usuario.");
 		}
+		
+		//Quiere iniciar sesion
 		else if (codigo == 2) {
 			p = strtok(NULL, "/");
 			char usuario[20];
@@ -273,6 +285,8 @@ void *AtenderCliente (void *socket)
 			p = strtok(NULL, "/");
 			char clave[20];
 			strcpy(clave, p);
+			
+			//Iniciamos la sesion del cliente con los datos que ha enviado y analizamos resultados
 			int res = IniciarSesion(usuario, clave, conn);
 			if(res ==0)
 				strcpy (buff2, "Se ha iniciado sesion correctamente.");
@@ -280,35 +294,62 @@ void *AtenderCliente (void *socket)
 				strcpy (buff2, "Error al consultar la base de datos.");
 			else if(res == -2)
 				strcpy (buff2, "Error. Los datos introducidos no coinciden.");
+			else
+				printf("Error inesperado.");
 		}
+		
+		//Quiere obtener los record de los jugadores que han perdido partidas contra Arnau
 		else if (codigo == 3) {
 			char lista[100];
 			strcpy(lista, "");
+			
+			//Llamamos a la funcion para que haga la consulta necesaria y recogemos el resultado guardado en lista. Analizamos resultados
 			int res = PuntuacionPerdedores(lista, conn);
 			printf("%s\n", lista);
 			if(res == 0)
 				strcpy (buff2, lista);
+			else if(res == -1)
+				strcpy (buff2, " (Error al consultar la base de datos)");
+			else
+				printf("Error inesperado.");
 		}
+		
+		//Quiere obtener los nombres de los jugadores que han jugado la partida mas larga
 		else if (codigo == 4) {
 			char lista[100];
+			
+			//Llamamos a la funcion para que haga la consulta necesaria y recogemos el resultado guardado en lista. Analizamos resultados
 			int res = NombresPartidaLarga(lista, conn);
 			if(res == 0)
 				strcpy (buff2, lista);
-		}	
+			else if(res == -1)
+				strcpy (buff2, " (Error al consultar la base de datos)");
+			else if(res == -2)
+				strcpy (buff2, " (Error. La consulta no ha ofrecido resultados)");
+			else
+				printf("Error inesperado.");
+		}
+		
+		//Quiere obtener el identificador de la persona que ostenta el mayor record de la base de datos
 		else if (codigo == 5) {
+			//Llamamos a la funcion para que haga la consulta necesaria y analizamos resultados
 			int res = DameRecord(conn);
 			if(res > 0)
 				sprintf (buff2, "%d", res);
+			else if(res == -1)
+				strcpy (buff2, " (Error al consultar la base de datos)");
+			else if(res == -2)
+				strcpy (buff2, " (Error. La consulta no ha ofrecido resultados)");
 		}
-		//Entregar lista conectados
-		else if (codigo == 6)
-		{
+		
+		//Quiere obtener la lista de usuarios conectados al servidor
+		else if (codigo == 6){
 			strcpy(buff2, lista_conectados);
 			buff2[strlen(buff2)-1] = '\0';
 		}
-		//Desconexion: 0/nombre
+		
+		//Quiere desconectarse del servidor
 		else if (codigo == 0) {
-			
 			p = strtok(NULL, "/");
 			char nombre[20];
 			strcpy(nombre, p);
@@ -319,13 +360,12 @@ void *AtenderCliente (void *socket)
 			t = strtok(lista_conectados, "/");
 			char nueva_lista[500];
 			strcpy(nueva_lista, "");
-			while(t != NULL)
-			{
+			while(t != NULL){
 				if(strcmp(t, nombre) != 0)
 					sprintf(nueva_lista, "%s%s/", nueva_lista, t);
-				
 				t = strtok(NULL, "/");
 			}
+			
 			//Asignamos esta nueva lista a lista_conectados
 			strcpy(lista_conectados, nueva_lista);
 			pthread_mutex_unlock(&mutex);
@@ -333,36 +373,36 @@ void *AtenderCliente (void *socket)
 			terminar=1;
 		}
 		printf ("%s\n", buff2);
-		// Y lo enviamos
+		//Enviamos el resultado
 		write (sock_conn,buff2, strlen(buff2));
 	}
 	// Se acabo el servicio para este cliente
 	close(sock_conn);
 }
 
-int main(int argc, char *argv[])
-{
+
+//Inicio del código
+int main(int argc, char *argv[]){
 	int sock_conn, sock_listen, ret;
 	struct sockaddr_in serv_adr;
 	
-	// INICIALITZACIONS
-	// Obrim el socket
+	//Inicializaciones
+	//Primero, abrimos el socket
 	if ((sock_listen = socket(AF_INET, SOCK_STREAM, 0)) < 0)
 		printf("Error creant socket");
-	// Fem el bind al port
 	
-	
-	memset(&serv_adr, 0, sizeof(serv_adr));// inicialitza a zero serv_addr
+	//A continuación, hacemos el bind al puerto
+	memset(&serv_adr, 0, sizeof(serv_adr)); // inicializa a zero serv_addr
 	serv_adr.sin_family = AF_INET;
 	
-	// asocia el socket a cualquiera de las IP de la m?quina. 
+	//Asocia el socket a cualquiera de las IP de la maquina. 
 	//htonl formatea el numero que recibe al formato necesario
 	serv_adr.sin_addr.s_addr = htonl(INADDR_ANY);
-	// escucharemos en el port 9050
+	
+	//Escucharemos en el puerto indicado entre parenteis
 	serv_adr.sin_port = htons(9020);
 	if (bind(sock_listen, (struct sockaddr *) &serv_adr, sizeof(serv_adr)) < 0)
 		printf ("Error al bind");
-	//La cola de peticiones pendientes no podr? ser superior a 4
 	if (listen(sock_listen, 2) < 0)
 		printf("Error en el Listen");
 	
@@ -381,7 +421,7 @@ int main(int argc, char *argv[])
 		//sock_conn es el socket que usaremos para este cliente
 		sockets[i] = sock_conn;
 		
-		// Crear thead y decirle lo que tiene que hacer
+		//Crear thead y decirle lo que tiene que hacer
 		pthread_create (&thread, NULL, AtenderCliente, &sockets[i]);
 		i=i+1;
 	}
