@@ -400,7 +400,7 @@ int main(int argc, char *argv[]){
 	serv_adr.sin_addr.s_addr = htonl(INADDR_ANY);
 	
 	//Escucharemos en el puerto indicado entre parenteis
-	serv_adr.sin_port = htons(9020);
+	serv_adr.sin_port = htons(9080);
 	if (bind(sock_listen, (struct sockaddr *) &serv_adr, sizeof(serv_adr)) < 0)
 		printf ("Error al bind");
 	if (listen(sock_listen, 2) < 0)
