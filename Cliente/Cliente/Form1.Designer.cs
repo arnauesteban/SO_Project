@@ -123,10 +123,10 @@
             this.nombresPartidaLarga.AutoSize = true;
             this.nombresPartidaLarga.Location = new System.Drawing.Point(325, 124);
             this.nombresPartidaLarga.Name = "nombresPartidaLarga";
-            this.nombresPartidaLarga.Size = new System.Drawing.Size(374, 17);
+            this.nombresPartidaLarga.Size = new System.Drawing.Size(296, 17);
             this.nombresPartidaLarga.TabIndex = 8;
             this.nombresPartidaLarga.TabStop = true;
-            this.nombresPartidaLarga.Text = "Dame los nombres de los jugadores que hayan jugado la partida más larga";
+            this.nombresPartidaLarga.Text = "Dame los nombres de los jugadores con partida mas larga";
             this.nombresPartidaLarga.UseVisualStyleBackColor = true;
             // 
             // dameRecord
@@ -134,11 +134,12 @@
             this.dameRecord.AutoSize = true;
             this.dameRecord.Location = new System.Drawing.Point(325, 148);
             this.dameRecord.Name = "dameRecord";
-            this.dameRecord.Size = new System.Drawing.Size(350, 17);
+            this.dameRecord.Size = new System.Drawing.Size(148, 17);
             this.dameRecord.TabIndex = 9;
             this.dameRecord.TabStop = true;
-            this.dameRecord.Text = "Dame el número de identificación que tien el jugador con más puntos";
+            this.dameRecord.Text = "Dame el número de fichas";
             this.dameRecord.UseVisualStyleBackColor = true;
+            this.dameRecord.CheckedChanged += new System.EventHandler(this.dameRecord_CheckedChanged);
             // 
             // conectar_Btn
             // 

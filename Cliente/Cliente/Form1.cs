@@ -154,7 +154,7 @@ namespace Cliente
             //Creamos un IPEndPoint con el ip del servidor y puerto del servidor 
             //al que deseamos conectarnos
             IPAddress direc = IPAddress.Parse("192.168.56.102");
-            IPEndPoint ipep = new IPEndPoint(direc, 9020);
+            IPEndPoint ipep = new IPEndPoint(direc, 9080);
 
             //Creamos el socket 
             server = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
@@ -184,6 +184,11 @@ namespace Cliente
             this.BackColor = Color.Gray;
             server.Shutdown(SocketShutdown.Both);
             server.Close();
+        }
+
+        private void dameRecord_CheckedChanged(object sender, EventArgs e)
+        {
+
         }
     }
 }
