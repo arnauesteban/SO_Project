@@ -10,12 +10,11 @@
 #include <pthread.h>
 
 //Lista de nombres de los usuarios conectados
-char lista_conectados [500];
 
 //Estructura necesaria para el acceso excluyente
 pthread_mutex_t mutex = PTHREAD_MUTEX_INITIALIZER;
 
-//Función que registra al usuario en la base de datos
+//Funci??n que registra al usuario en la base de datos
 int Registrarse (char usuario[20], char clave[20], MYSQL *conn) {	
 	MYSQL_RES *resultado;
 	MYSQL_ROW row;
@@ -78,7 +77,7 @@ int IniciarSesion(char usuario[20], char clave[20], MYSQL *conn) {
 	MYSQL_ROW row;
 	int err;
 	
-	//Para iniciar sesion, pedimos a la base de datos que busque jugadores que tengan el nombre y contraseña introducidos
+	//Para iniciar sesion, pedimos a la base de datos que busque jugadores que tengan el nombre y contrase??a introducidos
 	char consulta [80];
 	strcpy(consulta, "SELECT * FROM JUGADOR WHERE JUGADOR.NOMBRE='");
 	strcat(consulta, usuario);
@@ -101,10 +100,6 @@ int IniciarSesion(char usuario[20], char clave[20], MYSQL *conn) {
 		return -2;
 	}
 	
-	//Anadimos el nombre del usuario conectado a lista_conectados
-	pthread_mutex_lock(&mutex);
-	sprintf(lista_conectados, "%s%s/", lista_conectados, usuario);
-	pthread_mutex_unlock(&mutex);
 	
 	return 0;
 }
@@ -207,7 +202,81 @@ int DameRecord(MYSQL *conn) {
 	return ID;
 }
 
+typedef struct {
+	char nombre [20];
+	int socket;
+}Conectado;
 
+typedef struct{
+	Conectado conectados [100];
+	int num;
+}ListaConectados;
+
+int Pon (ListaConectados *lista, char nombre[20],int socket){
+	//A?ade nuevo Conectado
+	//retorna 0 si ok y -1 si la lista ya estaba llena
+	if (lista->num == 100)
+		return -1;
+	else {
+		strcpy(lista->conectados[lista->num].nombre ,nombre);
+		lista->conectados[lista->num].socket = socket;
+		lista->num++;
+		return 0;
+	}
+}
+
+int DamePosicion (ListaConectados *lista, char nombre[20]){
+	//Devuelve la posicion lista o -1 si no esta en la lista
+	int i = 0;
+	int encontrado = 0;
+	while ((i<lista->num) && !encontrado)
+	{
+		if (strcmp(lista->conectados[i].nombre ,nombre)==0)
+			encontrado = 1;
+		if (!encontrado)
+			i++;
+		
+	}
+	if (encontrado)
+		return i;
+	else 
+		return -1;
+	
+}
+
+int Elimina (ListaConectados *lista, char nombre[20])
+{
+	//Retorna 0 si elimina y -1 si ese usuario no esta en la lista
+	int pos = DamePosicion (lista,nombre);
+	if (pos==-1)
+		return -1;
+	else 
+	{
+		int i;
+		for (i=pos; i< lista->num-1; i++)
+		{
+			lista->conectados[i] = lista->conectados[i+1];
+			//strcpy(lista->conectados[i].nombre , lista->conectados[i+1].nombre);
+			//lista->conectados[i].socket = lista->conectados[i+1].socket;
+		}
+		lista->num--;
+		return 0;
+		
+	}
+}
+
+void DameConectados (ListaConectados *lista, char conectados[520]){
+	//Pone en conectados los nombres de todos los conectados separados por barra
+	//Primero pone el n?mero de conectados. P.ej: "2/Juan/Pablo"
+	sprintf(conectados, "%d",lista->num);
+	int i;
+	for (i=0; i< lista->num; i++)
+		sprintf(conectados,"%s/%s",conectados,lista->conectados[i].nombre);
+	
+}
+
+
+ListaConectados miLista;
 //Funcion que realiza cada thread
 void *AtenderCliente (void *socket){
 	int sock_conn;
@@ -238,6 +307,7 @@ void *AtenderCliente (void *socket){
 	char buff2[512];
 	int ret;
 	
+	
 	int terminar = 0;
 	while(terminar == 0) {
 		// Ahora recibimos el mensaje del cliente, que dejamos en buff
@@ -246,7 +316,7 @@ void *AtenderCliente (void *socket){
 		
 		// Tenemos que anadirle la marca de fin de string para que no escriba lo que hay despues en el buffer
 		buff[ret]='\0';
-		
+		char nombre_usuario [20];
 		//Escribimos el nombre en la consola del servidor
 		printf ("Se ha conectado: %s\n",buff);
 		
@@ -258,6 +328,7 @@ void *AtenderCliente (void *socket){
 		if (codigo ==1){
 			p = strtok(NULL, "/");
 			char usuario[20];
+			strcpy(nombre_usuario, usuario);
 			strcpy(usuario, p);
 			p = strtok(NULL, "/");
 			char clave[20];
@@ -285,6 +356,11 @@ void *AtenderCliente (void *socket){
 			p = strtok(NULL, "/");
 			char clave[20];
 			strcpy(clave, p);
+			
+			pthread_mutex_lock(&mutex);
+			Pon (&miLista,usuario,sock_conn);
+			pthread_mutex_unlock(&mutex);
+			
 			
 			//Iniciamos la sesion del cliente con los datos que ha enviado y analizamos resultados
 			int res = IniciarSesion(usuario, clave, conn);
@@ -344,30 +420,18 @@ void *AtenderCliente (void *socket){
 		
 		//Quiere obtener la lista de usuarios conectados al servidor
 		else if (codigo == 6){
-			strcpy(buff2, lista_conectados);
-			buff2[strlen(buff2)-1] = '\0';
+			
+			pthread_mutex_lock(&mutex);
+			DameConectados(&miLista, buff2);			
+			pthread_mutex_unlock(&mutex);
+			
 		}
 		
 		//Quiere desconectarse del servidor
 		else if (codigo == 0) {
-			p = strtok(NULL, "/");
-			char nombre[20];
-			strcpy(nombre, p);
 			
-			//Creamos una nueva lista SIN el ususario desconectado
 			pthread_mutex_lock(&mutex);
-			char *t;
-			t = strtok(lista_conectados, "/");
-			char nueva_lista[500];
-			strcpy(nueva_lista, "");
-			while(t != NULL){
-				if(strcmp(t, nombre) != 0)
-					sprintf(nueva_lista, "%s%s/", nueva_lista, t);
-				t = strtok(NULL, "/");
-			}
-			
-			//Asignamos esta nueva lista a lista_conectados
-			strcpy(lista_conectados, nueva_lista);
+			Elimina(&miLista,nombre_usuario);
 			pthread_mutex_unlock(&mutex);
 			
 			terminar=1;
@@ -381,17 +445,18 @@ void *AtenderCliente (void *socket){
 }
 
 
-//Inicio del código
+//Inicio del c??digo
 int main(int argc, char *argv[]){
 	int sock_conn, sock_listen, ret;
 	struct sockaddr_in serv_adr;
 	
+	miLista.num = 0;
 	//Inicializaciones
 	//Primero, abrimos el socket
 	if ((sock_listen = socket(AF_INET, SOCK_STREAM, 0)) < 0)
 		printf("Error creant socket");
 	
-	//A continuación, hacemos el bind al puerto
+	//A continuaci??n, hacemos el bind al puerto
 	memset(&serv_adr, 0, sizeof(serv_adr)); // inicializa a zero serv_addr
 	serv_adr.sin_family = AF_INET;
 	

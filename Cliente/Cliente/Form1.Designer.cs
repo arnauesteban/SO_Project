@@ -59,6 +59,7 @@
             this.usuario.Name = "usuario";
             this.usuario.Size = new System.Drawing.Size(100, 20);
             this.usuario.TabIndex = 1;
+            this.usuario.TextChanged += new System.EventHandler(this.usuario_TextChanged);
             // 
             // clave
             // 
@@ -171,6 +172,7 @@
             this.nombresConectados.TabStop = true;
             this.nombresConectados.Text = "Dame la lista de los usuarios conectados";
             this.nombresConectados.UseVisualStyleBackColor = true;
+            this.nombresConectados.CheckedChanged += new System.EventHandler(this.nombresConectados_CheckedChanged);
             // 
             // Form1
             // 

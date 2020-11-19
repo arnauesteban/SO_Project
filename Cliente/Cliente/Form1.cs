@@ -12,12 +12,17 @@ using System.Net.Sockets;
 namespace Cliente
 {
     public partial class Form1 : Form
-    {
+    { 
+
         Socket server;
         public Form1()
         {
             InitializeComponent();
+            CheckForIllegalCrossThreadCalls = false;//necesario para que los elementos de los formularios puedan ser 
+            //accedidos desde threads diferentes a los que los crearon
         }
+
+
 
         private void enviar_Btn_Click(object sender, EventArgs e)
         {
@@ -29,11 +34,12 @@ namespace Cliente
                 byte[] msg = System.Text.Encoding.ASCII.GetBytes(mensaje);
                 server.Send(msg);
 
-                //Recibimos la respuesta del servidor
                 byte[] msg2 = new byte[80];
                 server.Receive(msg2);
                 mensaje = Encoding.ASCII.GetString(msg2).Split('\0')[0];
+                //Respuesta a registrar
                 MessageBox.Show(mensaje);
+
             }
             else if (iniciar_sesion.Checked)
             {
@@ -43,12 +49,12 @@ namespace Cliente
                 byte[] msg = System.Text.Encoding.ASCII.GetBytes(mensaje);
                 server.Send(msg);
 
-                //Recibimos la respuesta del servidor
                 byte[] msg2 = new byte[80];
                 server.Receive(msg2);
                 mensaje = Encoding.ASCII.GetString(msg2).Split('\0')[0];
                 MessageBox.Show(mensaje);
             }
+
             else if (puntosPerdedores.Checked)
             {
                 // Quiere saber la longitud
@@ -57,7 +63,6 @@ namespace Cliente
                 byte[] msg = System.Text.Encoding.ASCII.GetBytes(mensaje);
                 server.Send(msg);
 
-                //Recibimos la respuesta del servidor
                 byte[] msg2 = new byte[80];
                 server.Receive(msg2);
                 mensaje = Encoding.ASCII.GetString(msg2).Split('\0')[0];
@@ -77,6 +82,7 @@ namespace Cliente
                     i++;
                 }
                 MessageBox.Show(mensajeFinal);
+
             }
             else if (nombresPartidaLarga.Checked)
             {
@@ -86,10 +92,10 @@ namespace Cliente
                 byte[] msg = System.Text.Encoding.ASCII.GetBytes(mensaje);
                 server.Send(msg);
 
-                //Recibimos la respuesta del servidor
                 byte[] msg2 = new byte[80];
                 server.Receive(msg2);
                 mensaje = Encoding.ASCII.GetString(msg2).Split('\0')[0];
+
                 string[] separado = mensaje.Split('/');
                 int i = 0;
                 string mensajeFinal = "Los siguientes jugadores han jugado la partida más larga: ";
@@ -106,6 +112,7 @@ namespace Cliente
                     i++;
                 }
                 MessageBox.Show(mensajeFinal);
+                
             }
             else if (dameRecord.Checked)
             {
@@ -115,11 +122,11 @@ namespace Cliente
                 byte[] msg = System.Text.Encoding.ASCII.GetBytes(mensaje);
                 server.Send(msg);
 
-                //Recibimos la respuesta del servidor
                 byte[] msg2 = new byte[80];
                 server.Receive(msg2);
                 mensaje = Encoding.ASCII.GetString(msg2).Split('\0')[0];
                 MessageBox.Show("ID del jugador con más puntos: " + mensaje);
+                
             }
             // Dame los nombres de los usuarios conectados
             else if (nombresConectados.Checked)
@@ -130,21 +137,20 @@ namespace Cliente
                 byte[] msg = System.Text.Encoding.ASCII.GetBytes(mensaje);
                 server.Send(msg);
 
-                //Recibimos la respuesta del servidor
                 byte[] msg2 = new byte[80];
                 server.Receive(msg2);
                 mensaje = Encoding.ASCII.GetString(msg2).Split('\0')[0];
-
                 //Recogemos los nombres de los usuarios conectados
                 string[] nombres = mensaje.Split('/');
 
                 string mensajeFinal = "Usuarios conectados: ";
-                for (int i = 0; i<nombres.Length - 1; i++)
+                for (int i = 0; i < nombres.Length - 1; i++)
                 {
                     mensajeFinal += nombres[i] += ", ";
                 }
                 mensajeFinal += nombres[nombres.Length - 1];
                 MessageBox.Show(mensajeFinal);
+                
 
             }
         }
@@ -170,6 +176,8 @@ namespace Cliente
                 MessageBox.Show("No he podido conectar con el servidor");
                 return;
             }
+
+
         }
 
         private void desconectar_Btn_Click(object sender, EventArgs e)
@@ -187,6 +195,16 @@ namespace Cliente
         }
 
         private void dameRecord_CheckedChanged(object sender, EventArgs e)
+        {
+
+        }
+
+        private void nombresConectados_CheckedChanged(object sender, EventArgs e)
+        {
+
+        }
+
+        private void usuario_TextChanged(object sender, EventArgs e)
         {
 
         }
