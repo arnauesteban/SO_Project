@@ -9,12 +9,24 @@
 #include <mysql.h>
 #include <pthread.h>
 
-//Lista de nombres de los usuarios conectados
+//Estructura usuario
+typedef struct {
+	char nombre[20];
+	int sock;
+} TUsuario;
+
+//Lista de 50 usuarios como maximo
+typedef struct{
+	TUsuario usuario[50];
+	int num;
+} TListaUsuarios;
+
+TListaUsuarios lista_conectados;
 
 //Estructura necesaria para el acceso excluyente
 pthread_mutex_t mutex = PTHREAD_MUTEX_INITIALIZER;
 
-//Funci??n que registra al usuario en la base de datos
+//Función que registra al usuario en la base de datos
 int Registrarse (char usuario[20], char clave[20], MYSQL *conn) {	
 	MYSQL_RES *resultado;
 	MYSQL_ROW row;
@@ -59,11 +71,12 @@ int Registrarse (char usuario[20], char clave[20], MYSQL *conn) {
 	}
 	
 	// Ahora ya podemos realizar la insercion 
-	sprintf(consulta, "INSERT INTO JUGADOR VALUES (%d,'%s','%s',0,0,0);", i + 1, usuario, clave);
+	sprintf(consulta, "INSERT INTO JUGADOR VALUES (%d,'%s','%s',0, 0, 0);", i + 1, usuario, clave);
 	err = mysql_query(conn, consulta);
 	if (err!=0) {
 		printf ("Error al introducir datos la base %u %s\n", 
-				mysql_errno(conn), mysql_error(conn));
+		mysql_errno(conn), mysql_error(conn));
+
 		return -3;
 	}
 	return 0;
@@ -77,7 +90,7 @@ int IniciarSesion(char usuario[20], char clave[20], MYSQL *conn) {
 	MYSQL_ROW row;
 	int err;
 	
-	//Para iniciar sesion, pedimos a la base de datos que busque jugadores que tengan el nombre y contrase??a introducidos
+	//Para iniciar sesion, pedimos a la base de datos que busque jugadores que tengan el nombre y contraseña introducidos
 	char consulta [80];
 	strcpy(consulta, "SELECT * FROM JUGADOR WHERE JUGADOR.NOMBRE='");
 	strcat(consulta, usuario);
@@ -96,10 +109,8 @@ int IniciarSesion(char usuario[20], char clave[20], MYSQL *conn) {
 	
 	//Si la consulta no da resultados, el usuario esta introduciendo datos erroneos
 	if(row == NULL) {
-		printf("Error. Los datos no coinciden.");
 		return -2;
 	}
-	
 	
 	return 0;
 }
@@ -136,7 +147,7 @@ int PuntuacionPerdedores(char lista[100], MYSQL *conn) {
 			printf("%s\n", lista);
 			row = mysql_fetch_row(resultado);
 	}
-		return 0;
+	return 0;
 }
 
 
@@ -182,7 +193,9 @@ int DameRecord(MYSQL *conn) {
 	int err;
 	
 	//Consulta que se debe hacer en la base
+
 	err = mysql_query(conn, "SELECT JUGADOR.FICHAS FROM JUGADOR ORDER BY JUGADOR.FICHAS DESC;");
+
 	if(err != 0){
 		printf("Error al consultar la base %u %s\n", mysql_errno(conn), mysql_error(conn));
 		return -1;
@@ -202,87 +215,17 @@ int DameRecord(MYSQL *conn) {
 	return ID;
 }
 
-typedef struct {
-	char nombre [20];
-	int socket;
-}Conectado;
 
-typedef struct{
-	Conectado conectados [100];
-	int num;
-}ListaConectados;
-
-int Pon (ListaConectados *lista, char nombre[20],int socket){
-	//A?ade nuevo Conectado
-	//retorna 0 si ok y -1 si la lista ya estaba llena
-	if (lista->num == 100)
-		return -1;
-	else {
-		strcpy(lista->conectados[lista->num].nombre ,nombre);
-		lista->conectados[lista->num].socket = socket;
-		lista->num++;
-		return 0;
-	}
-}
-
-int DamePosicion (ListaConectados *lista, char nombre[20]){
-	//Devuelve la posicion lista o -1 si no esta en la lista
-	int i = 0;
-	int encontrado = 0;
-	while ((i<lista->num) && !encontrado)
-	{
-		if (strcmp(lista->conectados[i].nombre ,nombre)==0)
-			encontrado = 1;
-		if (!encontrado)
-			i++;
-		
-	}
-	if (encontrado)
-		return i;
-	else 
-		return -1;
-	
-}
-
-int Elimina (ListaConectados *lista, char nombre[20])
-{
-	//Retorna 0 si elimina y -1 si ese usuario no esta en la lista
-	int pos = DamePosicion (lista,nombre);
-	if (pos==-1)
-		return -1;
-	else 
-	{
-		int i;
-		for (i=pos; i< lista->num-1; i++)
-		{
-			lista->conectados[i] = lista->conectados[i+1];
-			//strcpy(lista->conectados[i].nombre , lista->conectados[i+1].nombre);
-			//lista->conectados[i].socket = lista->conectados[i+1].socket;
-		}
-		lista->num--;
-		return 0;
-		
-	}
-}
-
-void DameConectados (ListaConectados *lista, char conectados[520]){
-	//Pone en conectados los nombres de todos los conectados separados por barra
-	//Primero pone el n?mero de conectados. P.ej: "2/Juan/Pablo"
-	sprintf(conectados, "%d",lista->num);
-	int i;
-	for (i=0; i< lista->num; i++)
-		sprintf(conectados,"%s/%s",conectados,lista->conectados[i].nombre);
-	
-}
-
-
-ListaConectados miLista;
 //Funcion que realiza cada thread
-void *AtenderCliente (void *socket){
+
+void *AtenderCliente (void *num){
+	int i;
+	int *k;
+	k = (int *) num;
+	i = *k;
+	
 	int sock_conn;
-	int *s;
-	s= (int *) socket;
-	sock_conn= *s;
+	sock_conn= lista_conectados.usuario[i].sock;
 	
 	MYSQL *conn;
 	//Creamos una conexion al servidor MYSQL 
@@ -293,7 +236,9 @@ void *AtenderCliente (void *socket){
 		exit(1);
 	}
 	//inicializar la conexion, entrando nuestras claves de acceso y el nombre de la base de datos a la que queremos acceder 
+
 	conn = mysql_real_connect (conn, "localhost","root", "mysql", "TG11",0, NULL, 0);
+
 	if (conn==NULL) {
 		printf ("Error al inicializar la conexion: %u %s\n",
 				mysql_errno(conn), mysql_error(conn));
@@ -307,7 +252,6 @@ void *AtenderCliente (void *socket){
 	char buff2[512];
 	int ret;
 	
-	
 	int terminar = 0;
 	while(terminar == 0) {
 		// Ahora recibimos el mensaje del cliente, que dejamos en buff
@@ -316,7 +260,7 @@ void *AtenderCliente (void *socket){
 		
 		// Tenemos que anadirle la marca de fin de string para que no escriba lo que hay despues en el buffer
 		buff[ret]='\0';
-		char nombre_usuario [20];
+		
 		//Escribimos el nombre en la consola del servidor
 		printf ("Se ha conectado: %s\n",buff);
 		
@@ -324,26 +268,60 @@ void *AtenderCliente (void *socket){
 		char *p = strtok(buff, "/");
 		int codigo =  atoi (p);
 		
-		//Quiere que lo registremos en la base de datos
-		if (codigo ==1){
+		//Quiere desconectarse del servidor
+			if (codigo == 0) {
+				p = strtok(NULL, "/");
+				char nombre[20];
+				strcpy(nombre, p);
+				
+				//Creamos una nueva lista SIN el ususario desconectado
+				pthread_mutex_lock(&mutex);
+				
+				//Recorrido y guardamos los usuarios conectados
+				char lista[500];
+				strcpy(lista, "");
+				strcpy(lista_conectados.usuario[i].nombre, "");
+				for(int j = 0; j < lista_conectados.num; j++)
+				{
+					if(strcmp(lista_conectados.usuario[j].nombre, "") != 0)
+					{
+						sprintf(lista, "%s%s/", lista, lista_conectados.usuario[j].nombre);
+					}
+				}
+				//Borramos la ultima '/'
+				lista[strlen(lista)-1] = '\0';
+				char listadefinitiva[500];
+				sprintf(listadefinitiva, "6$%s", lista);
+				for(int j = 0; j < lista_conectados.num; j++)
+					if(strcmp(lista_conectados.usuario[j].nombre, "") != 0)
+					write (lista_conectados.usuario[j].sock, listadefinitiva, strlen(listadefinitiva));
+				
+				pthread_mutex_unlock(&mutex);
+				
+				terminar=1;
+			}
+				
+			//Quiere que lo registremos en la base de datos: 1/nombre/clave
+			else if (codigo ==1){
 			p = strtok(NULL, "/");
-			char usuario[20];
-			strcpy(nombre_usuario, usuario);
-			strcpy(usuario, p);
+			char nombre[20];
+			strcpy(nombre, p);
 			p = strtok(NULL, "/");
 			char clave[20];
 			strcpy(clave, p);
 			
 			//Registramos al cliente con los datos que ha enviado y analizamos resultados
-			int res = Registrarse(usuario, clave, conn);
+
+			int res = Registrarse(nombre, clave, conn);
+
 			if(res == 0)
-				strcpy (buff2, "Se ha registrado correctamente.");
+				strcpy (buff2, "1$Se ha registrado correctamente.");
 			else if(res == -1)
-				strcpy (buff2, "Error al consultar la base de datos.");
+				strcpy (buff2, "1$Error al consultar la base de datos.");
 			else if(res == -2)
-				strcpy (buff2, "Lo sentimos, ya hay alguien con ese nombre. Introduce un nombre distinto.");
+				strcpy (buff2, "1$Lo sentimos, ya hay alguien con ese nombre. Introduce un nombre distinto.");
 			else if(res == -3)
-				strcpy (buff2, "Error al introducir tus datos en la base.");
+				strcpy (buff2, "1$Error al introducir tus datos en la base.");
 			else
 				printf("Error inesperado al registar al usuario.");
 		}
@@ -351,44 +329,71 @@ void *AtenderCliente (void *socket){
 		//Quiere iniciar sesion
 		else if (codigo == 2) {
 			p = strtok(NULL, "/");
-			char usuario[20];
-			strcpy(usuario, p);
+			char nombre[20];
+			strcpy(nombre, p);
 			p = strtok(NULL, "/");
 			char clave[20];
 			strcpy(clave, p);
 			
-			pthread_mutex_lock(&mutex);
-			Pon (&miLista,usuario,sock_conn);
-			pthread_mutex_unlock(&mutex);
-			
-			
 			//Iniciamos la sesion del cliente con los datos que ha enviado y analizamos resultados
-			int res = IniciarSesion(usuario, clave, conn);
+
+			int res = IniciarSesion(nombre, clave, conn);
 			if(res ==0)
-				strcpy (buff2, "Se ha iniciado sesion correctamente.");
+			{
+				strcpy (buff2, "2$Se ha iniciado sesion correctamente.");
+				//Recorrido y guardamos los usuarios conectados
+				strcpy(lista_conectados.usuario[i].nombre, nombre);
+				char lista[500];
+				strcpy(lista, "");
+				for(int j = 0; j < lista_conectados.num; j++)
+				{
+					if(strcmp(lista_conectados.usuario[j].nombre, "") != 0)
+					{
+						sprintf(lista, "%s%s/", lista, lista_conectados.usuario[j].nombre);
+					}
+				}
+				//Borramos la ultima '/'
+				lista[strlen(lista)-1] = '\0';
+				char listadefinitiva[500];
+				printf("%s\n", lista);
+				sprintf(listadefinitiva, "6$%s", lista);
+				printf("%s\n", lista);
+				for(int j = 0; j < lista_conectados.num; j++)
+					if(strcmp(lista_conectados.usuario[j].nombre, "") != 0)
+						write (lista_conectados.usuario[j].sock, listadefinitiva, strlen(listadefinitiva));
+			}
+
 			else if(res == -1)
-				strcpy (buff2, "Error al consultar la base de datos.");
+				strcpy (buff2, "2$Error al consultar la base de datos.");
 			else if(res == -2)
-				strcpy (buff2, "Error. Los datos introducidos no coinciden.");
+				strcpy (buff2, "2$Error. Los datos introducidos no coinciden.");
 			else
 				printf("Error inesperado.");
 		}
 		
-		//Quiere obtener los record de los jugadores que han perdido partidas contra Arnau
-		else if (codigo == 3) {
-			char lista[100];
+		//Un cliente en concreto pide que se le envie la lista de conectados actualizada
+		else if (codigo == 3)
+		{
+			//Enviamos la lista al cliente en concreto
+			char lista[500];
 			strcpy(lista, "");
-			
-			//Llamamos a la funcion para que haga la consulta necesaria y recogemos el resultado guardado en lista. Analizamos resultados
-			int res = PuntuacionPerdedores(lista, conn);
+			for(int j = 0; j < lista_conectados.num; j++)
+			{
+				if(strcmp(lista_conectados.usuario[j].nombre, "") != 0)
+				{
+					sprintf(lista, "%s%s/", lista, lista_conectados.usuario[j].nombre);
+				}
+			}
+			//Borramos la ultima '/'
+			lista[strlen(lista)-1] = '\0';
+			char listadefinitiva[500];
 			printf("%s\n", lista);
-			if(res == 0)
-				strcpy (buff2, lista);
-			else if(res == -1)
-				strcpy (buff2, " (Error al consultar la base de datos)");
-			else
-				printf("Error inesperado.");
+			sprintf(listadefinitiva, "6$%s", lista);
+			printf("%s\n", lista);
+
+			write (lista_conectados.usuario[i].sock, listadefinitiva, strlen(listadefinitiva));
 		}
+		
 		
 		//Quiere obtener los nombres de los jugadores que han jugado la partida mas larga
 		else if (codigo == 4) {
@@ -397,11 +402,11 @@ void *AtenderCliente (void *socket){
 			//Llamamos a la funcion para que haga la consulta necesaria y recogemos el resultado guardado en lista. Analizamos resultados
 			int res = NombresPartidaLarga(lista, conn);
 			if(res == 0)
-				strcpy (buff2, lista);
+				sprintf (buff2, "4$%s", lista);
 			else if(res == -1)
-				strcpy (buff2, " (Error al consultar la base de datos)");
+				strcpy (buff2, "4$ (Error al consultar la base de datos)");
 			else if(res == -2)
-				strcpy (buff2, " (Error. La consulta no ha ofrecido resultados)");
+				strcpy (buff2, "4$ (Error. La consulta no ha ofrecido resultados)");
 			else
 				printf("Error inesperado.");
 		}
@@ -411,31 +416,31 @@ void *AtenderCliente (void *socket){
 			//Llamamos a la funcion para que haga la consulta necesaria y analizamos resultados
 			int res = DameRecord(conn);
 			if(res > 0)
-				sprintf (buff2, "%d", res);
+				sprintf (buff2, "5$%d", res);
 			else if(res == -1)
-				strcpy (buff2, " (Error al consultar la base de datos)");
+				strcpy (buff2, "5$ (Error al consultar la base de datos)");
 			else if(res == -2)
-				strcpy (buff2, " (Error. La consulta no ha ofrecido resultados)");
+				strcpy (buff2, "5$ (Error. La consulta no ha ofrecido resultados)");
 		}
 		
-		//Quiere obtener la lista de usuarios conectados al servidor
-		else if (codigo == 6){
+		//Quiere obtener los record de los jugadores que han perdido partidas contra Arnau
+		else if (codigo == 7) {
+			char lista[100];
+			strcpy(lista, "");
 			
-			pthread_mutex_lock(&mutex);
-			DameConectados(&miLista, buff2);			
-			pthread_mutex_unlock(&mutex);
-			
+			//Llamamos a la funcion para que haga la consulta necesaria y recogemos el resultado guardado en lista. Analizamos resultados
+			int res = PuntuacionPerdedores(lista, conn);
+			printf("%s\n", lista);
+			if(res == 0)
+				sprintf (buff2, "7$%s", lista);
+			else if(res == -1)
+				strcpy (buff2, "7$ (Error al consultar la base de datos)");
+			else
+				printf("Error inesperado.");
 		}
 		
-		//Quiere desconectarse del servidor
-		else if (codigo == 0) {
-			
-			pthread_mutex_lock(&mutex);
-			Elimina(&miLista,nombre_usuario);
-			pthread_mutex_unlock(&mutex);
-			
-			terminar=1;
-		}
+		
+		
 		printf ("%s\n", buff2);
 		//Enviamos el resultado
 		write (sock_conn,buff2, strlen(buff2));
@@ -445,18 +450,18 @@ void *AtenderCliente (void *socket){
 }
 
 
-//Inicio del c??digo
+//Inicio del código
 int main(int argc, char *argv[]){
 	int sock_conn, sock_listen, ret;
 	struct sockaddr_in serv_adr;
+	lista_conectados.num = 0;
 	
-	miLista.num = 0;
 	//Inicializaciones
 	//Primero, abrimos el socket
 	if ((sock_listen = socket(AF_INET, SOCK_STREAM, 0)) < 0)
-		printf("Error creant socket");
+		printf("Error creando socket");
 	
-	//A continuaci??n, hacemos el bind al puerto
+	//A continuación, hacemos el bind al puerto
 	memset(&serv_adr, 0, sizeof(serv_adr)); // inicializa a zero serv_addr
 	serv_adr.sin_family = AF_INET;
 	
@@ -467,14 +472,12 @@ int main(int argc, char *argv[]){
 	//Escucharemos en el puerto indicado entre parenteis
 	serv_adr.sin_port = htons(9080);
 	if (bind(sock_listen, (struct sockaddr *) &serv_adr, sizeof(serv_adr)) < 0)
-		printf ("Error al bind");
+		printf ("Error al bind\n");
 	if (listen(sock_listen, 2) < 0)
-		printf("Error en el Listen");
+		printf("Error en el Listen\n");
 	
-	int i;
-	int sockets[i];
 	pthread_t thread;
-	i=0;
+	
 	
 	// Atendemos peticiones
 	for(;;){
@@ -483,12 +486,16 @@ int main(int argc, char *argv[]){
 		sock_conn = accept(sock_listen, NULL, NULL);
 		printf ("He recibido conexi?n\n");
 		
+		int i;
+		i = lista_conectados.num;
+		
 		//sock_conn es el socket que usaremos para este cliente
-		sockets[i] = sock_conn;
+		lista_conectados.usuario[i].sock = sock_conn;
+		lista_conectados.num++;
 		
 		//Crear thead y decirle lo que tiene que hacer
-		pthread_create (&thread, NULL, AtenderCliente, &sockets[i]);
-		i=i+1;
+		pthread_create (&thread, NULL, AtenderCliente, &i);
+
 	}
 }
 
