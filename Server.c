@@ -8,6 +8,7 @@
 #include <stdio.h>
 #include <mysql.h>
 #include <pthread.h>
+#include <my_global.h>
 
 //Estructura usuario
 typedef struct {
@@ -237,7 +238,7 @@ void *AtenderCliente (void *num){
 	}
 	//inicializar la conexion, entrando nuestras claves de acceso y el nombre de la base de datos a la que queremos acceder 
 
-	conn = mysql_real_connect (conn, "localhost","root", "mysql", "TG11",0, NULL, 0);
+	conn = mysql_real_connect (conn, "shiva2.upc.es","root", "mysql", "TG11",0, NULL, 0);
 
 	if (conn==NULL) {
 		printf ("Error al inicializar la conexion: %u %s\n",
@@ -470,7 +471,7 @@ int main(int argc, char *argv[]){
 	serv_adr.sin_addr.s_addr = htonl(INADDR_ANY);
 	
 	//Escucharemos en el puerto indicado entre parenteis
-	serv_adr.sin_port = htons(9080);
+	serv_adr.sin_port = htons(50084);
 	if (bind(sock_listen, (struct sockaddr *) &serv_adr, sizeof(serv_adr)) < 0)
 		printf ("Error al bind\n");
 	if (listen(sock_listen, 2) < 0)
