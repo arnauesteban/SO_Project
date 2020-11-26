@@ -29,8 +29,7 @@
         private void InitializeComponent()
         {
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(Login));
-            this.registrarseBtn = new System.Windows.Forms.Button();
-            this.loginBtn = new System.Windows.Forms.Button();
+            this.opcionBtn = new System.Windows.Forms.Button();
             this.label1 = new System.Windows.Forms.Label();
             this.nombreIn = new System.Windows.Forms.TextBox();
             this.claveIn = new System.Windows.Forms.TextBox();
@@ -41,25 +40,15 @@
             this.enviarBtn = new System.Windows.Forms.Button();
             this.SuspendLayout();
             // 
-            // registrarseBtn
+            // opcionBtn
             // 
-            this.registrarseBtn.Location = new System.Drawing.Point(634, 38);
-            this.registrarseBtn.Name = "registrarseBtn";
-            this.registrarseBtn.Size = new System.Drawing.Size(170, 40);
-            this.registrarseBtn.TabIndex = 0;
-            this.registrarseBtn.Text = "Registrarse";
-            this.registrarseBtn.UseVisualStyleBackColor = true;
-            this.registrarseBtn.Click += new System.EventHandler(this.registrarseBtn_Click);
-            // 
-            // loginBtn
-            // 
-            this.loginBtn.Location = new System.Drawing.Point(430, 38);
-            this.loginBtn.Name = "loginBtn";
-            this.loginBtn.Size = new System.Drawing.Size(170, 40);
-            this.loginBtn.TabIndex = 1;
-            this.loginBtn.Text = "Iniciar Sesión";
-            this.loginBtn.UseVisualStyleBackColor = true;
-            this.loginBtn.Click += new System.EventHandler(this.loginBtn_Click);
+            this.opcionBtn.Location = new System.Drawing.Point(543, 52);
+            this.opcionBtn.Name = "opcionBtn";
+            this.opcionBtn.Size = new System.Drawing.Size(170, 40);
+            this.opcionBtn.TabIndex = 1;
+            this.opcionBtn.Text = "Iniciar Sesión";
+            this.opcionBtn.UseVisualStyleBackColor = true;
+            this.opcionBtn.Click += new System.EventHandler(this.opcionBtn_Click);
             // 
             // label1
             // 
@@ -161,8 +150,7 @@
             this.Controls.Add(this.claveIn);
             this.Controls.Add(this.nombreIn);
             this.Controls.Add(this.label1);
-            this.Controls.Add(this.loginBtn);
-            this.Controls.Add(this.registrarseBtn);
+            this.Controls.Add(this.opcionBtn);
             this.Name = "Login";
             this.Text = "Login";
             this.Load += new System.EventHandler(this.Login_Load);
@@ -173,8 +161,7 @@
 
         #endregion
 
-        private System.Windows.Forms.Button registrarseBtn;
-        private System.Windows.Forms.Button loginBtn;
+        private System.Windows.Forms.Button opcionBtn;
         private System.Windows.Forms.Label label1;
         private System.Windows.Forms.TextBox nombreIn;
         private System.Windows.Forms.TextBox claveIn;

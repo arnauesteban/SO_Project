@@ -16,7 +16,8 @@ namespace Cliente
     {
         Socket server;
         Thread atender;
-        bool primeraVez = true;
+        bool conectado = false;
+
         public Login()
         {
             InitializeComponent();
@@ -26,14 +27,27 @@ namespace Cliente
 
         private void Login_Load(object sender, EventArgs e)
         {
-            
+            opcionBtn.Text = "Iniciar sesión";
+            titleLb.Text = "Registro";
+            clave2Lb.Visible = true;
+            clave2In.Visible = true;
+            enviarBtn.Text = "Registrarse";
+            nombreIn.Text = null;
+            claveIn.Text = null;
+            clave2In.Text = null;
         }
+
         private void ConectarServidor()
         {
-            //Creamos un IPEndPoint con el ip del servidor y puerto del servidor 
-            //al que deseamos conectarnos
-            IPAddress direc = IPAddress.Parse("192.168.56.102");
-            IPEndPoint ipep = new IPEndPoint(direc, 9080);
+            //Creamos un IPEndPoint con el ip del servidor y puerto del servidor al que deseamos conectarnos
+            
+            //Parametros de shiva
+            IPAddress direc = IPAddress.Parse("147.83.117.22");
+            IPEndPoint ipep = new IPEndPoint(direc, 50084);
+
+            //Parametros de pruebas
+            //IPAddress direc = IPAddress.Parse("192.168.56.101");
+            //IPEndPoint ipep = new IPEndPoint(direc, 9050);
 
             //Creamos el socket 
             server = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
@@ -65,7 +79,60 @@ namespace Cliente
         private void EnviarServidor(string sentencia)
         {
             byte[] msg = System.Text.Encoding.ASCII.GetBytes(sentencia);
-            server.Send(msg);
+            try
+            {
+                server.Send(msg);
+            }
+            catch (SocketException)
+            {
+                conectado = false;
+            }
+        }
+
+        private bool ComprobarCaracteres(string cadena)
+        {
+            int i = 0;
+            bool error = false;
+            while (i < cadena.Length && !error)
+            {
+                if (cadena[i] == '$' || cadena[i] == '/' || cadena[i] == '|' || cadena[i] == '&' || cadena[i] == '%')
+                {
+                    error = true;
+                    MessageBox.Show("No se puede usar ninguno de los siguientes carácteres: $ / | % &. Inténtelo de nuevo.");
+                }
+                if (cadena[i] == 'á' || cadena[i] == 'Á' || cadena[i] == 'à' || cadena[i] == 'À' || cadena[i] == 'â' || cadena[i] == 'Â')
+                {
+                    error = true;
+                    MessageBox.Show("No se puede usar tildes. Inténtelo de nuevo.");
+                }
+                if (cadena[i] == 'é' || cadena[i] == 'É' || cadena[i] == 'è' || cadena[i] == 'È' || cadena[i] == 'ê' || cadena[i] == 'Ê')
+                {
+                    error = true;
+                    MessageBox.Show("No se puede usar tildes. Inténtelo de nuevo.");
+                }
+                if (cadena[i] == 'í' || cadena[i] == 'Í' || cadena[i] == 'ì' || cadena[i] == 'Ì' || cadena[i] == 'î' || cadena[i] == 'Î')
+                {
+                    error = true;
+                    MessageBox.Show("No se puede usar tildes. Inténtelo de nuevo.");
+                }
+                if (cadena[i] == 'ó' || cadena[i] == 'Ó' || cadena[i] == 'ò' || cadena[i] == 'Ò' || cadena[i] == 'ô' || cadena[i] == 'Ô')
+                {
+                    error = true;
+                    MessageBox.Show("No se puede usar tildes. Inténtelo de nuevo.");
+                }
+                if (cadena[i] == 'ú' || cadena[i] == 'Ú' || cadena[i] == 'ù' || cadena[i] == 'Ù' || cadena[i] == 'û' || cadena[i] == 'Û')
+                {
+                    error = true;
+                    MessageBox.Show("No se puede usar tildes. Inténtelo de nuevo.");
+                }
+                if (cadena[i] == 'ç' || cadena[i] == 'ñ' || cadena[i] == 'Ç' || cadena[i] == 'Ñ')
+                {
+                    error = true;
+                    MessageBox.Show("No se puede usar las letras 'ç' ni 'ñ'. Inténtelo de nuevo.");
+                }
+                i++;
+            }
+            return error;
         }
 
         private void atenderServidor()
@@ -100,58 +167,81 @@ namespace Cliente
             }
         }
 
-
-        private void registrarseBtn_Click(object sender, EventArgs e)
-        {
-            loginBtn.Enabled = true;
-            registrarseBtn.Enabled = false;
-            titleLb.Text = "Registro";
-            clave2Lb.Visible = true;
-            clave2In.Visible = true;
-            enviarBtn.Text = "Registrarse";
-            nombreIn.Text = null;
-            claveIn.Text = null;
-            clave2In.Text = null;
-        }
-
-        private void loginBtn_Click(object sender, EventArgs e)
-        {
-            loginBtn.Enabled = false;
-            registrarseBtn.Enabled = true;
-            titleLb.Text = "Iniciar Sesión";
-            clave2Lb.Visible = false;
-            clave2In.Visible = false;
-            enviarBtn.Text = "Conectarse";
-        }
-
         private void enviarBtn_Click(object sender, EventArgs e)
         {
-            if (enviarBtn.Text == "Registrarse" && primeraVez && claveIn.Text == clave2In.Text)
+            if (enviarBtn.Text == "Registrarse")
             {
-                ConectarServidor();
-                primeraVez = false;
-            }
-            else if(enviarBtn.Text == "Conectarse")
-            {
-                ConectarServidor();
-                primeraVez = false;
-            }
+                bool errorNombre = ComprobarCaracteres(nombreIn.Text);
+                bool errorClave = ComprobarCaracteres(claveIn.Text);
 
-            //Inicio sesion
-            if (enviarBtn.Text == "Conectarse")
-            {
-                string sentencia = "2/" + nombreIn.Text + "/" + claveIn.Text;
-                EnviarServidor(sentencia);
-            }
+                if(claveIn.Text != clave2In.Text)
+                    MessageBox.Show("Las contraseñas no coinciden. Inténtalo de nuevo.");
+                else if(nombreIn.Text.Length > 20)
+                    MessageBox.Show("El nombre de usuario es demasiado largo. Usa uno disinto (máximo 20 carácteres).");
+                else if (claveIn.Text.Length > 20)
+                    MessageBox.Show("La clave de acceso es demasiado larga. Usa otra disinta (máximo 20 carácteres).");
+                else if (errorNombre || errorClave)
+                {
 
-            //Registro
-            else if (enviarBtn.Text == "Registrarse" && claveIn.Text == clave2In.Text)
-            {
-                string sentencia = "1/" + nombreIn.Text + "/" + claveIn.Text;
-                EnviarServidor(sentencia);
+                }
+                else
+                {
+                    if (!conectado)
+                    {
+                        conectado = true;
+                        ConectarServidor();
+                    }
+                    string sentencia = "1/" + nombreIn.Text + "/" + claveIn.Text;
+                    EnviarServidor(sentencia);
+                }
             }
-            else MessageBox.Show("Las contraseñas no coinciden. Inténtalo de nuevo.");
-            
+            else
+            {
+                bool errorNombre = ComprobarCaracteres(nombreIn.Text);
+                bool errorClave = ComprobarCaracteres(claveIn.Text);
+
+                if (nombreIn.Text.Length > 20)
+                    MessageBox.Show("El nombre de usuario es demasiado largo. La longitud de este campo tiene que ser más corta (máximo 20 carácteres).");
+                else if (claveIn.Text.Length > 20)
+                    MessageBox.Show("La clave de acceso es demasiado larga. La longitud de este campo tiene que ser más corta (máximo 20 carácteres).");
+                else if (errorNombre || errorClave)
+                {
+
+                }
+                else
+                {
+                    if (!conectado)
+                    {
+                        conectado = true;
+                        ConectarServidor();
+                    }
+                    string sentencia = "2/" + nombreIn.Text + "/" + claveIn.Text;
+                    EnviarServidor(sentencia);
+                }
+            }
+        }
+
+        private void opcionBtn_Click(object sender, EventArgs e)
+        {
+            if (enviarBtn.Text == "Registrarse")
+            {
+                opcionBtn.Text = "Registrarse";
+                titleLb.Text = "Iniciar Sesión";
+                clave2Lb.Visible = false;
+                clave2In.Visible = false;
+                enviarBtn.Text = "Conectarse";
+            }
+            else
+            {
+                opcionBtn.Text = "Iniciar sesión";
+                titleLb.Text = "Registro";
+                clave2Lb.Visible = true;
+                clave2In.Visible = true;
+                enviarBtn.Text = "Registrarse";
+                nombreIn.Text = null;
+                claveIn.Text = null;
+                clave2In.Text = null;
+            }
         }
     }
 }
