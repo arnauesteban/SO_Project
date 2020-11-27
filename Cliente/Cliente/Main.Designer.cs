@@ -134,6 +134,7 @@
             this.Controls.Add(this.enviar_Btn);
             this.Name = "Main";
             this.Text = "Main (conectado)";
+            //this.FormClosed += new System.Windows.Forms.FormClosedEventHandler(this.Main_FormClosed);
             this.Load += new System.EventHandler(this.Form1_Load);
             ((System.ComponentModel.ISupportInitialize)(this.ConectadosGrid)).EndInit();
             this.ResumeLayout(false);

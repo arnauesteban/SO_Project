@@ -16,6 +16,7 @@ namespace Cliente
     {
         Socket server;
         Thread atender;
+        bool conectado = true;
         string usuario;
 
         public Main(Socket socket, string usuario)
@@ -152,13 +153,10 @@ namespace Cliente
 
             // Enviamos al servidor el código de petición
             // Estructura del mensaje a enviar: 0/
-            byte[] msg = System.Text.Encoding.ASCII.GetBytes(mensaje);
-            server.Send(msg);
+            EnviarServidor(mensaje);
 
-            // Nos desconectamos
-            atender.Abort();
-            server.Shutdown(SocketShutdown.Both);
-            server.Close();
+            DesconectarServidor();
+            conectado = false;
 
             //Abrimos formulario login
             this.Hide();
@@ -167,6 +165,13 @@ namespace Cliente
             login.ShowDialog();
         }
 
+        private void DesconectarServidor()
+        {
+            // Nos desconectamos
+            atender.Abort();
+            server.Shutdown(SocketShutdown.Both);
+            server.Close();
+        }
         private void Form1_Load(object sender, EventArgs e)
         {
             nombreJugadorLb.Text = this.usuario;
@@ -179,6 +184,17 @@ namespace Cliente
             //Pedimos al servidor que nos envie la lista de conectados actualizada
             EnviarServidor("3/");
 
+        }
+
+        private void Main_FormClosed(object sender, FormClosedEventArgs e)
+        {
+            string mensaje = "0/" + this.usuario;
+
+            // Enviamos al servidor el código de petición
+            // Estructura del mensaje a enviar: 0/
+            EnviarServidor(mensaje);
+
+            if(conectado) DesconectarServidor();
         }
     }
 }

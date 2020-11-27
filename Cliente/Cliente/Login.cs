@@ -35,6 +35,8 @@ namespace Cliente
             nombreIn.Text = null;
             claveIn.Text = null;
             clave2In.Text = null;
+
+            if(conectado) DesconectarServidor();
         }
 
         private void ConectarServidor()
@@ -87,51 +89,61 @@ namespace Cliente
             {
                 conectado = false;
             }
+            catch (NullReferenceException)
+            {
+                conectado = false;
+            }
         }
 
-        private bool ComprobarCaracteres(string cadena)
+        private bool ComprobarCaracteres(string cadena, string campo)
         {
             int i = 0;
             bool error = false;
-            while (i < cadena.Length && !error)
+            if (cadena == null || cadena == "")
             {
-                if (cadena[i] == '$' || cadena[i] == '/' || cadena[i] == '|' || cadena[i] == '&' || cadena[i] == '%')
-                {
-                    error = true;
-                    MessageBox.Show("No se puede usar ninguno de los siguientes carácteres: $ / | % &. Inténtelo de nuevo.");
-                }
-                if (cadena[i] == 'á' || cadena[i] == 'Á' || cadena[i] == 'à' || cadena[i] == 'À' || cadena[i] == 'â' || cadena[i] == 'Â')
-                {
-                    error = true;
-                    MessageBox.Show("No se puede usar tildes. Inténtelo de nuevo.");
-                }
-                if (cadena[i] == 'é' || cadena[i] == 'É' || cadena[i] == 'è' || cadena[i] == 'È' || cadena[i] == 'ê' || cadena[i] == 'Ê')
-                {
-                    error = true;
-                    MessageBox.Show("No se puede usar tildes. Inténtelo de nuevo.");
-                }
-                if (cadena[i] == 'í' || cadena[i] == 'Í' || cadena[i] == 'ì' || cadena[i] == 'Ì' || cadena[i] == 'î' || cadena[i] == 'Î')
-                {
-                    error = true;
-                    MessageBox.Show("No se puede usar tildes. Inténtelo de nuevo.");
-                }
-                if (cadena[i] == 'ó' || cadena[i] == 'Ó' || cadena[i] == 'ò' || cadena[i] == 'Ò' || cadena[i] == 'ô' || cadena[i] == 'Ô')
-                {
-                    error = true;
-                    MessageBox.Show("No se puede usar tildes. Inténtelo de nuevo.");
-                }
-                if (cadena[i] == 'ú' || cadena[i] == 'Ú' || cadena[i] == 'ù' || cadena[i] == 'Ù' || cadena[i] == 'û' || cadena[i] == 'Û')
-                {
-                    error = true;
-                    MessageBox.Show("No se puede usar tildes. Inténtelo de nuevo.");
-                }
-                if (cadena[i] == 'ç' || cadena[i] == 'ñ' || cadena[i] == 'Ç' || cadena[i] == 'Ñ')
-                {
-                    error = true;
-                    MessageBox.Show("No se puede usar las letras 'ç' ni 'ñ'. Inténtelo de nuevo.");
-                }
-                i++;
+                error = true;
+                MessageBox.Show("Debes rellenar el campo " + campo);
             }
+            else
+                while (i < cadena.Length && !error)
+                {
+                    if (cadena[i] == '$' || cadena[i] == '/' || cadena[i] == '|' || cadena[i] == '&' || cadena[i] == '%')
+                    {
+                        error = true;
+                        MessageBox.Show("No se puede usar ninguno de los siguientes carácteres: $ / | % & en el campo " + campo);
+                    }
+                    if (cadena[i] == 'á' || cadena[i] == 'Á' || cadena[i] == 'à' || cadena[i] == 'À' || cadena[i] == 'â' || cadena[i] == 'Â')
+                    {
+                        error = true;
+                        MessageBox.Show("No se puede usar tildes en el campo " + campo);
+                    }
+                    if (cadena[i] == 'é' || cadena[i] == 'É' || cadena[i] == 'è' || cadena[i] == 'È' || cadena[i] == 'ê' || cadena[i] == 'Ê')
+                    {
+                        error = true;
+                        MessageBox.Show("No se puede usar tildes en el campo " + campo);
+                    }
+                    if (cadena[i] == 'í' || cadena[i] == 'Í' || cadena[i] == 'ì' || cadena[i] == 'Ì' || cadena[i] == 'î' || cadena[i] == 'Î')
+                    {
+                        error = true;
+                        MessageBox.Show("No se puede usar tildes en el campo " + campo);
+                    }
+                    if (cadena[i] == 'ó' || cadena[i] == 'Ó' || cadena[i] == 'ò' || cadena[i] == 'Ò' || cadena[i] == 'ô' || cadena[i] == 'Ô')
+                    {
+                        error = true;
+                        MessageBox.Show("No se puede usar tildes en el campo " + campo);
+                    }
+                    if (cadena[i] == 'ú' || cadena[i] == 'Ú' || cadena[i] == 'ù' || cadena[i] == 'Ù' || cadena[i] == 'û' || cadena[i] == 'Û')
+                    {
+                        error = true;
+                        MessageBox.Show("No se puede usar tildes en el campo " + campo);
+                    }
+                    if (cadena[i] == 'ç' || cadena[i] == 'ñ' || cadena[i] == 'Ç' || cadena[i] == 'Ñ')
+                    {
+                        error = true;
+                        MessageBox.Show("No se puede usar las letras 'ç' ni 'ñ' en el campo " + campo);
+                    }
+                    i++;
+                }
             return error;
         }
 
@@ -171,8 +183,8 @@ namespace Cliente
         {
             if (enviarBtn.Text == "Registrarse")
             {
-                bool errorNombre = ComprobarCaracteres(nombreIn.Text);
-                bool errorClave = ComprobarCaracteres(claveIn.Text);
+                bool errorNombre = ComprobarCaracteres(nombreIn.Text, "'Nombre de usuario'");
+                bool errorClave = ComprobarCaracteres(claveIn.Text, "'Contraseña'");
 
                 if(claveIn.Text != clave2In.Text)
                     MessageBox.Show("Las contraseñas no coinciden. Inténtalo de nuevo.");
@@ -197,8 +209,8 @@ namespace Cliente
             }
             else
             {
-                bool errorNombre = ComprobarCaracteres(nombreIn.Text);
-                bool errorClave = ComprobarCaracteres(claveIn.Text);
+                bool errorNombre = ComprobarCaracteres(nombreIn.Text, "'Nombre de usuario'");
+                bool errorClave = ComprobarCaracteres(claveIn.Text, "'Contraseña'");
 
                 if (nombreIn.Text.Length > 20)
                     MessageBox.Show("El nombre de usuario es demasiado largo. La longitud de este campo tiene que ser más corta (máximo 20 carácteres).");
