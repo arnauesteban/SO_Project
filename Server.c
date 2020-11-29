@@ -8,7 +8,7 @@
 #include <stdio.h>
 #include <mysql.h>
 #include <pthread.h>
-#include <my_global.h>
+
 
 //Estructura usuario
 typedef struct {
@@ -16,13 +16,25 @@ typedef struct {
 	int sock;
 } TUsuario;
 
-//Lista de 50 usuarios como maximo
+//Lista de 100 usuarios como maximo
 typedef struct{
-	TUsuario usuario[50];
+	TUsuario usuario[100];
 	int num;
 } TListaUsuarios;
 
+typedef struct {
+	int ID;
+	TUsuario usuario[8];
+	int numero_jugadores;
+} TPartida;
+
+typedef struct {
+	TPartida partida[100];
+	int num;
+} TListaPartidas;
+
 TListaUsuarios lista_conectados;
+TListaPartidas lista_partidas;
 
 //Estructura necesaria para el acceso excluyente
 pthread_mutex_t mutex = PTHREAD_MUTEX_INITIALIZER;
@@ -238,7 +250,8 @@ void *AtenderCliente (void *num){
 	}
 	//inicializar la conexion, entrando nuestras claves de acceso y el nombre de la base de datos a la que queremos acceder 
 
-	conn = mysql_real_connect (conn, "shiva2.upc.es","root", "mysql", "TG11",0, NULL, 0);
+	//conn = mysql_real_connect (conn, "shiva2.upc.es","root", "mysql", "TG11",0, NULL, 0);
+	conn = mysql_real_connect (conn, "localhost", "root", "mysql", "TG11", 0, NULL, 0);
 
 	if (conn==NULL) {
 		printf ("Error al inicializar la conexion: %u %s\n",
@@ -440,7 +453,124 @@ void *AtenderCliente (void *num){
 				printf("Error inesperado.");
 		}
 		
+		//Invitar a jugadores a la partida
+		else if (codigo == 8) {
+			char nombre_host[20];
+			int encontrado = 0;
+			int l = 0;
+			while(l < lista_conectados.num && !encontrado) {
+				if(sock_conn == lista_conectados.usuario[l].sock) {
+					encontrado = 1;
+					strcpy(nombre_host, lista_conectados.usuario[l].nombre);
+				}
+				l++;
+			}
+			strcpy(lista_partidas.partida[lista_partidas.num].usuario[0].nombre, nombre_host);
+			lista_partidas.partida[lista_partidas.num].usuario[0].sock = sock_conn;
+			lista_partidas.partida[lista_partidas.num].ID =lista_partidas.num;
+			lista_partidas.partida[lista_partidas.num].numero_jugadores = 1;
+			char mensaje[200];
+			sprintf(mensaje, "8$%s/%d", nombre_host, lista_partidas.partida[lista_partidas.num].ID);
+			p = strtok(NULL, "/");
+			int num_invitados = atoi(p);
+			p = strtok(NULL, "/");
+			for (int j = 0; j < num_invitados; j++) {
+				char nombre_invitado[20];
+				strcpy(nombre_invitado, p);
+				for(int k = 0; k < lista_conectados.num; k++) {
+					if(strcmp(lista_conectados.usuario[k].nombre, nombre_invitado) == 0)
+						write (lista_conectados.usuario[k].sock, mensaje, strlen(mensaje));
+				}
+				p = strtok(NULL, "/");
+			}
+		}
 		
+		//Aceptar o rechazar la invitación
+		else if(codigo == 9) {
+			p = strtok(NULL, "/");
+			int ID_partida = atoi(p);
+			p = strtok(NULL, "/");
+			int respuesta = atoi(p); //1 = acepta   0 = rechaza
+			int l = 0;
+			int encontrado = 0;
+			if(respuesta = 1) {
+				char nombre_invitado[20];
+				while(l < lista_conectados.num && !encontrado) {
+					if(sock_conn == lista_conectados.usuario[l].sock) {
+						encontrado = 1;
+						strcpy(nombre_invitado, lista_conectados.usuario[l].nombre);
+					}
+				l++;
+				}
+				encontrado = 0;
+				l = 0;
+				while (!encontrado && l < lista_partidas.num) {
+					if(lista_partidas.partida[l].ID = ID_partida) {
+						strcpy(lista_partidas.partida[l].usuario[lista_partidas.partida[l].numero_jugadores].nombre, nombre_invitado);
+						lista_partidas.partida[lista_partidas.num].usuario[lista_partidas.partida[l].numero_jugadores].sock = sock_conn;
+						lista_partidas.partida[l].numero_jugadores++;
+						encontrado = 1;
+					}
+					else
+						l++;
+				}
+			}
+			else {
+				while (!encontrado && l < lista_partidas.num) {
+					if(lista_partidas.partida[l].ID = ID_partida)
+						encontrado = 1;
+					else
+						l++;
+				}
+			}
+			char mensaje[200];
+			sprintf(mensaje, "9$%d", respuesta);
+			write (lista_partidas.partida[l].usuario[0].sock, mensaje, strlen(mensaje));
+		}
+		
+		else if(codigo == 10) {
+			p = strtok(NULL, "/");
+			int ID_partida = atoi(p);
+			p = strtok(NULL, "/");
+			char mensaje[200];
+			strcpy(mensaje, p);
+			int j = 0;
+			int encontrado = 0;
+			while (!encontrado && j < lista_partidas.num) {
+				if(lista_partidas.partida[j].ID = ID_partida) {
+					encontrado = 1;
+				}
+				else
+				   j++;
+			}
+			char mensaje_final[250];
+			sprintf(mensaje_final, "10$%d/%s", ID_partida, mensaje);
+			for(int k = 0; k < lista_partidas.partida[j].numero_jugadores; k++)
+				write (lista_partidas.partida[j].usuario[k].sock, mensaje, strlen(mensaje));
+		}
+		
+		else if(codigo = 11) {
+			p = strtok(NULL, "/");
+			int ID_partida = atoi(p);
+			int j = 0;
+			int encontrado = 0;
+			while (!encontrado && j < lista_partidas.num) {
+				if(lista_partidas.partida[j].ID = ID_partida)
+					encontrado = 1;
+				else
+				   j++;
+			}
+			int k = 0;
+			encontrado = 0;
+			while (!encontrado && k < lista_partidas.partida[j].numero_jugadores) {
+				if(lista_partidas.partida[j].usuario[k].sock = sock_conn)
+					encontrado = 1;
+				else
+				   j++;
+			}
+			strcpy(lista_partidas.partida[j].usuario[k].nombre, "");
+			lista_partidas.partida[j].usuario[k].sock = NULL;
+		}
 		
 		printf ("%s\n", buff2);
 		//Enviamos el resultado
@@ -456,6 +586,7 @@ int main(int argc, char *argv[]){
 	int sock_conn, sock_listen, ret;
 	struct sockaddr_in serv_adr;
 	lista_conectados.num = 0;
+	lista_partidas.num = 0;
 	
 	//Inicializaciones
 	//Primero, abrimos el socket
@@ -471,7 +602,7 @@ int main(int argc, char *argv[]){
 	serv_adr.sin_addr.s_addr = htonl(INADDR_ANY);
 	
 	//Escucharemos en el puerto indicado entre parenteis
-	serv_adr.sin_port = htons(50084);
+	serv_adr.sin_port = htons(9050);
 	if (bind(sock_listen, (struct sockaddr *) &serv_adr, sizeof(serv_adr)) < 0)
 		printf ("Error al bind\n");
 	if (listen(sock_listen, 2) < 0)
