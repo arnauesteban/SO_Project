@@ -8,3 +8,6 @@ Versión 2 verificada por Arnau
 
 Versión 3 generada por Sergi 
 Versión 3 verificada por Joan 
+
+Versión 4 generada por Arnau
+Versión 4 verificada por Sergi
