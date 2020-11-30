@@ -496,8 +496,8 @@ void *AtenderCliente (void *num){
 			int respuesta = atoi(p); //1 = acepta   0 = rechaza
 			int l = 0;
 			int encontrado = 0;
-			if(respuesta = 1) {
-				char nombre_invitado[20];
+			
+			char nombre_invitado[20];
 				while(l < lista_conectados.num && !encontrado) {
 					if(sock_conn == lista_conectados.usuario[l].sock) {
 						encontrado = 1;
@@ -505,6 +505,9 @@ void *AtenderCliente (void *num){
 					}
 				l++;
 				}
+				
+			if(respuesta = 1) {
+				
 				encontrado = 0;
 				l = 0;
 				while (!encontrado && l < lista_partidas.num) {
@@ -527,7 +530,10 @@ void *AtenderCliente (void *num){
 				}
 			}
 			char mensaje[200];
-			sprintf(mensaje, "9$%d", respuesta);
+			
+			//Enviamos al cliente host de partida: 9$respuesta/nombre_invitado
+			//1 = si, 0 = no
+			sprintf(mensaje, "9$%d/%s", respuesta, nombre_invitado);
 			write (lista_partidas.partida[l].usuario[0].sock, mensaje, strlen(mensaje));
 		}
 		
