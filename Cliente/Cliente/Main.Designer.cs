@@ -36,7 +36,7 @@
             this.desconectar_Btn = new System.Windows.Forms.Button();
             this.ConectadosGrid = new System.Windows.Forms.DataGridView();
             this.nombreJugadorLb = new System.Windows.Forms.Label();
-            this.button1 = new System.Windows.Forms.Button();
+            this.NuevaPartidaBtn = new System.Windows.Forms.Button();
             ((System.ComponentModel.ISupportInitialize)(this.ConectadosGrid)).BeginInit();
             this.SuspendLayout();
             // 
@@ -119,15 +119,15 @@
             this.nombreJugadorLb.TabIndex = 14;
             this.nombreJugadorLb.Text = "Jugador";
             // 
-            // button1
+            // NuevaPartidaBtn
             // 
-            this.button1.Location = new System.Drawing.Point(622, 12);
-            this.button1.Name = "button1";
-            this.button1.Size = new System.Drawing.Size(75, 23);
-            this.button1.TabIndex = 15;
-            this.button1.Text = "Invitar";
-            this.button1.UseVisualStyleBackColor = true;
-            this.button1.Click += new System.EventHandler(this.button1_Click);
+            this.NuevaPartidaBtn.Location = new System.Drawing.Point(622, 12);
+            this.NuevaPartidaBtn.Name = "NuevaPartidaBtn";
+            this.NuevaPartidaBtn.Size = new System.Drawing.Size(75, 23);
+            this.NuevaPartidaBtn.TabIndex = 15;
+            this.NuevaPartidaBtn.Text = "Nueva Partida";
+            this.NuevaPartidaBtn.UseVisualStyleBackColor = true;
+            this.NuevaPartidaBtn.Click += new System.EventHandler(this.NuevaPartidaBtn_Click);
             // 
             // Main
             // 
@@ -136,7 +136,7 @@
             this.BackgroundImage = ((System.Drawing.Image)(resources.GetObject("$this.BackgroundImage")));
             this.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Stretch;
             this.ClientSize = new System.Drawing.Size(919, 346);
-            this.Controls.Add(this.button1);
+            this.Controls.Add(this.NuevaPartidaBtn);
             this.Controls.Add(this.nombreJugadorLb);
             this.Controls.Add(this.ConectadosGrid);
             this.Controls.Add(this.desconectar_Btn);
@@ -162,7 +162,7 @@
         private System.Windows.Forms.Button desconectar_Btn;
         private System.Windows.Forms.DataGridView ConectadosGrid;
         private System.Windows.Forms.Label nombreJugadorLb;
-        private System.Windows.Forms.Button button1;
+        private System.Windows.Forms.Button NuevaPartidaBtn;
     }
 }
 

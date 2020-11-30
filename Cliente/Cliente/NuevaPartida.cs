@@ -45,17 +45,46 @@ namespace Cliente
                 string[] trozos = Encoding.ASCII.GetString(msg2).Split('$');
                 int codigo = Convert.ToInt32(trozos[0]);
                 string mensaje = trozos[1].Split('\0')[0];
+                string[] separado = mensaje.Split('/');
 
                 switch (codigo)
                 {
+                    case 9:
+                        if (Convert.ToInt32(separado[0]) == 1)
+                        {
+                            //Invitacion aceptada
+                            JugadoresUnidosGrid.ColumnCount = 1;
+                            JugadoresUnidosGrid.RowCount = 6;
+                            JugadoresUnidosGrid.ColumnHeadersVisible = false;
+                            JugadoresUnidosGrid.RowHeadersVisible = false;
+                            JugadoresUnidosGrid.AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.Fill;
+                            JugadoresUnidosGrid.AutoSizeRowsMode = DataGridViewAutoSizeRowsMode.AllCells;
 
+                            //Introducimos el nuevo usuario que se ha unido a la partida en la data grid view
+                            int i = 0;
+                            bool encontrado = false;
+                            while (i < JugadoresUnidosGrid.RowCount && !encontrado)
+                            {
+                                if (JugadoresUnidosGrid[0, i].Value == null)
+                                    encontrado = true;
+                                else
+                                    i++;
+                            }
+                            if(encontrado)
+                                JugadoresUnidosGrid[0, i].Value = separado[1];
+                            
+
+                            //Sets the alignment of all columns to middle center
+                            this.JugadoresUnidosGrid.Columns[0].DefaultCellStyle.Alignment = DataGridViewContentAlignment.MiddleCenter;
+                        }
+                        break;
                 }
 
 
             }
         }
         
-        private void button1_Click(object sender, EventArgs e)
+        private void InvitarBtn_Click(object sender, EventArgs e)
             {
                 string[] invitados = invitadosIn.Text.Split(' ');
 

@@ -46,6 +46,12 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="InvitacionRecibida.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="InvitacionRecibida.Designer.cs">
+      <DependentUpon>InvitacionRecibida.cs</DependentUpon>
+    </Compile>
     <Compile Include="NuevaPartida.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -66,6 +72,9 @@
     </Compile>
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <EmbeddedResource Include="InvitacionRecibida.resx">
+      <DependentUpon>InvitacionRecibida.cs</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="NuevaPartida.resx">
       <DependentUpon>NuevaPartida.cs</DependentUpon>
     </EmbeddedResource>

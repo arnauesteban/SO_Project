@@ -18,7 +18,6 @@ namespace Cliente
         Thread atender;
         bool conectado = true;
         string usuario;
-        Login loginForm;
 
         public Main(Socket socket, string usuario)
         {
@@ -83,7 +82,7 @@ namespace Cliente
                         ConectadosGrid.AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.Fill;
                         ConectadosGrid.AutoSizeRowsMode = DataGridViewAutoSizeRowsMode.AllCells;
 
-                        //the first row of the grid is filled with this values to help the user to undertand thed data
+                        //Introducimos el nombre de los usuarios conectados en la DataGridView
                         for (int j = 0; j < separado.Length; j++)
                         {
                             ConectadosGrid[0, j].Value = separado[j];
@@ -111,6 +110,24 @@ namespace Cliente
                             i++;
                         }
                         MessageBox.Show(mensajeFinal);
+                        break;
+
+                    case 8:
+                        //Recepcion de invitacion
+                        separado = mensaje.Split('/');
+                        InvitacionRecibida notificacion_form = new InvitacionRecibida(separado[0]);
+                        DialogResult respuesta = notificacion_form.ShowDialog();
+
+                        if (respuesta == (DialogResult)1)
+                        {
+                            //Se acepta la partida
+                            EnviarServidor("9/" + separado[1] + "/1");
+                        }
+                        else
+                        {
+                            //Se rechaza la partida
+                            EnviarServidor("9/" + separado[1] + "/0");
+                        }
                         break;
                 }
             }
@@ -198,9 +215,11 @@ namespace Cliente
             if(conectado) DesconectarServidor();
         }
 
-        private void button1_Click(object sender, EventArgs e)
+        private void NuevaPartidaBtn_Click(object sender, EventArgs e)
         {
-
+            NuevaPartida nueva_partida_form = new NuevaPartida(this.server);
+            this.Close();
+            nueva_partida_form.ShowDialog();
         }
     }
 }

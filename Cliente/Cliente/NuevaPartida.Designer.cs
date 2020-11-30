@@ -29,20 +29,20 @@ namespace Cliente
         /// </summary>
         private void InitializeComponent()
         {
-            this.dataGridView1 = new System.Windows.Forms.DataGridView();
+            this.JugadoresUnidosGrid = new System.Windows.Forms.DataGridView();
             this.label1 = new System.Windows.Forms.Label();
             this.invitadosIn = new System.Windows.Forms.TextBox();
-            this.button1 = new System.Windows.Forms.Button();
-            ((System.ComponentModel.ISupportInitialize)(this.dataGridView1)).BeginInit();
+            this.InvitarBtn = new System.Windows.Forms.Button();
+            ((System.ComponentModel.ISupportInitialize)(this.JugadoresUnidosGrid)).BeginInit();
             this.SuspendLayout();
             // 
-            // dataGridView1
+            // JugadoresUnidosGrid
             // 
-            this.dataGridView1.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
-            this.dataGridView1.Location = new System.Drawing.Point(373, 12);
-            this.dataGridView1.Name = "dataGridView1";
-            this.dataGridView1.Size = new System.Drawing.Size(240, 150);
-            this.dataGridView1.TabIndex = 0;
+            this.JugadoresUnidosGrid.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
+            this.JugadoresUnidosGrid.Location = new System.Drawing.Point(373, 12);
+            this.JugadoresUnidosGrid.Name = "JugadoresUnidosGrid";
+            this.JugadoresUnidosGrid.Size = new System.Drawing.Size(240, 150);
+            this.JugadoresUnidosGrid.TabIndex = 0;
             // 
             // label1
             // 
@@ -60,29 +60,29 @@ namespace Cliente
             this.invitadosIn.Size = new System.Drawing.Size(137, 20);
             this.invitadosIn.TabIndex = 2;
             // 
-            // button1
+            // InvitarBtn
             // 
-            this.button1.Location = new System.Drawing.Point(16, 56);
-            this.button1.Name = "button1";
-            this.button1.Size = new System.Drawing.Size(75, 23);
-            this.button1.TabIndex = 3;
-            this.button1.Text = "Invitar";
-            this.button1.UseVisualStyleBackColor = true;
-            this.button1.Click += new System.EventHandler(this.button1_Click);
+            this.InvitarBtn.Location = new System.Drawing.Point(16, 56);
+            this.InvitarBtn.Name = "InvitarBtn";
+            this.InvitarBtn.Size = new System.Drawing.Size(75, 23);
+            this.InvitarBtn.TabIndex = 3;
+            this.InvitarBtn.Text = "Invitar";
+            this.InvitarBtn.UseVisualStyleBackColor = true;
+            this.InvitarBtn.Click += new System.EventHandler(this.InvitarBtn_Click);
             // 
             // NuevaPartida
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(625, 295);
-            this.Controls.Add(this.button1);
+            this.Controls.Add(this.InvitarBtn);
             this.Controls.Add(this.invitadosIn);
             this.Controls.Add(this.label1);
-            this.Controls.Add(this.dataGridView1);
+            this.Controls.Add(this.JugadoresUnidosGrid);
             this.Name = "NuevaPartida";
             this.Text = "Form1";
             this.Load += new System.EventHandler(this.NuevaPartida_Load);
-            ((System.ComponentModel.ISupportInitialize)(this.dataGridView1)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.JugadoresUnidosGrid)).EndInit();
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -90,9 +90,9 @@ namespace Cliente
 
         #endregion
 
-        private System.Windows.Forms.DataGridView dataGridView1;
+        private System.Windows.Forms.DataGridView JugadoresUnidosGrid;
         private System.Windows.Forms.Label label1;
         private System.Windows.Forms.TextBox invitadosIn;
-        private System.Windows.Forms.Button button1;
+        private System.Windows.Forms.Button InvitarBtn;
     }
 }
