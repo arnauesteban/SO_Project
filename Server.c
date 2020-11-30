@@ -251,7 +251,7 @@ void *AtenderCliente (void *num){
 	//inicializar la conexion, entrando nuestras claves de acceso y el nombre de la base de datos a la que queremos acceder 
 
 	//conn = mysql_real_connect (conn, "shiva2.upc.es","root", "mysql", "TG11",0, NULL, 0);
-	conn = mysql_real_connect (conn, "localhost", "root", "mysql", "TG11", 0, NULL, 0);
+	conn = mysql_real_connect (conn, "shiva2.upc.es", "root", "mysql", "TG11", 0, NULL, 0);
 
 	if (conn==NULL) {
 		printf ("Error al inicializar la conexion: %u %s\n",
@@ -454,6 +454,7 @@ void *AtenderCliente (void *num){
 		}
 		
 		//Invitar a jugadores a la partida
+		//  8/num_invitados/nombre_invitado1/nombre_invitado2/...
 		else if (codigo == 8) {
 			char nombre_host[20];
 			int encontrado = 0;
@@ -470,6 +471,8 @@ void *AtenderCliente (void *num){
 			lista_partidas.partida[lista_partidas.num].ID =lista_partidas.num;
 			lista_partidas.partida[lista_partidas.num].numero_jugadores = 1;
 			char mensaje[200];
+			
+			//Se envia al invitado: 8$nombre_host/id_partida
 			sprintf(mensaje, "8$%s/%d", nombre_host, lista_partidas.partida[lista_partidas.num].ID);
 			p = strtok(NULL, "/");
 			int num_invitados = atoi(p);
@@ -507,7 +510,7 @@ void *AtenderCliente (void *num){
 				while (!encontrado && l < lista_partidas.num) {
 					if(lista_partidas.partida[l].ID = ID_partida) {
 						strcpy(lista_partidas.partida[l].usuario[lista_partidas.partida[l].numero_jugadores].nombre, nombre_invitado);
-						lista_partidas.partida[lista_partidas.num].usuario[lista_partidas.partida[l].numero_jugadores].sock = sock_conn;
+						lista_partidas.partida[l].usuario[lista_partidas.partida[l].numero_jugadores].sock = sock_conn;
 						lista_partidas.partida[l].numero_jugadores++;
 						encontrado = 1;
 					}
@@ -569,7 +572,7 @@ void *AtenderCliente (void *num){
 				   j++;
 			}
 			strcpy(lista_partidas.partida[j].usuario[k].nombre, "");
-			lista_partidas.partida[j].usuario[k].sock = NULL;
+			lista_partidas.partida[j].usuario[k].sock = -1;
 		}
 		
 		printf ("%s\n", buff2);
@@ -602,7 +605,7 @@ int main(int argc, char *argv[]){
 	serv_adr.sin_addr.s_addr = htonl(INADDR_ANY);
 	
 	//Escucharemos en el puerto indicado entre parenteis
-	serv_adr.sin_port = htons(9050);
+	serv_adr.sin_port = htons(50084);
 	if (bind(sock_listen, (struct sockaddr *) &serv_adr, sizeof(serv_adr)) < 0)
 		printf ("Error al bind\n");
 	if (listen(sock_listen, 2) < 0)

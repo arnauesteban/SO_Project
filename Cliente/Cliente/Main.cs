@@ -18,6 +18,7 @@ namespace Cliente
         Thread atender;
         bool conectado = true;
         string usuario;
+        Login loginForm;
 
         public Main(Socket socket, string usuario)
         {
@@ -195,6 +196,11 @@ namespace Cliente
             EnviarServidor(mensaje);
 
             if(conectado) DesconectarServidor();
+        }
+
+        private void button1_Click(object sender, EventArgs e)
+        {
+
         }
     }
 }
