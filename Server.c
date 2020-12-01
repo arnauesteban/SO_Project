@@ -550,7 +550,7 @@ void *AtenderCliente (void *num){
 		}
 		
 		//Aceptar o rechazar la invitación
-		// El servidor recibe 9/respuesta
+		// El servidor recibe 9/id_partida/respuesta
 		//donde respuesta: 1 = SI, 0 = NO
 		else if(codigo == 9) {
 			p = strtok(NULL, "/");
@@ -560,17 +560,20 @@ void *AtenderCliente (void *num){
 			int l = 0;
 			int encontrado = 0;
 			
+			//Buscamos el nombre del invitado en la lista de conectados
 			char nombre_invitado[20];
-				while(l < lista_conectados.num && !encontrado) {
-					if(sock_conn == lista_conectados.usuario[l].sock) {
-						encontrado = 1;
-						strcpy(nombre_invitado, lista_conectados.usuario[l].nombre);
-					}
-				l++;
-				}
-				
+			while(l < lista_conectados.num && !encontrado) {
+				if(sock_conn == lista_conectados.usuario[l].sock) {
+					encontrado = 1;
+					strcpy(nombre_invitado, lista_conectados.usuario[l].nombre);
+				} else
+					l++;
+			}
+			
 			if(respuesta = 1) {
 				
+				//Se ha aceptado la invitacion
+				//Unimos al usuario a la partida
 				encontrado = 0;
 				l = 0;
 				while (!encontrado && l < lista_partidas.num) {
