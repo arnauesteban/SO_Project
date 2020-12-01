@@ -228,6 +228,51 @@ int DameRecord(MYSQL *conn) {
 	return ID;
 }
 
+int AsignarIdPartida(MYSQL *conn)
+{
+	MYSQL_RES *resultado;
+	MYSQL_ROW row;
+	int err;
+	int id_max_sql;
+	
+	err = mysql_query(conn, "SELECT MAX(ID) FROM PARTIDA;");
+	if(err != 0){
+		printf("Error al consultar la base %u %s\n", mysql_errno(conn), mysql_error(conn));
+		return -1;
+	}
+	resultado = mysql_store_result(conn);
+	row = mysql_fetch_row(resultado);
+	
+	//No hay partidas, asignamos id=0
+	if(row == NULL){
+		id = 0;
+	}
+	else
+	{
+		//asignamos como Id el valor siguiente al valor maximo encontrado en la base de datos
+		id_max_sql = atoi(row[0]) + 1;
+	}
+	
+	//Ahora buscamos la Id maxima en la lista de partidas
+	int id_max = 0;
+	for(int i = 0; i < lista_partidas.num; i++)
+	{
+		if(id_max < lista_partidas.partida[i].ID)
+			id_max = lista_partidas.partida[i].ID;
+	}
+	
+	int id;
+	if(id_max > id_max_sql)
+		id = id_max + 1;
+	else
+		id = id_max_sql + 1;
+	
+	//Retornamos la Id disponible para asignar a una partida
+	return id;
+	
+	
+}
+
 
 //Funcion que realiza cada thread
 
@@ -454,11 +499,17 @@ void *AtenderCliente (void *num){
 		}
 		
 		//Invitar a jugadores a la partida
-		//  8/num_invitados/nombre_invitado1/nombre_invitado2/...
+		//  El servidor recibe 8/num_invitados/nombre_invitado1/nombre_invitado2/...
 		else if (codigo == 8) {
 			char nombre_host[20];
 			int encontrado = 0;
 			int l = 0;
+			
+			MYSQL_RES *resultado;
+			MYSQL_ROW row;
+			int err;
+			
+			//Buscamos el nombre del host en la lista de conectados
 			while(l < lista_conectados.num && !encontrado) {
 				if(sock_conn == lista_conectados.usuario[l].sock) {
 					encontrado = 1;
@@ -466,10 +517,20 @@ void *AtenderCliente (void *num){
 				}
 				l++;
 			}
+			
+			pthread_mutex_lock(&mutex);
+			//Creamos nueva partida en la lista de partidas
 			strcpy(lista_partidas.partida[lista_partidas.num].usuario[0].nombre, nombre_host);
 			lista_partidas.partida[lista_partidas.num].usuario[0].sock = sock_conn;
-			lista_partidas.partida[lista_partidas.num].ID =lista_partidas.num;
+			
+			//Asignamos una ID a la partida, miramos que no exista en la base de datos ni en la lista de partidas local
+			int id = AsignarIdPartida(&conn);
+			lista_partidas.partida[lista_partidas.num].ID = lista_partidas.num;
+			
 			lista_partidas.partida[lista_partidas.num].numero_jugadores = 1;
+			
+			pthread_mutex_unlock(&mutex);
+			
 			char mensaje[200];
 			
 			//Se envia al invitado: 8$nombre_host/id_partida
@@ -489,6 +550,8 @@ void *AtenderCliente (void *num){
 		}
 		
 		//Aceptar o rechazar la invitación
+		// El servidor recibe 9/respuesta
+		//donde respuesta: 1 = SI, 0 = NO
 		else if(codigo == 9) {
 			p = strtok(NULL, "/");
 			int ID_partida = atoi(p);
