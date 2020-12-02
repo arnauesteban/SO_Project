@@ -24,8 +24,7 @@ typedef struct{
 
 typedef struct {
 	int ID;
-	TUsuario usuario[8];
-	int numero_jugadores;
+	TListaUsuarios lista_jugadores;
 } TPartida;
 
 typedef struct {
@@ -273,9 +272,29 @@ int AsignarIdPartida(MYSQL *conn)
 	
 }
 
+//Envia a todos los usuarios de una partida activa la lista de jugadores
+//Se envia al cliente el mensaje: 3/nombre1/nombre2/...
+void EnviarListaJugadoresPartidaActiva(int i)
+{
+	TPartida partida = lista_partidas.partida[i];
+	char mensaje[180];
+	
+	//Creamos el mensaje
+	sprintf(mensaje, "3/");
+	for(int j = 0; j < partida.lista_jugadores.num; j++)
+	{
+		sprintf(mensaje, "%s%s/", mensaje, partida.lista_jugadores.usuario[j].nombre;
+	}
+	
+	//Enviamos el mensaje a todos los jugadores de una partida
+	for(int j = 0; j < partida.lista_jugadores.num; j++)
+	{
+		write (partida.lista_jugadores.usuario[j].sock, mensaje, strlen(mensaje));
+	}
+	
+}
 
 //Funcion que realiza cada thread
-
 void *AtenderCliente (void *num){
 	int i;
 	int *k;
@@ -520,14 +539,14 @@ void *AtenderCliente (void *num){
 			
 			pthread_mutex_lock(&mutex);
 			//Creamos nueva partida en la lista de partidas
-			strcpy(lista_partidas.partida[lista_partidas.num].usuario[0].nombre, nombre_host);
-			lista_partidas.partida[lista_partidas.num].usuario[0].sock = sock_conn;
+			strcpy(lista_partidas.partida[lista_partidas.num].lista_jugadores.usuario[0].nombre, nombre_host);
+			lista_partidas.partida[lista_partidas.num].lista_jugadores.usuario[0].sock = sock_conn;
 			
 			//Asignamos una ID a la partida, miramos que no exista en la base de datos ni en la lista de partidas local
 			int id = AsignarIdPartida(&conn);
 			lista_partidas.partida[lista_partidas.num].ID = lista_partidas.num;
 			
-			lista_partidas.partida[lista_partidas.num].numero_jugadores = 1;
+			lista_partidas.partida[lista_partidas.num].lista_jugadores.num = 1;
 			
 			pthread_mutex_unlock(&mutex);
 			
@@ -570,37 +589,31 @@ void *AtenderCliente (void *num){
 					l++;
 			}
 			
-			if(respuesta = 1) {
-				
-				//Se ha aceptado la invitacion
-				//Unimos al usuario a la partida
-				encontrado = 0;
-				l = 0;
-				while (!encontrado && l < lista_partidas.num) {
-					if(lista_partidas.partida[l].ID = ID_partida) {
-						strcpy(lista_partidas.partida[l].usuario[lista_partidas.partida[l].numero_jugadores].nombre, nombre_invitado);
-						lista_partidas.partida[l].usuario[lista_partidas.partida[l].numero_jugadores].sock = sock_conn;
-						lista_partidas.partida[l].numero_jugadores++;
-						encontrado = 1;
-					}
-					else
-						l++;
-				}
-			}
-			else {
-				while (!encontrado && l < lista_partidas.num) {
+			//Buscamos la partida concreta en la lista de partidas
+			// l sera el valor del indice de la partida dentro de la lista
+			while (!encontrado && l < lista_partidas.num) 
+			{
 					if(lista_partidas.partida[l].ID = ID_partida)
 						encontrado = 1;
 					else
 						l++;
-				}
 			}
-			char mensaje[200];
 			
-			//Enviamos al cliente host de partida: 9$respuesta/nombre_invitado
-			//1 = si, 0 = no
-			sprintf(mensaje, "9$%d/%s", respuesta, nombre_invitado);
-			write (lista_partidas.partida[l].usuario[0].sock, mensaje, strlen(mensaje));
+			if(respuesta = 1) {
+				
+				//Se ha aceptado la invitacion
+				
+				//Unimos al usuario a la partida
+				TPartida partida = lista_partidas.partida[l];
+				
+				strcpy(partida.lista_jugadores.usuario[partida.lista_jugadores.num].nombre, nombre_invitado);
+				partida.lista_jugadores.usuario[partida.lista_jugadores.num].sock = sock_conn;
+				partida.lista_jugadores.num++;
+				
+				//Enviamos a todos los jugadores de la partida la lista de jugadores actualizada
+				EnviarListaJugadoresPartidaActiva(l);
+			}
+			//Si se ha rechazado la invitacion, no hacemos nada, no lo unimos ni le enviamos nada
 		}
 		
 		else if(codigo == 10) {
@@ -620,8 +633,8 @@ void *AtenderCliente (void *num){
 			}
 			char mensaje_final[250];
 			sprintf(mensaje_final, "10$%d/%s", ID_partida, mensaje);
-			for(int k = 0; k < lista_partidas.partida[j].numero_jugadores; k++)
-				write (lista_partidas.partida[j].usuario[k].sock, mensaje, strlen(mensaje));
+			for(int k = 0; k < lista_partidas.partida[j].lista_jugadores.num; k++)
+				write (lista_partidas.partida[j].lista_jugadores.usuario[k].sock, mensaje, strlen(mensaje));
 		}
 		
 		else if(codigo = 11) {
@@ -637,14 +650,14 @@ void *AtenderCliente (void *num){
 			}
 			int k = 0;
 			encontrado = 0;
-			while (!encontrado && k < lista_partidas.partida[j].numero_jugadores) {
-				if(lista_partidas.partida[j].usuario[k].sock = sock_conn)
+			while (!encontrado && k < lista_partidas.partida[j].lista_jugadores.num) {
+				if(lista_partidas.partida[j].lista_jugadores.usuario[k].sock = sock_conn)
 					encontrado = 1;
 				else
 				   j++;
 			}
-			strcpy(lista_partidas.partida[j].usuario[k].nombre, "");
-			lista_partidas.partida[j].usuario[k].sock = -1;
+			strcpy(lista_partidas.partida[j].lista_jugadores.usuario[k].nombre, "");
+			lista_partidas.partida[j].lista_jugadores.usuario[k].sock = -1;
 		}
 		
 		printf ("%s\n", buff2);
