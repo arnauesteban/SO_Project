@@ -18,10 +18,11 @@ namespace Cliente
         public Thread atender;
         bool conectado = false;
 
+        Main main;
+
         public Login()
         {
             InitializeComponent();
-            CheckForIllegalCrossThreadCalls = false;
             
         }
 
@@ -164,15 +165,28 @@ namespace Cliente
                     case 1:
                         MessageBox.Show(mensaje);
                         break;
+
                     case 2:
                         MessageBox.Show(mensaje);
                         if (mensaje == "Se ha iniciado sesion correctamente.")
                         {
-                            Main main = new Main(this.server, nombreIn.Text);
+                            main = new Main(this.server, nombreIn.Text);
                             this.Close();
                             main.ShowDialog();
-                            this.Text = "Login";
                         }
+                        break;
+
+                    case 3:
+                        NuevaPartida nueva_partida_form = main.GetFormNuevaPartida();
+                        nueva_partida_form.TomaRespuesta9(mensaje);
+                        break;
+
+                    case 6:
+                        main.TomaRespuesta6(mensaje);
+                        break;
+
+                    case 8:
+                        main.TomaRespuesta8(mensaje);
                         break;
                 }
             }

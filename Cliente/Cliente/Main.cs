@@ -19,12 +19,58 @@ namespace Cliente
         bool conectado = true;
         string usuario;
 
+        NuevaPartida nueva_partida_form;
+        Thread ThreadNuevaPartida;
+
+        public NuevaPartida GetFormNuevaPartida()
+        {
+            return this.nueva_partida_form;
+        }
         public Main(Socket socket, string usuario)
         {
             InitializeComponent();
-            CheckForIllegalCrossThreadCalls = false;
             this.server = socket;
             this.usuario = usuario;
+        }
+
+        public void TomaRespuesta6(string mensaje)
+        {
+            string[] separado = mensaje.Split('/');
+
+            ConectadosGrid.ColumnCount = 1;
+            ConectadosGrid.RowCount = separado.Length;
+            ConectadosGrid.ColumnHeadersVisible = false;
+            ConectadosGrid.RowHeadersVisible = false;
+            ConectadosGrid.AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.Fill;
+            ConectadosGrid.AutoSizeRowsMode = DataGridViewAutoSizeRowsMode.AllCells;
+
+            //Introducimos el nombre de los usuarios conectados en la DataGridView
+            for (int j = 0; j < separado.Length; j++)
+            {
+                ConectadosGrid[0, j].Value = separado[j];
+            }
+
+            //Sets the alignment of all columns to middle center
+            this.ConectadosGrid.Columns[0].DefaultCellStyle.Alignment = DataGridViewContentAlignment.MiddleCenter;
+        }
+
+        public void TomaRespuesta8(string mensaje)
+        {
+            //Recepcion de invitacion
+            string[] separado = mensaje.Split('/');
+            InvitacionRecibida notificacion_form = new InvitacionRecibida(separado[0]);
+            DialogResult respuesta = notificacion_form.ShowDialog();
+
+            if (respuesta == (DialogResult)1)
+            {
+                //Se acepta la partida
+                EnviarServidor("9/" + separado[1] + "/1");
+            }
+            else
+            {
+                //Se rechaza la partida
+                EnviarServidor("9/" + separado[1] + "/0");
+            }
         }
 
         private void EnviarServidor(string sentencia)
@@ -32,106 +78,7 @@ namespace Cliente
             byte[] msg = System.Text.Encoding.ASCII.GetBytes(sentencia);
             server.Send(msg);
         }
-        private void atenderServidor()
-        {
-            while (true)
-            {
-                //Recibimos la respuesta del servidor
-                byte[] msg2 = new byte[80];
-                server.Receive(msg2);
-                string[] trozos = Encoding.ASCII.GetString(msg2).Split('$');
-                int codigo = Convert.ToInt32(trozos[0]);
-                string mensaje = trozos[1].Split('\0')[0];
-                string mensajeFinal;
-                string[] separado;
-                int i;
-                int cont;
 
-                switch (codigo)
-                {
-                    
-                    case 4:
-                        // Estructura del mensaje recibido: nombre1/nombre2/
-                        separado = mensaje.Split('/');
-                        i = 0;
-                        mensajeFinal = "Los siguientes jugadores han jugado la partida más larga: ";
-                        cont = 0;
-                        while (separado[i] != null && separado[i] != "")
-                        {
-                            if (cont == 0)
-                            {
-                                mensajeFinal = mensajeFinal + "" + separado[i];
-                                cont = 1;
-                            }
-                            else
-                                mensajeFinal = mensajeFinal + ", " + separado[i];
-                            i++;
-                        }
-                        MessageBox.Show(mensajeFinal);
-                        break;
-                    case 5:
-                        MessageBox.Show("ID del jugador con más puntos: " + mensaje);
-                        break;
-                    case 6:
-                        separado = mensaje.Split('/');
-
-                        ConectadosGrid.ColumnCount = 1;
-                        ConectadosGrid.RowCount = separado.Length;
-                        ConectadosGrid.ColumnHeadersVisible = false;
-                        ConectadosGrid.RowHeadersVisible = false;
-                        ConectadosGrid.AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.Fill;
-                        ConectadosGrid.AutoSizeRowsMode = DataGridViewAutoSizeRowsMode.AllCells;
-
-                        //Introducimos el nombre de los usuarios conectados en la DataGridView
-                        for (int j = 0; j < separado.Length; j++)
-                        {
-                            ConectadosGrid[0, j].Value = separado[j];
-                        }
-
-                        //Sets the alignment of all columns to middle center
-                        this.ConectadosGrid.Columns[0].DefaultCellStyle.Alignment = DataGridViewContentAlignment.MiddleCenter;
-                        break;
-
-                    case 7:
-                        // Estructura del mensaje recibido: num/num/num...
-                        separado = mensaje.Split('/');
-                        i = 0;
-                        mensajeFinal = "Records de los jugadores han perdido partidas contra Arnau: ";
-                        cont = 0;
-                        while (separado[i] != null && separado[i] != "")
-                        {
-                            if (cont == 0)
-                            {
-                                mensajeFinal = mensajeFinal + "" + separado[i];
-                                cont = 1;
-                            }
-                            else
-                                mensajeFinal = mensajeFinal + ", " + separado[i];
-                            i++;
-                        }
-                        MessageBox.Show(mensajeFinal);
-                        break;
-
-                    case 8:
-                        //Recepcion de invitacion
-                        separado = mensaje.Split('/');
-                        InvitacionRecibida notificacion_form = new InvitacionRecibida(separado[0]);
-                        DialogResult respuesta = notificacion_form.ShowDialog();
-
-                        if (respuesta == (DialogResult)1)
-                        {
-                            //Se acepta la partida
-                            EnviarServidor("9/" + separado[1] + "/1");
-                        }
-                        else
-                        {
-                            //Se rechaza la partida
-                            EnviarServidor("9/" + separado[1] + "/0");
-                        }
-                        break;
-                }
-            }
-        }
 
         //Evento que se da cuando el usuario pulsa el botón "Enviar"
         private void enviar_Btn_Click(object sender, EventArgs e)
@@ -174,6 +121,9 @@ namespace Cliente
             EnviarServidor(mensaje);
 
             DesconectarServidor();
+
+            if (ThreadNuevaPartida.IsAlive) ThreadNuevaPartida.Abort() ;
+
             conectado = false;
 
             //Abrimos formulario login
@@ -194,11 +144,6 @@ namespace Cliente
         {
             nombreJugadorLb.Text = this.usuario;
 
-            //Iniciamos el thread de atencion al servidor
-            ThreadStart ts = delegate { atenderServidor(); };
-            atender = new Thread(ts);
-            atender.Start();
-
             //Pedimos al servidor que nos envie la lista de conectados actualizada
             EnviarServidor("3/");
 
@@ -212,12 +157,23 @@ namespace Cliente
             // Estructura del mensaje a enviar: 0/
             EnviarServidor(mensaje);
 
+            if(ThreadNuevaPartida.IsAlive)  ThreadNuevaPartida.Abort();
+
             if(conectado) DesconectarServidor();
         }
 
         private void NuevaPartidaBtn_Click(object sender, EventArgs e)
         {
-            NuevaPartida nueva_partida_form = new NuevaPartida(this.server);
+            //Iniciamos el thread de atencion al servidor
+            ThreadStart ts = delegate { AbrirFormularioNuevaPartida(); };
+            ThreadNuevaPartida = new Thread(ts);
+            ThreadNuevaPartida.Start();
+            
+        }
+
+        private void AbrirFormularioNuevaPartida()
+        {
+            nueva_partida_form = new NuevaPartida(this.server);
             this.Close();
             nueva_partida_form.ShowDialog();
         }

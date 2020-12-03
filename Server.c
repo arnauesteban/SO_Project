@@ -347,7 +347,7 @@ void *AtenderCliente (void *num){
 		int codigo =  atoi (p);
 		
 		//Quiere desconectarse del servidor
-			if (codigo == 0) {
+		if (codigo == 0) {
 				p = strtok(NULL, "/");
 				char nombre[20];
 				strcpy(nombre, p);
@@ -379,8 +379,8 @@ void *AtenderCliente (void *num){
 				terminar=1;
 			}
 				
-			//Quiere que lo registremos en la base de datos: 1/nombre/clave
-			else if (codigo ==1){
+		//Quiere que lo registremos en la base de datos: 1/nombre/clave
+		else if (codigo ==1){
 			p = strtok(NULL, "/");
 			char nombre[20];
 			strcpy(nombre, p);
@@ -470,51 +470,6 @@ void *AtenderCliente (void *num){
 			printf("%s\n", lista);
 
 			write (lista_conectados.usuario[i].sock, listadefinitiva, strlen(listadefinitiva));
-		}
-		
-		
-		//Quiere obtener los nombres de los jugadores que han jugado la partida mas larga
-		else if (codigo == 4) {
-			char lista[100];
-			
-			//Llamamos a la funcion para que haga la consulta necesaria y recogemos el resultado guardado en lista. Analizamos resultados
-			int res = NombresPartidaLarga(lista, conn);
-			if(res == 0)
-				sprintf (buff2, "4$%s", lista);
-			else if(res == -1)
-				strcpy (buff2, "4$ (Error al consultar la base de datos)");
-			else if(res == -2)
-				strcpy (buff2, "4$ (Error. La consulta no ha ofrecido resultados)");
-			else
-				printf("Error inesperado.");
-		}
-		
-		//Quiere obtener el identificador de la persona que ostenta el mayor record de la base de datos
-		else if (codigo == 5) {
-			//Llamamos a la funcion para que haga la consulta necesaria y analizamos resultados
-			int res = DameRecord(conn);
-			if(res > 0)
-				sprintf (buff2, "5$%d", res);
-			else if(res == -1)
-				strcpy (buff2, "5$ (Error al consultar la base de datos)");
-			else if(res == -2)
-				strcpy (buff2, "5$ (Error. La consulta no ha ofrecido resultados)");
-		}
-		
-		//Quiere obtener los record de los jugadores que han perdido partidas contra Arnau
-		else if (codigo == 7) {
-			char lista[100];
-			strcpy(lista, "");
-			
-			//Llamamos a la funcion para que haga la consulta necesaria y recogemos el resultado guardado en lista. Analizamos resultados
-			int res = PuntuacionPerdedores(lista, conn);
-			printf("%s\n", lista);
-			if(res == 0)
-				sprintf (buff2, "7$%s", lista);
-			else if(res == -1)
-				strcpy (buff2, "7$ (Error al consultar la base de datos)");
-			else
-				printf("Error inesperado.");
 		}
 		
 		//Invitar a jugadores a la partida

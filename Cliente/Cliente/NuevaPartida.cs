@@ -19,7 +19,6 @@ namespace Cliente
         {
             InitializeComponent();
             this.socket = socket;
-            CheckForIllegalCrossThreadCalls = false;
         }
 
         private void EnviarServidor(string sentencia)
@@ -35,55 +34,39 @@ namespace Cliente
             atender = new Thread(ts);
             atender.Start();
         }
-        private void atenderServidor()
+
+        public void TomaRespuesta9(string mensaje)
         {
-            while (true)
+            string[] separado = mensaje.Split('/');
+
+            if (Convert.ToInt32(separado[0]) == 1)
             {
-                //Recibimos la respuesta del servidor
-                byte[] msg2 = new byte[80];
-                socket.Receive(msg2);
-                string[] trozos = Encoding.ASCII.GetString(msg2).Split('$');
-                int codigo = Convert.ToInt32(trozos[0]);
-                string mensaje = trozos[1].Split('\0')[0];
-                string[] separado = mensaje.Split('/');
+                //Invitacion aceptada
+                JugadoresUnidosGrid.ColumnCount = 1;
+                JugadoresUnidosGrid.RowCount = 6;
+                JugadoresUnidosGrid.ColumnHeadersVisible = false;
+                JugadoresUnidosGrid.RowHeadersVisible = false;
+                JugadoresUnidosGrid.AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.Fill;
+                JugadoresUnidosGrid.AutoSizeRowsMode = DataGridViewAutoSizeRowsMode.AllCells;
 
-                switch (codigo)
+                //Introducimos el nuevo usuario que se ha unido a la partida en la data grid view
+                int i = 0;
+                bool encontrado = false;
+                while (i < JugadoresUnidosGrid.RowCount && !encontrado)
                 {
-                    case 9:
-                        if (Convert.ToInt32(separado[0]) == 1)
-                        {
-                            //Invitacion aceptada
-                            JugadoresUnidosGrid.ColumnCount = 1;
-                            JugadoresUnidosGrid.RowCount = 6;
-                            JugadoresUnidosGrid.ColumnHeadersVisible = false;
-                            JugadoresUnidosGrid.RowHeadersVisible = false;
-                            JugadoresUnidosGrid.AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.Fill;
-                            JugadoresUnidosGrid.AutoSizeRowsMode = DataGridViewAutoSizeRowsMode.AllCells;
-
-                            //Introducimos el nuevo usuario que se ha unido a la partida en la data grid view
-                            int i = 0;
-                            bool encontrado = false;
-                            while (i < JugadoresUnidosGrid.RowCount && !encontrado)
-                            {
-                                if (JugadoresUnidosGrid[0, i].Value == null)
-                                    encontrado = true;
-                                else
-                                    i++;
-                            }
-                            if(encontrado)
-                                JugadoresUnidosGrid[0, i].Value = separado[1];
-                            
-
-                            //Sets the alignment of all columns to middle center
-                            this.JugadoresUnidosGrid.Columns[0].DefaultCellStyle.Alignment = DataGridViewContentAlignment.MiddleCenter;
-                        }
-                        break;
+                    if (JugadoresUnidosGrid[0, i].Value == null)
+                        encontrado = true;
+                    else
+                        i++;
                 }
+                if (encontrado)
+                    JugadoresUnidosGrid[0, i].Value = separado[1];
 
 
+                //Sets the alignment of all columns to middle center
+                this.JugadoresUnidosGrid.Columns[0].DefaultCellStyle.Alignment = DataGridViewContentAlignment.MiddleCenter;
             }
         }
-        
         private void InvitarBtn_Click(object sender, EventArgs e)
             {
                 string[] invitados = invitadosIn.Text.Split(' ');
