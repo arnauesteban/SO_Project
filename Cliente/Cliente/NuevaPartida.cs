@@ -14,7 +14,7 @@ namespace Cliente
     public partial class NuevaPartida : Form
     {
         Socket socket;
-        Thread atender;
+
         public NuevaPartida(Socket socket)
         {
             InitializeComponent();
@@ -25,14 +25,6 @@ namespace Cliente
         {
             byte[] msg = System.Text.Encoding.ASCII.GetBytes(sentencia);
             socket.Send(msg);
-        }
-
-        private void NuevaPartida_Load(object sender, EventArgs e)
-        {
-            //Iniciamos el thread de atencion al servidor
-            ThreadStart ts = delegate { atenderServidor(); };
-            atender = new Thread(ts);
-            atender.Start();
         }
 
         public void TomaRespuesta9(string mensaje)

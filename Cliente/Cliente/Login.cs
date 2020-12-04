@@ -152,7 +152,6 @@ namespace Cliente
         {
             while (true)
             {
-                this.Text = "Login (conectado)";
                 //Recibimos la respuesta del servidor
                 byte[] msg2 = new byte[80];
                 server.Receive(msg2);
@@ -182,7 +181,8 @@ namespace Cliente
                         break;
 
                     case 6:
-                        main.TomaRespuesta6(mensaje);
+                        if(main != null)
+                            main.TomaRespuesta6(mensaje);
                         break;
 
                     case 8:

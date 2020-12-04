@@ -81,7 +81,6 @@ namespace Cliente
             this.Controls.Add(this.JugadoresUnidosGrid);
             this.Name = "NuevaPartida";
             this.Text = "Form1";
-            this.Load += new System.EventHandler(this.NuevaPartida_Load);
             ((System.ComponentModel.ISupportInitialize)(this.JugadoresUnidosGrid)).EndInit();
             this.ResumeLayout(false);
             this.PerformLayout();
