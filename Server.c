@@ -244,7 +244,7 @@ int AsignarIdPartida(MYSQL *conn)
 	
 	//No hay partidas, asignamos id=0
 	if(row == NULL){
-		id = 0;
+		id_max_sql = 0;
 	}
 	else
 	{
@@ -273,7 +273,8 @@ int AsignarIdPartida(MYSQL *conn)
 }
 
 //Envia a todos los usuarios de una partida activa la lista de jugadores
-//Se envia al cliente el mensaje: 3/nombre1/nombre2/...
+//Se envia al cliente el mensaje: nombre1/nombre2/...
+
 void EnviarListaJugadoresPartidaActiva(int i)
 {
 	TPartida partida = lista_partidas.partida[i];
@@ -283,7 +284,7 @@ void EnviarListaJugadoresPartidaActiva(int i)
 	sprintf(mensaje, "3/");
 	for(int j = 0; j < partida.lista_jugadores.num; j++)
 	{
-		sprintf(mensaje, "%s%s/", mensaje, partida.lista_jugadores.usuario[j].nombre;
+		sprintf(mensaje, "%s%s/", mensaje, partida.lista_jugadores.usuario[j].nombre);
 	}
 	
 	//Enviamos el mensaje a todos los jugadores de una partida
@@ -498,7 +499,7 @@ void *AtenderCliente (void *num){
 			lista_partidas.partida[lista_partidas.num].lista_jugadores.usuario[0].sock = sock_conn;
 			
 			//Asignamos una ID a la partida, miramos que no exista en la base de datos ni en la lista de partidas local
-			int id = AsignarIdPartida(&conn);
+			int id = AsignarIdPartida(conn);
 			lista_partidas.partida[lista_partidas.num].ID = lista_partidas.num;
 			
 			lista_partidas.partida[lista_partidas.num].lista_jugadores.num = 1;
