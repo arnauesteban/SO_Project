@@ -16,8 +16,11 @@ namespace Cliente
     {
         Socket server;
         Thread atender;
+        Thread partida;
         bool conectado = true;
         string usuario;
+        string lista_seleccionados = null;
+        int num_invitados;
 
         public Main(Socket socket, string usuario)
         {
@@ -220,6 +223,28 @@ namespace Cliente
             NuevaPartida nueva_partida_form = new NuevaPartida(this.server);
             this.Close();
             nueva_partida_form.ShowDialog();
+        }
+
+        private void ConectadosGrid_SelectionChanged(object sender, EventArgs e)
+        {
+            num_invitados = ConectadosGrid.SelectedCells.Count;
+            for (int i = 0; i < num_invitados; i++)
+            {
+                lista_seleccionados = lista_seleccionados + "/" + ConectadosGrid.SelectedCells[i].Value;
+            }
+        }
+
+        private void CrearPartida()
+        {
+            Partida p = new Partida();
+            p.ShowDialog();
+        }
+        private void invitar_Btn_Click(object sender, EventArgs e)
+        {
+            EnviarServidor("8/" + num_invitados + lista_seleccionados);
+            ThreadStart ts = delegate { CrearPartida(); };
+            partida = new Thread(ts);
+            partida.Start();
         }
     }
 }
