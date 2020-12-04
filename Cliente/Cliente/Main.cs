@@ -14,9 +14,8 @@ namespace Cliente
 {
     public partial class Main : Form
     {
-        Socket server;
+        Server server;
         Thread atender;
-        bool conectado = true;
         string usuario;
 
         NuevaPartida nueva_partida_form;
@@ -26,10 +25,10 @@ namespace Cliente
         {
             return this.nueva_partida_form;
         }
-        public Main(Socket socket, string usuario)
+        public Main(Server server, string usuario)
         {
             InitializeComponent();
-            this.server = socket;
+            this.server = server;
             this.usuario = usuario;
         }
 
@@ -64,53 +63,15 @@ namespace Cliente
             if (respuesta == (DialogResult)1)
             {
                 //Se acepta la partida
-                EnviarServidor("9/" + separado[1] + "/1");
+                server.Enviar("9/" + separado[1] + "/1");
             }
             else
             {
                 //Se rechaza la partida
-                EnviarServidor("9/" + separado[1] + "/0");
+                server.Enviar("9/" + separado[1] + "/0");
             }
         }
 
-        private void EnviarServidor(string sentencia)
-        {
-            byte[] msg = System.Text.Encoding.ASCII.GetBytes(sentencia);
-            server.Send(msg);
-        }
-
-
-        //Evento que se da cuando el usuario pulsa el botón "Enviar"
-        private void enviar_Btn_Click(object sender, EventArgs e)
-        {
-            if (puntosPerdedores.Checked)
-            {
-                // Quiere obtener las puntuaciones record de los jugadores que han perdido partidas contra Arnau
-                string mensaje = "7/";
-                // Enviamos al servidor el código de petición
-                // Estructura del mensaje a enviar: 7/
-                byte[] msg = System.Text.Encoding.ASCII.GetBytes(mensaje);
-                server.Send(msg);
-            }
-            else if (nombresPartidaLarga.Checked)
-            {
-                // Quiere saber el nombre de los jugadores que han jugado la partida más larga
-                string mensaje = "4/";
-                // Enviamos al servidor el código de petición
-                // Estructura del mensaje a enviar: 4/
-                byte[] msg = System.Text.Encoding.ASCII.GetBytes(mensaje);
-                server.Send(msg);
-            }
-            else if (dameRecord.Checked)
-            {
-                // Quiere saber el identificador del usuario que ostenta el mayor récord de la base de datos
-                string mensaje = "5/";
-                // Enviamos al servidor el código de petición
-                // Estructura del mensaje a enviar: 5/
-                byte[] msg = System.Text.Encoding.ASCII.GetBytes(mensaje);
-                server.Send(msg);
-            }
-        }
         private void desconectar_Btn_Click(object sender, EventArgs e)
         {
             //Quiere desconectarse del servidor
@@ -118,13 +79,11 @@ namespace Cliente
 
             // Enviamos al servidor el código de petición
             // Estructura del mensaje a enviar: 0/
-            EnviarServidor(mensaje);
+            server.Enviar(mensaje);
 
-            DesconectarServidor();
+            server.Desconectar();
 
             if (ThreadNuevaPartida.IsAlive) ThreadNuevaPartida.Abort() ;
-
-            conectado = false;
 
             //Abrimos formulario login
             this.Hide();
@@ -133,19 +92,12 @@ namespace Cliente
             login.ShowDialog();
         }
 
-        private void DesconectarServidor()
-        {
-            // Nos desconectamos
-            atender.Abort();
-            server.Shutdown(SocketShutdown.Both);
-            server.Close();
-        }
         private void Form1_Load(object sender, EventArgs e)
         {
             nombreJugadorLb.Text = this.usuario;
 
             //Pedimos al servidor que nos envie la lista de conectados actualizada
-            EnviarServidor("3/");
+            server.Enviar("3/");
 
         }
 
@@ -155,11 +107,11 @@ namespace Cliente
 
             // Enviamos al servidor el código de petición
             // Estructura del mensaje a enviar: 0/
-            EnviarServidor(mensaje);
+            server.Enviar(mensaje);
 
             if(ThreadNuevaPartida.IsAlive)  ThreadNuevaPartida.Abort();
 
-            if(conectado) DesconectarServidor();
+            if(server.IsConnected()) server.Desconectar();
         }
 
         private void NuevaPartidaBtn_Click(object sender, EventArgs e)
@@ -176,6 +128,11 @@ namespace Cliente
             nueva_partida_form = new NuevaPartida(this.server);
             this.Close();
             nueva_partida_form.ShowDialog();
+        }
+
+        private void contextMenuStrip1_Opening(object sender, CancelEventArgs e)
+        {
+
         }
     }
 }

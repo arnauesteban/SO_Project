@@ -13,18 +13,12 @@ namespace Cliente
 {
     public partial class NuevaPartida : Form
     {
-        Socket socket;
+        Server server;
 
-        public NuevaPartida(Socket socket)
+        public NuevaPartida(Server server)
         {
             InitializeComponent();
-            this.socket = socket;
-        }
-
-        private void EnviarServidor(string sentencia)
-        {
-            byte[] msg = System.Text.Encoding.ASCII.GetBytes(sentencia);
-            socket.Send(msg);
+            this.server = server;
         }
 
         public void TomaRespuesta9(string mensaje)
@@ -70,7 +64,7 @@ namespace Cliente
                 }
 
                 //Enviamos la invitacion al servidor
-                EnviarServidor("8/" + invitados.Length + "/" + mensaje_invitados);
+                server.Enviar("8/" + invitados.Length + "/" + mensaje_invitados);
             }
 
         

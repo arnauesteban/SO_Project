@@ -14,9 +14,8 @@ namespace Cliente
 {
     public partial class Login : Form
     {
-        Socket server;
         public Thread atender;
-        bool conectado = false;
+        Server server;
 
         Main main;
 
@@ -28,6 +27,8 @@ namespace Cliente
 
         private void Login_Load(object sender, EventArgs e)
         {
+            server = new Server();
+
             opcionBtn.Text = "Iniciar sesión";
             titleLb.Text = "Registro";
             clave2Lb.Visible = true;
@@ -37,63 +38,13 @@ namespace Cliente
             claveIn.Text = null;
             clave2In.Text = null;
 
-            if(conectado) DesconectarServidor();
-        }
-
-        private void ConectarServidor()
-        {
-            //Creamos un IPEndPoint con el ip del servidor y puerto del servidor al que deseamos conectarnos
-            
-            //Parametros de shiva
-            //IPAddress direc = IPAddress.Parse("147.83.117.22");
-            //IPEndPoint ipep = new IPEndPoint(direc, 50084);
-
-            //Parametros de pruebas
-            IPAddress direc = IPAddress.Parse("147.83.117.22");
-            IPEndPoint ipep = new IPEndPoint(direc, 50084);
-
-            //Creamos el socket 
-            server = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
-            try
+            if (server.IsConnected())
             {
-                server.Connect(ipep); //Intentamos conectar el socket
-            }
-            catch (SocketException)
-            {
-                //Si hay excepcion imprimimos error y salimos del programa con return 
-                MessageBox.Show("No he podido conectar con el servidor");
-                return;
-            }
-            ThreadStart ts = delegate { atenderServidor(); };
-            atender = new Thread(ts);
-            atender.Start();
-        }
+                server.Desconectar();
 
-        private void DesconectarServidor()
-        {
-            EnviarServidor("0/");
-
-            // Nos desconectamos
-            atender.Abort();
-            server.Shutdown(SocketShutdown.Both);
-            server.Close();
-        }
-
-        private void EnviarServidor(string sentencia)
-        {
-            byte[] msg = System.Text.Encoding.ASCII.GetBytes(sentencia);
-            try
-            {
-                server.Send(msg);
-            }
-            catch (SocketException)
-            {
-                conectado = false;
-            }
-            catch (NullReferenceException)
-            {
-                conectado = false;
-            }
+                // Nos desconectamos
+                atender.Abort();
+            } 
         }
 
         private bool ComprobarCaracteres(string cadena, string campo)
@@ -148,14 +99,19 @@ namespace Cliente
             return error;
         }
 
+        public delegate void DelegadoLogin();
+
+        public void CerrarFormulario()
+        {
+            this.Close();
+        }
+
         private void atenderServidor()
         {
             while (true)
             {
                 //Recibimos la respuesta del servidor
-                byte[] msg2 = new byte[80];
-                server.Receive(msg2);
-                string[] trozos = Encoding.ASCII.GetString(msg2).Split('$');
+                string[] trozos = server.Recibir().Split('$');
                 int codigo = Convert.ToInt32(trozos[0]);
                 string mensaje = trozos[1].Split('\0')[0];
 
@@ -169,8 +125,9 @@ namespace Cliente
                         MessageBox.Show(mensaje);
                         if (mensaje == "Se ha iniciado sesion correctamente.")
                         {
-                            main = new Main(this.server, nombreIn.Text);
-                            this.Close();
+                            main = new Main(server, nombreIn.Text);
+                            DelegadoLogin delegado = new DelegadoLogin(CerrarFormulario);
+                            this.Invoke(delegado);
                             main.ShowDialog();
                         }
                         break;
@@ -194,6 +151,7 @@ namespace Cliente
 
         private void enviarBtn_Click(object sender, EventArgs e)
         {
+
             if (enviarBtn.Text == "Registrarse")
             {
                 bool errorNombre = ComprobarCaracteres(nombreIn.Text, "'Nombre de usuario'");
@@ -211,13 +169,20 @@ namespace Cliente
                 }
                 else
                 {
-                    if (!conectado)
+                    if (!server.IsConnected())
                     {
-                        conectado = true;
-                        ConectarServidor();
+                        if (server.Conectar() == 1)
+                        {
+                            ThreadStart ts = delegate { atenderServidor(); };
+                            atender = new Thread(ts);
+                            atender.Start();
+                        }
                     }
-                    string sentencia = "1/" + nombreIn.Text + "/" + claveIn.Text;
-                    EnviarServidor(sentencia);
+                    if (server.IsConnected())
+                    {
+                        string sentencia = "1/" + nombreIn.Text + "/" + claveIn.Text;
+                        server.Enviar(sentencia);
+                    }
                 }
             }
             else
@@ -235,13 +200,20 @@ namespace Cliente
                 }
                 else
                 {
-                    if (!conectado)
+                    if (!server.IsConnected())
                     {
-                        conectado = true;
-                        ConectarServidor();
+                        if (server.Conectar() == 1)
+                        {
+                            ThreadStart ts = delegate { atenderServidor(); };
+                            atender = new Thread(ts);
+                            atender.Start();
+                        }
                     }
-                    string sentencia = "2/" + nombreIn.Text + "/" + claveIn.Text;
-                    EnviarServidor(sentencia);
+                    if (server.IsConnected())
+                    {
+                        string sentencia = "2/" + nombreIn.Text + "/" + claveIn.Text;
+                        server.Enviar(sentencia);
+                    }
                 }
             }
         }
