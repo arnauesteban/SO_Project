@@ -18,6 +18,7 @@ namespace Cliente
         Main main;
         Server server;
         Thread atender;
+        Thread thread_main;
 
         bool mainAbierto;
 
@@ -47,6 +48,7 @@ namespace Cliente
                 server.Desconectar();
 
                 // Nos desconectamos
+                MessageBox.Show("Abortamos");
                 atender.Abort();
             } 
         }
@@ -110,6 +112,14 @@ namespace Cliente
             this.Close();
         }
 
+        public void AbrirMain()
+        {
+            main = new Main(server, nombreIn.Text);
+            mainAbierto = true;
+            this.Close();
+            main.ShowDialog();
+        }
+
         private void atenderServidor()
         {
             while (server.IsConnected())
@@ -129,23 +139,23 @@ namespace Cliente
                         MessageBox.Show(mensaje);
                         if (mensaje == "Se ha iniciado sesion correctamente.")
                         {
-                            main = new Main(server, nombreIn.Text);
-                            mainAbierto = true;
-                            DelegadoLogin delegado = new DelegadoLogin(CerrarFormulario);
-                            this.Invoke(delegado);
-                            main.ShowDialog();
+                            //DelegadoLogin abrir = new DelegadoLogin(AbrirMain);
+                            ThreadStart ts = delegate { this.AbrirMain(); };
+                            thread_main = new Thread(ts);
+                            thread_main.Start();
                             
                         }
                         break;
 
-                    case 3:
+                    /*case 3:
                         NuevaPartida nueva_partida_form = main.GetFormNuevaPartida();
                         nueva_partida_form.TomaRespuesta9(mensaje);
-                        break;
+                        break;*/
 
-                    case 6:
+                    case 3:
+                        //MessageBox.Show("Conectados recibidos");
                         if(main != null)
-                            main.TomaRespuesta6(mensaje);
+                            main.TomaRespuesta3(mensaje);
                         break;
 
                     case 8:
@@ -253,7 +263,10 @@ namespace Cliente
         {
             if (atender != null && !mainAbierto)
                 if (atender.IsAlive)
+                {
+                    MessageBox.Show("Abortado");
                     atender.Abort();
+                }
         }
     }
 }

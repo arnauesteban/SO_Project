@@ -24,6 +24,8 @@ namespace Cliente
         NuevaPartida nueva_partida_form;
         Thread ThreadNuevaPartida;
 
+        public delegate void DelegadoMain();
+
         public NuevaPartida GetFormNuevaPartida()
         {
             return this.nueva_partida_form;
@@ -31,11 +33,12 @@ namespace Cliente
         public Main(Server server, string usuario)
         {
             InitializeComponent();
+            CheckForIllegalCrossThreadCalls = false;
             this.server = server;
             this.usuario = usuario;
         }
 
-        public void TomaRespuesta6(string mensaje)
+        public void TomaRespuesta3(string mensaje)
         {
             string[] separado = mensaje.Split('/');
 
@@ -80,9 +83,12 @@ namespace Cliente
 
             server.Desconectar();
 
-            if (ThreadNuevaPartida != null) 
-                if(ThreadNuevaPartida.IsAlive)
-                    ThreadNuevaPartida.Abort() ;
+            if (ThreadNuevaPartida != null)
+                if (ThreadNuevaPartida.IsAlive)
+                {
+                    MessageBox.Show("Aborto nueva partida");
+                    ThreadNuevaPartida.Abort();
+                }
 
             //Abrimos formulario login
             this.Hide();
@@ -102,15 +108,7 @@ namespace Cliente
 
         private void Main_FormClosed(object sender, FormClosedEventArgs e)
         {
-            string mensaje = "0/" + this.usuario;
 
-            // Enviamos al servidor el código de petición
-            // Estructura del mensaje a enviar: 0/
-            server.Enviar(mensaje);
-
-            if(ThreadNuevaPartida.IsAlive)  ThreadNuevaPartida.Abort();
-
-            if(server.IsConnected()) server.Desconectar();
         }
 
         private void NuevaPartidaBtn_Click(object sender, EventArgs e)
@@ -148,6 +146,18 @@ namespace Cliente
             ThreadStart ts = delegate { CrearPartida(); };
             partida = new Thread(ts);
             partida.Start();
+        }
+
+        private void Main_FormClosing(object sender, FormClosingEventArgs e)
+        {
+            if (ThreadNuevaPartida != null)
+                if (ThreadNuevaPartida.IsAlive)
+                {
+                    MessageBox.Show("Abortamos nueva partida");
+                    ThreadNuevaPartida.Abort();
+                }
+
+            if (server.IsConnected()) server.Desconectar();
         }
     }
 }

@@ -28,7 +28,7 @@ namespace Cliente
 
             //Parametros de pruebas
             IPAddress direc = IPAddress.Parse("192.168.56.102");
-            IPEndPoint ipep = new IPEndPoint(direc, 9500);
+            IPEndPoint ipep = new IPEndPoint(direc, 9400);
 
             //Creamos el socket 
             server = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);

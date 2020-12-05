@@ -48,7 +48,6 @@ void AnadirConectado(char nombre[20], int socket)
 //Retorna 1 si lo ha eliminado, -1 si el usuario no existe
 int EliminarConectado(int i)
 {
-	
 	//Si hemos encontrado al usuario, lo eliminamos
 	if(i < lista_conectados.num)
 	{
@@ -75,13 +74,36 @@ void GetListaConectados(char lista[])
 	lista[strlen(lista)-1] = '\0';
 }
 
+
+//Devuelve el indice donde se encuentra el usuario conectado con el socket pasado como parametro
+//Retorna -1 si no existe
+int GetIndex(int socket)
+{
+	//Busqueda en la lista de conectados
+	int i = 0;
+	int encontrado = 0;
+	
+	while(i < lista_conectados.num && !encontrado)
+	{
+		if(lista_conectados.usuario[i].sock == socket)
+			encontrado = 1;
+		else
+			i++;
+	}
+	
+	if(encontrado)
+		return i;
+	else
+		return -1;
+}
+
 void EnviarListaConectadosATodos()
 {
 	char lista[2105];
 	GetListaConectados(lista);
 		
 	char mensaje[2105];
-	sprintf(mensaje, "6$%s", lista);
+	sprintf(mensaje, "3$%s", lista);
 	
 	for(int i = 0; i < lista_conectados.num; i++)
 	{
@@ -349,14 +371,12 @@ void EnviarListaJugadoresPartidaActiva(int i)
 }
 
 //Funcion que realiza cada thread
-void *AtenderCliente (void *num){
-	int i;
-	int *k;
-	k = (int *) num;
-	i = *k;
-	
+void *AtenderCliente (void *socket){
 	int sock_conn;
-	sock_conn= lista_conectados.usuario[i].sock;
+	int *k;
+	k = (int *) socket;
+	sock_conn = *k;
+
 	
 	MYSQL *conn;
 	//Creamos una conexion al servidor MYSQL 
@@ -368,8 +388,8 @@ void *AtenderCliente (void *num){
 	}
 	//inicializar la conexion, entrando nuestras claves de acceso y el nombre de la base de datos a la que queremos acceder 
 
-	//conn = mysql_real_connect (conn, "shiva2.upc.es","root", "mysql", "TG11",0, NULL, 0);
-	conn = mysql_real_connect (conn, "shiva2.upc.es", "root", "mysql", "TG11", 0, NULL, 0);
+	//conn = mysql_real_connect (conn, "localhost","root", "mysql", "TG11",0, NULL, 0);
+	conn = mysql_real_connect (conn, "localhost", "root", "mysql", "TG11", 0, NULL, 0);
 
 	if (conn==NULL) {
 		printf ("Error al inicializar la conexion: %u %s\n",
@@ -403,6 +423,14 @@ void *AtenderCliente (void *num){
 		//Quiere desconectarse del servidor
 		if (codigo == 0) {
 				p = strtok(NULL, "/");
+				int i = GetIndex(sock_conn);
+				
+				char nombre[20];
+				if(i != -1)
+				{
+					strcpy(nombre, lista_conectados.usuario[i].nombre);
+				}
+				else
 				
 				//Creamos una nueva lista SIN el ususario desconectado
 				pthread_mutex_lock(&mutex);
@@ -412,6 +440,9 @@ void *AtenderCliente (void *num){
 				pthread_mutex_unlock(&mutex);
 				
 				EnviarListaConectadosATodos();
+				
+				if(i != -1)
+					sprintf(buff2, "Se ha desconectado %s\n", nombre);
 				
 				terminar=1;
 			}
@@ -439,6 +470,9 @@ void *AtenderCliente (void *num){
 				strcpy (buff2, "1$Error al introducir tus datos en la base.");
 			else
 				printf("Error inesperado al registar al usuario.");
+			
+			//Enviamos el resultado
+			write (sock_conn,buff2, strlen(buff2));
 		}
 		
 		//Quiere iniciar sesion
@@ -456,26 +490,9 @@ void *AtenderCliente (void *num){
 			if(res ==0)
 			{
 				strcpy (buff2, "2$Se ha iniciado sesion correctamente.");
-				//Recorrido y guardamos los usuarios conectados
-				strcpy(lista_conectados.usuario[i].nombre, nombre);
-				char lista[500];
-				strcpy(lista, "");
-				for(int j = 0; j < lista_conectados.num; j++)
-				{
-					if(strcmp(lista_conectados.usuario[j].nombre, "") != 0)
-					{
-						sprintf(lista, "%s%s/", lista, lista_conectados.usuario[j].nombre);
-					}
-				}
-				//Borramos la ultima '/'
-				lista[strlen(lista)-1] = '\0';
-				char listadefinitiva[500];
-				printf("%s\n", lista);
-				sprintf(listadefinitiva, "6$%s", lista);
-				printf("%s\n", lista);
-				for(int j = 0; j < lista_conectados.num; j++)
-					if(strcmp(lista_conectados.usuario[j].nombre, "") != 0)
-						write (lista_conectados.usuario[j].sock, listadefinitiva, strlen(listadefinitiva));
+				AnadirConectado(nombre, sock_conn);
+				
+				EnviarListaConectadosATodos();
 			}
 
 			else if(res == -1)
@@ -484,6 +501,9 @@ void *AtenderCliente (void *num){
 				strcpy (buff2, "2$Error. Los datos introducidos no coinciden.");
 			else
 				printf("Error inesperado.");
+			
+			//Enviamos el resultado
+			write (sock_conn,buff2, strlen(buff2));
 		}
 		
 		//Un cliente en concreto pide que se le envie la lista de conectados actualizada
@@ -503,10 +523,15 @@ void *AtenderCliente (void *num){
 			lista[strlen(lista)-1] = '\0';
 			char listadefinitiva[500];
 			printf("%s\n", lista);
-			sprintf(listadefinitiva, "6$%s", lista);
-			printf("%s\n", lista);
+			sprintf(listadefinitiva, "3$%s", lista);
+			printf("%s\n", listadefinitiva);
 
-			write (lista_conectados.usuario[i].sock, listadefinitiva, strlen(listadefinitiva));
+			write (sock_conn, listadefinitiva, strlen(listadefinitiva));
+			
+			char nombre[20];
+			int i = GetIndex(sock_conn);
+			strcpy(nombre, lista_conectados.usuario[i].nombre);
+			sprintf(buff2, "Enviada lista de conectados a %s: %d %d", nombre, sock_conn, lista_conectados.usuario[i].sock);
 		}
 		
 		//Invitar a jugadores a la partida
@@ -652,9 +677,9 @@ void *AtenderCliente (void *num){
 			lista_partidas.partida[j].lista_jugadores.usuario[k].sock = -1;
 		}
 		
+		
 		printf ("%s\n", buff2);
-		//Enviamos el resultado
-		write (sock_conn,buff2, strlen(buff2));
+		
 	}
 	// Se acabo el servicio para este cliente
 	close(sock_conn);
@@ -682,7 +707,7 @@ int main(int argc, char *argv[]){
 	serv_adr.sin_addr.s_addr = htonl(INADDR_ANY);
 	
 	//Escucharemos en el puerto indicado entre parenteis
-	serv_adr.sin_port = htons(50084);
+	serv_adr.sin_port = htons(9400);
 	if (bind(sock_listen, (struct sockaddr *) &serv_adr, sizeof(serv_adr)) < 0)
 		printf ("Error al bind\n");
 	if (listen(sock_listen, 2) < 0)
@@ -698,15 +723,9 @@ int main(int argc, char *argv[]){
 		sock_conn = accept(sock_listen, NULL, NULL);
 		printf ("He recibido conexi?n\n");
 		
-		int i;
-		i = lista_conectados.num;
-		
-		//sock_conn es el socket que usaremos para este cliente
-		lista_conectados.usuario[i].sock = sock_conn;
-		lista_conectados.num++;
 		
 		//Crear thead y decirle lo que tiene que hacer
-		pthread_create (&thread, NULL, AtenderCliente, &i);
+		pthread_create (&thread, NULL, AtenderCliente, &sock_conn);
 
 	}
 }

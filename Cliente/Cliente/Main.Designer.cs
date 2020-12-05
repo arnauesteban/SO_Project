@@ -102,6 +102,7 @@
             this.Controls.Add(this.desconectar_Btn);
             this.Name = "Main";
             this.Text = "Main (conectado)";
+            this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.Main_FormClosing);
             this.Load += new System.EventHandler(this.Form1_Load);
             ((System.ComponentModel.ISupportInitialize)(this.ConectadosGrid)).EndInit();
             this.ResumeLayout(false);
