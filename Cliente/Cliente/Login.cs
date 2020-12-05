@@ -14,10 +14,10 @@ namespace Cliente
 {
     public partial class Login : Form
     {
-        public Thread atender;
-        Server server;
 
         Main main;
+        Server server;
+        Thread atender;
 
         public Login()
         {
@@ -208,6 +208,8 @@ namespace Cliente
                             atender = new Thread(ts);
                             atender.Start();
                         }
+                        else
+                            MessageBox.Show("No se ha podido conectar con el servidor");
                     }
                     if (server.IsConnected())
                     {

@@ -33,6 +33,7 @@
             this.ConectadosGrid = new System.Windows.Forms.DataGridView();
             this.nombreJugadorLb = new System.Windows.Forms.Label();
             this.NuevaPartidaBtn = new System.Windows.Forms.Button();
+            this.invitar_Btn = new System.Windows.Forms.Button();
             ((System.ComponentModel.ISupportInitialize)(this.ConectadosGrid)).BeginInit();
             this.SuspendLayout();
             // 
@@ -54,6 +55,7 @@
             this.ConectadosGrid.Name = "ConectadosGrid";
             this.ConectadosGrid.Size = new System.Drawing.Size(176, 322);
             this.ConectadosGrid.TabIndex = 13;
+            this.ConectadosGrid.SelectionChanged += new System.EventHandler(this.ConectadosGrid_SelectionChanged);
             // 
             // nombreJugadorLb
             // 
@@ -76,6 +78,16 @@
             this.NuevaPartidaBtn.UseVisualStyleBackColor = true;
             this.NuevaPartidaBtn.Click += new System.EventHandler(this.NuevaPartidaBtn_Click);
             // 
+            // invitar_Btn
+            // 
+            this.invitar_Btn.Location = new System.Drawing.Point(772, 168);
+            this.invitar_Btn.Name = "invitar_Btn";
+            this.invitar_Btn.Size = new System.Drawing.Size(93, 23);
+            this.invitar_Btn.TabIndex = 16;
+            this.invitar_Btn.Text = "Invitar selección";
+            this.invitar_Btn.UseVisualStyleBackColor = true;
+            this.invitar_Btn.Click += new System.EventHandler(this.invitar_Btn_Click);
+            // 
             // Main
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -83,6 +95,7 @@
             this.BackgroundImage = ((System.Drawing.Image)(resources.GetObject("$this.BackgroundImage")));
             this.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Stretch;
             this.ClientSize = new System.Drawing.Size(919, 346);
+            this.Controls.Add(this.invitar_Btn);
             this.Controls.Add(this.NuevaPartidaBtn);
             this.Controls.Add(this.nombreJugadorLb);
             this.Controls.Add(this.ConectadosGrid);
@@ -101,6 +114,7 @@
         private System.Windows.Forms.DataGridView ConectadosGrid;
         private System.Windows.Forms.Label nombreJugadorLb;
         private System.Windows.Forms.Button NuevaPartidaBtn;
+        private System.Windows.Forms.Button invitar_Btn;
     }
 }
 

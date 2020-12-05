@@ -38,6 +38,59 @@ TListaPartidas lista_partidas;
 //Estructura necesaria para el acceso excluyente
 pthread_mutex_t mutex = PTHREAD_MUTEX_INITIALIZER;
 
+void AnadirConectado(char nombre[20], int socket)
+{
+	strcpy(lista_conectados.usuario[lista_conectados.num].nombre, nombre);
+	lista_conectados.usuario[lista_conectados.num].sock = socket;
+	lista_conectados.num++;
+}
+
+//Retorna 1 si lo ha eliminado, -1 si el usuario no existe
+int EliminarConectado(int i)
+{
+	
+	//Si hemos encontrado al usuario, lo eliminamos
+	if(i < lista_conectados.num)
+	{
+		for(int j = i; j < lista_conectados.num - 1; j++)
+		{
+			lista_conectados.usuario[j] = lista_conectados.usuario[j+1];
+		}
+		lista_conectados.num--;
+		
+		return 1;
+	}
+	
+	return -1;
+}
+
+void GetListaConectados(char lista[])
+{
+	for(int i = 0; i < lista_conectados.num; i++)
+	{
+		sprintf(lista, "%s%s/", lista, lista_conectados.usuario[i].nombre);
+	}
+	
+	//eliminamos el ultimo caracter '/'
+	lista[strlen(lista)-1] = '\0';
+}
+
+void EnviarListaConectadosATodos()
+{
+	char lista[2105];
+	GetListaConectados(lista);
+		
+	char mensaje[2105];
+	sprintf(mensaje, "6$%s", lista);
+	
+	for(int i = 0; i < lista_conectados.num; i++)
+	{
+		write(lista_conectados.usuario[i].sock, mensaje, strlen(mensaje));
+	}
+	
+	printf("Enviada lista conectados a todos: %s \n", mensaje);
+}
+
 //Función que registra al usuario en la base de datos
 int Registrarse (char usuario[20], char clave[20], MYSQL *conn) {	
 	MYSQL_RES *resultado;
@@ -350,32 +403,15 @@ void *AtenderCliente (void *num){
 		//Quiere desconectarse del servidor
 		if (codigo == 0) {
 				p = strtok(NULL, "/");
-				char nombre[20];
-				strcpy(nombre, p);
 				
 				//Creamos una nueva lista SIN el ususario desconectado
 				pthread_mutex_lock(&mutex);
 				
-				//Recorrido y guardamos los usuarios conectados
-				char lista[500];
-				strcpy(lista, "");
-				strcpy(lista_conectados.usuario[i].nombre, "");
-				for(int j = 0; j < lista_conectados.num; j++)
-				{
-					if(strcmp(lista_conectados.usuario[j].nombre, "") != 0)
-					{
-						sprintf(lista, "%s%s/", lista, lista_conectados.usuario[j].nombre);
-					}
-				}
-				//Borramos la ultima '/'
-				lista[strlen(lista)-1] = '\0';
-				char listadefinitiva[500];
-				sprintf(listadefinitiva, "6$%s", lista);
-				for(int j = 0; j < lista_conectados.num; j++)
-					if(strcmp(lista_conectados.usuario[j].nombre, "") != 0)
-					write (lista_conectados.usuario[j].sock, listadefinitiva, strlen(listadefinitiva));
+				EliminarConectado(i);
 				
 				pthread_mutex_unlock(&mutex);
+				
+				EnviarListaConectadosATodos();
 				
 				terminar=1;
 			}

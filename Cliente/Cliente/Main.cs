@@ -15,8 +15,11 @@ namespace Cliente
     public partial class Main : Form
     {
         Server server;
-        Thread atender;
+        Thread partida;
+
         string usuario;
+        string lista_seleccionados = null;
+        int num_invitados;
 
         NuevaPartida nueva_partida_form;
         Thread ThreadNuevaPartida;
@@ -74,16 +77,12 @@ namespace Cliente
 
         private void desconectar_Btn_Click(object sender, EventArgs e)
         {
-            //Quiere desconectarse del servidor
-            string mensaje = "0/" + this.usuario;
-
-            // Enviamos al servidor el código de petición
-            // Estructura del mensaje a enviar: 0/
-            server.Enviar(mensaje);
 
             server.Desconectar();
 
-            if (ThreadNuevaPartida.IsAlive) ThreadNuevaPartida.Abort() ;
+            if (ThreadNuevaPartida != null) 
+                if(ThreadNuevaPartida.IsAlive)
+                    ThreadNuevaPartida.Abort() ;
 
             //Abrimos formulario login
             this.Hide();
@@ -129,10 +128,26 @@ namespace Cliente
             this.Close();
             nueva_partida_form.ShowDialog();
         }
-
-        private void contextMenuStrip1_Opening(object sender, CancelEventArgs e)
+        private void ConectadosGrid_SelectionChanged(object sender, EventArgs e)
         {
+            num_invitados = ConectadosGrid.SelectedCells.Count;
+            for (int i = 0; i < num_invitados; i++)
+            {
+                lista_seleccionados = lista_seleccionados + "/" + ConectadosGrid.SelectedCells[i].Value;
+            }
+        }
 
+        private void CrearPartida()
+        {
+            Partida p = new Partida();
+            p.ShowDialog();
+        }
+        private void invitar_Btn_Click(object sender, EventArgs e)
+        {
+            server.Enviar("8/" + num_invitados + lista_seleccionados);
+            ThreadStart ts = delegate { CrearPartida(); };
+            partida = new Thread(ts);
+            partida.Start();
         }
     }
 }
