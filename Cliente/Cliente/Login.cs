@@ -19,6 +19,8 @@ namespace Cliente
         Server server;
         Thread atender;
 
+        bool mainAbierto;
+
         public Login()
         {
             InitializeComponent();
@@ -28,6 +30,8 @@ namespace Cliente
         private void Login_Load(object sender, EventArgs e)
         {
             server = new Server();
+
+            mainAbierto = false;
 
             opcionBtn.Text = "Iniciar sesión";
             titleLb.Text = "Registro";
@@ -108,7 +112,7 @@ namespace Cliente
 
         private void atenderServidor()
         {
-            while (true)
+            while (server.IsConnected())
             {
                 //Recibimos la respuesta del servidor
                 string[] trozos = server.Recibir().Split('$');
@@ -126,9 +130,11 @@ namespace Cliente
                         if (mensaje == "Se ha iniciado sesion correctamente.")
                         {
                             main = new Main(server, nombreIn.Text);
+                            mainAbierto = true;
                             DelegadoLogin delegado = new DelegadoLogin(CerrarFormulario);
                             this.Invoke(delegado);
                             main.ShowDialog();
+                            
                         }
                         break;
 
@@ -241,6 +247,13 @@ namespace Cliente
                 claveIn.Text = null;
                 clave2In.Text = null;
             }
+        }
+
+        private void Login_FormClosed(object sender, FormClosedEventArgs e)
+        {
+            if (atender != null && !mainAbierto)
+                if (atender.IsAlive)
+                    atender.Abort();
         }
     }
 }
