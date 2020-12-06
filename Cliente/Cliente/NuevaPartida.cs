@@ -14,59 +14,60 @@ namespace Cliente
     public partial class NuevaPartida : Form
     {
         Server server;
+        int ID;
+        string usuario;
 
-        public NuevaPartida(Server server)
+        public NuevaPartida(Server server, string usuario, string mensaje)
         {
             InitializeComponent();
             this.server = server;
+            this.usuario = usuario;
+            server.Enviar(mensaje);
+            chatLbl.Text = "¡Bienvenido a una nueva partida de poker! Espera a que tus contrincantes acepten tu invitación o pulsa el botón del centro de la mesa.";
         }
 
-        public void TomaRespuesta9(string mensaje)
+        public NuevaPartida(Server server, string usuario, int ID)
         {
-            string[] separado = mensaje.Split('/');
-
-            if (Convert.ToInt32(separado[0]) == 1)
-            {
-                //Invitacion aceptada
-                JugadoresUnidosGrid.ColumnCount = 1;
-                JugadoresUnidosGrid.RowCount = 6;
-                JugadoresUnidosGrid.ColumnHeadersVisible = false;
-                JugadoresUnidosGrid.RowHeadersVisible = false;
-                JugadoresUnidosGrid.AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.Fill;
-                JugadoresUnidosGrid.AutoSizeRowsMode = DataGridViewAutoSizeRowsMode.AllCells;
-
-                //Introducimos el nuevo usuario que se ha unido a la partida en la data grid view
-                int i = 0;
-                bool encontrado = false;
-                while (i < JugadoresUnidosGrid.RowCount && !encontrado)
-                {
-                    if (JugadoresUnidosGrid[0, i].Value == null)
-                        encontrado = true;
-                    else
-                        i++;
-                }
-                if (encontrado)
-                    JugadoresUnidosGrid[0, i].Value = separado[1];
-
-
-                //Sets the alignment of all columns to middle center
-                this.JugadoresUnidosGrid.Columns[0].DefaultCellStyle.Alignment = DataGridViewContentAlignment.MiddleCenter;
-            }
+            InitializeComponent();
+            this.server = server;
+            this.usuario = usuario;
+            this.ID = ID;
+            chatLbl.Text = "¡Bienvenido a una nueva partida de poker! Espera a que otros contrincantes acepten la invitación o a que el host pulse el botón del centro de la mesa.";
         }
-        private void InvitarBtn_Click(object sender, EventArgs e)
-            {
-                string[] invitados = invitadosIn.Text.Split(' ');
 
-                string mensaje_invitados = "";
-                for (int i = 0; i < invitados.Length; i++)
-                {
-                    mensaje_invitados += invitados[i];
-                }
+        public int getID()
+        {
+            return this.ID;
+        }
 
-                //Enviamos la invitacion al servidor
-                server.Enviar("8/" + invitados.Length + "/" + mensaje_invitados);
-            }
+        public void TomaRespuesta10(string mensaje)
+        {
 
-        
+        }
+
+        public void TomaRespuesta12(string mensaje)
+        {
+            this.ID = Convert.ToInt32(mensaje);
+        }
+
+        private void enviar_Btn_Click(object sender, EventArgs e)
+        {
+            string mensaje = "10/" + this.ID + "/" + chatTextBox.Text;
+            server.Enviar(mensaje);
+            chatTextBox.Text = "";
+        }
+
+        private void empezarBtn_Click(object sender, EventArgs e)
+        {
+            MessageBox.Show("Juego no implementado.");
+        }
+
+        private void NuevaPartida_FormClosing(object sender, FormClosingEventArgs e)
+        {
+            string mensaje = "10/" + this.ID + "/" + this.usuario + " se ha ido de la partida.";
+            server.Enviar(mensaje);
+            mensaje = "11/" + this.ID;
+            server.Enviar(mensaje);
+        }
     }
 }

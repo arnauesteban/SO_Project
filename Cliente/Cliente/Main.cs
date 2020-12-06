@@ -15,21 +15,22 @@ namespace Cliente
     public partial class Main : Form
     {
         Server server;
-        Thread partida;
 
         string usuario;
         string lista_seleccionados = null;
         int num_invitados;
 
-        NuevaPartida nueva_partida_form;
+        List<NuevaPartida> lista_forms_partidas = new List<NuevaPartida>();
         Thread ThreadNuevaPartida;
+        int cont_forms = 0;
 
         public delegate void DelegadoMain();
 
-        public NuevaPartida GetFormNuevaPartida()
+        /*public NuevaPartida GetFormNuevaPartida()
         {
             return this.nueva_partida_form;
-        }
+        }*/
+
         public Main(Server server, string usuario)
         {
             InitializeComponent();
@@ -70,6 +71,9 @@ namespace Cliente
             {
                 //Se acepta la partida
                 server.Enviar("9/" + separado[1] + "/1");
+                ThreadStart ts = delegate { AbrirFormularioPartidaCreada(Convert.ToInt32(separado[1])); };
+                ThreadNuevaPartida = new Thread(ts);
+                ThreadNuevaPartida.Start();
             }
             else
             {
@@ -78,23 +82,19 @@ namespace Cliente
             }
         }
 
-        private void desconectar_Btn_Click(object sender, EventArgs e)
+        public void TomaRespuesta10(string mensaje)
         {
-
-            server.Desconectar();
-
-            if (ThreadNuevaPartida != null)
-                if (ThreadNuevaPartida.IsAlive)
+            string[] separado = mensaje.Split('/');
+            for (int j = 0; j < cont_forms; j++)
+                if (lista_forms_partidas[j].getID() == Convert.ToInt32(separado[0]))
                 {
-                    MessageBox.Show("Aborto nueva partida");
-                    ThreadNuevaPartida.Abort();
+                    //lista_forms_partidas[cont_forms - 1].TomaRespuesta10(separado[1]);
                 }
+        }
 
-            //Abrimos formulario login
-            this.Hide();
-            this.Close();
-            Login login = new Login();
-            login.ShowDialog();
+        public void TomaRespuesta12(string mensaje)
+        {
+            //lista_forms_partidas[cont_forms - 1].TomaRespuesta12(mensaje);
         }
 
         private void Form1_Load(object sender, EventArgs e)
@@ -106,26 +106,6 @@ namespace Cliente
 
         }
 
-        private void Main_FormClosed(object sender, FormClosedEventArgs e)
-        {
-
-        }
-
-        private void NuevaPartidaBtn_Click(object sender, EventArgs e)
-        {
-            //Iniciamos el thread de atencion al servidor
-            ThreadStart ts = delegate { AbrirFormularioNuevaPartida(); };
-            ThreadNuevaPartida = new Thread(ts);
-            ThreadNuevaPartida.Start();
-            
-        }
-
-        private void AbrirFormularioNuevaPartida()
-        {
-            nueva_partida_form = new NuevaPartida(this.server);
-            this.Close();
-            nueva_partida_form.ShowDialog();
-        }
         private void ConectadosGrid_SelectionChanged(object sender, EventArgs e)
         {
             num_invitados = ConectadosGrid.SelectedCells.Count;
@@ -135,17 +115,29 @@ namespace Cliente
             }
         }
 
-        private void CrearPartida()
+        private void NuevaPartidaBtn_Click(object sender, EventArgs e)
         {
-            Partida p = new Partida();
-            p.ShowDialog();
+            string mensaje = "8/" + num_invitados + lista_seleccionados;
+            //Iniciamos el thread de atencion al servidor
+            ThreadStart ts = delegate { AbrirFormularioNuevaPartida(mensaje); };
+            ThreadNuevaPartida = new Thread(ts);
+            ThreadNuevaPartida.Start();
         }
-        private void invitar_Btn_Click(object sender, EventArgs e)
+
+        private void AbrirFormularioPartidaCreada(int ID)
         {
-            server.Enviar("8/" + num_invitados + lista_seleccionados);
-            ThreadStart ts = delegate { CrearPartida(); };
-            partida = new Thread(ts);
-            partida.Start();
+            NuevaPartida form = new NuevaPartida(this.server, this.usuario, ID);
+            lista_forms_partidas.Add(form);
+            cont_forms++;
+            form.ShowDialog();
+        }
+
+        private void AbrirFormularioNuevaPartida(string mensaje)
+        {
+            NuevaPartida form = new NuevaPartida(this.server, this.usuario, mensaje);
+            lista_forms_partidas.Add(form);
+            cont_forms++;
+            form.ShowDialog();
         }
 
         private void Main_FormClosing(object sender, FormClosingEventArgs e)
@@ -157,7 +149,27 @@ namespace Cliente
                     ThreadNuevaPartida.Abort();
                 }
 
-            if (server.IsConnected()) server.Desconectar();
+            if (server.IsConnected())
+                server.Desconectar();
+        }
+
+        private void desconectar_Btn_Click(object sender, EventArgs e)
+        {
+
+            server.Desconectar();
+
+            if (ThreadNuevaPartida != null)
+                if (ThreadNuevaPartida.IsAlive)
+                {
+                    MessageBox.Show("Aborto partida");
+                    ThreadNuevaPartida.Abort();
+                }
+
+            //Abrimos formulario login
+            this.Hide();
+            this.Close();
+            Login login = new Login();
+            login.ShowDialog();
         }
     }
 }

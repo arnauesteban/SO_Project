@@ -29,59 +29,62 @@ namespace Cliente
         /// </summary>
         private void InitializeComponent()
         {
-            this.JugadoresUnidosGrid = new System.Windows.Forms.DataGridView();
-            this.label1 = new System.Windows.Forms.Label();
-            this.invitadosIn = new System.Windows.Forms.TextBox();
-            this.InvitarBtn = new System.Windows.Forms.Button();
-            ((System.ComponentModel.ISupportInitialize)(this.JugadoresUnidosGrid)).BeginInit();
+            this.chatTextBox = new System.Windows.Forms.TextBox();
+            this.enviar_Btn = new System.Windows.Forms.Button();
+            this.chatLbl = new System.Windows.Forms.Label();
+            this.empezarBtn = new System.Windows.Forms.Button();
             this.SuspendLayout();
             // 
-            // JugadoresUnidosGrid
+            // chatTextBox
             // 
-            this.JugadoresUnidosGrid.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
-            this.JugadoresUnidosGrid.Location = new System.Drawing.Point(373, 12);
-            this.JugadoresUnidosGrid.Name = "JugadoresUnidosGrid";
-            this.JugadoresUnidosGrid.Size = new System.Drawing.Size(240, 150);
-            this.JugadoresUnidosGrid.TabIndex = 0;
+            this.chatTextBox.Location = new System.Drawing.Point(416, 312);
+            this.chatTextBox.Name = "chatTextBox";
+            this.chatTextBox.Size = new System.Drawing.Size(116, 20);
+            this.chatTextBox.TabIndex = 6;
+            this.chatTextBox.Text = "Escribe algo";
             // 
-            // label1
+            // enviar_Btn
             // 
-            this.label1.AutoSize = true;
-            this.label1.Location = new System.Drawing.Point(13, 13);
-            this.label1.Name = "label1";
-            this.label1.Size = new System.Drawing.Size(48, 13);
-            this.label1.TabIndex = 1;
-            this.label1.Text = "Invitar a:";
+            this.enviar_Btn.Location = new System.Drawing.Point(538, 312);
+            this.enviar_Btn.Name = "enviar_Btn";
+            this.enviar_Btn.Size = new System.Drawing.Size(75, 22);
+            this.enviar_Btn.TabIndex = 5;
+            this.enviar_Btn.Text = "Enviar";
+            this.enviar_Btn.UseVisualStyleBackColor = true;
+            this.enviar_Btn.Click += new System.EventHandler(this.enviar_Btn_Click);
             // 
-            // invitadosIn
+            // chatLbl
             // 
-            this.invitadosIn.Location = new System.Drawing.Point(16, 30);
-            this.invitadosIn.Name = "invitadosIn";
-            this.invitadosIn.Size = new System.Drawing.Size(137, 20);
-            this.invitadosIn.TabIndex = 2;
+            this.chatLbl.BackColor = System.Drawing.Color.Black;
+            this.chatLbl.ForeColor = System.Drawing.Color.White;
+            this.chatLbl.Location = new System.Drawing.Point(413, 9);
+            this.chatLbl.Name = "chatLbl";
+            this.chatLbl.Size = new System.Drawing.Size(200, 300);
+            this.chatLbl.TabIndex = 4;
+            this.chatLbl.Text = "label2";
             // 
-            // InvitarBtn
+            // empezarBtn
             // 
-            this.InvitarBtn.Location = new System.Drawing.Point(16, 56);
-            this.InvitarBtn.Name = "InvitarBtn";
-            this.InvitarBtn.Size = new System.Drawing.Size(75, 23);
-            this.InvitarBtn.TabIndex = 3;
-            this.InvitarBtn.Text = "Invitar";
-            this.InvitarBtn.UseVisualStyleBackColor = true;
-            this.InvitarBtn.Click += new System.EventHandler(this.InvitarBtn_Click);
+            this.empezarBtn.Location = new System.Drawing.Point(152, 150);
+            this.empezarBtn.Name = "empezarBtn";
+            this.empezarBtn.Size = new System.Drawing.Size(75, 23);
+            this.empezarBtn.TabIndex = 7;
+            this.empezarBtn.Text = "Empezar";
+            this.empezarBtn.UseVisualStyleBackColor = true;
+            this.empezarBtn.Click += new System.EventHandler(this.empezarBtn_Click);
             // 
             // NuevaPartida
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(625, 295);
-            this.Controls.Add(this.InvitarBtn);
-            this.Controls.Add(this.invitadosIn);
-            this.Controls.Add(this.label1);
-            this.Controls.Add(this.JugadoresUnidosGrid);
+            this.ClientSize = new System.Drawing.Size(625, 345);
+            this.Controls.Add(this.empezarBtn);
+            this.Controls.Add(this.chatTextBox);
+            this.Controls.Add(this.enviar_Btn);
+            this.Controls.Add(this.chatLbl);
             this.Name = "NuevaPartida";
             this.Text = "Form1";
-            ((System.ComponentModel.ISupportInitialize)(this.JugadoresUnidosGrid)).EndInit();
+            this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.NuevaPartida_FormClosing);
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -89,9 +92,10 @@ namespace Cliente
 
         #endregion
 
-        private System.Windows.Forms.DataGridView JugadoresUnidosGrid;
-        private System.Windows.Forms.Label label1;
-        private System.Windows.Forms.TextBox invitadosIn;
-        private System.Windows.Forms.Button InvitarBtn;
+        private System.Windows.Forms.TextBox chatTextBox;
+        private System.Windows.Forms.Button enviar_Btn;
+        private System.Windows.Forms.Label chatLbl;
+        private System.Windows.Forms.Button empezarBtn;
+
     }
 }

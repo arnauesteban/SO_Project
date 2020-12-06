@@ -38,16 +38,14 @@ TListaPartidas lista_partidas;
 //Estructura necesaria para el acceso excluyente
 pthread_mutex_t mutex = PTHREAD_MUTEX_INITIALIZER;
 
-void AnadirConectado(char nombre[20], int socket)
-{
+void AnadirConectado(char nombre[20], int socket) {
 	strcpy(lista_conectados.usuario[lista_conectados.num].nombre, nombre);
 	lista_conectados.usuario[lista_conectados.num].sock = socket;
 	lista_conectados.num++;
 }
 
 //Retorna 1 si lo ha eliminado, -1 si el usuario no existe
-int EliminarConectado(int i)
-{
+int EliminarConectado(int i) {
 	//Si hemos encontrado al usuario, lo eliminamos
 	if(i < lista_conectados.num)
 	{
@@ -63,8 +61,7 @@ int EliminarConectado(int i)
 	return -1;
 }
 
-void GetListaConectados(char lista[])
-{
+void GetListaConectados(char lista[]) {
 	for(int i = 0; i < lista_conectados.num; i++)
 	{
 		sprintf(lista, "%s%s/", lista, lista_conectados.usuario[i].nombre);
@@ -74,11 +71,9 @@ void GetListaConectados(char lista[])
 	lista[strlen(lista)-1] = '\0';
 }
 
-
 //Devuelve el indice donde se encuentra el usuario conectado con el socket pasado como parametro
 //Retorna -1 si no existe
-int GetIndex(int socket)
-{
+int GetIndex(int socket) {
 	//Busqueda en la lista de conectados
 	int i = 0;
 	int encontrado = 0;
@@ -97,8 +92,7 @@ int GetIndex(int socket)
 		return -1;
 }
 
-void EnviarListaConectadosATodos()
-{
+void EnviarListaConectadosATodos() {
 	char lista[2105];
 	GetListaConectados(lista);
 		
@@ -169,8 +163,6 @@ int Registrarse (char usuario[20], char clave[20], MYSQL *conn) {
 	return 0;
 }
 
-
-
 //Funcion que inicia la sesion del usuario
 int IniciarSesion(char usuario[20], char clave[20], MYSQL *conn) {
 	MYSQL_RES *resultado;
@@ -201,8 +193,6 @@ int IniciarSesion(char usuario[20], char clave[20], MYSQL *conn) {
 	
 	return 0;
 }
-
-
 
 //Funcion que retorna los record de los jugadores que han perdido partidas contra Arnau
 int PuntuacionPerdedores(char lista[100], MYSQL *conn) {
@@ -236,7 +226,6 @@ int PuntuacionPerdedores(char lista[100], MYSQL *conn) {
 	}
 	return 0;
 }
-
 
 //Funcion que retorna los nombres de los jugadores que han jugado la partida mas larga
 int NombresPartidaLarga(char lista[100], MYSQL *conn) {
@@ -272,7 +261,6 @@ int NombresPartidaLarga(char lista[100], MYSQL *conn) {
 	   return 0;
 }
 
-
 //Funcion que devuelve la mayor puntuacion record registrada en la base de datos
 int DameRecord(MYSQL *conn) {
 	MYSQL_RES *resultado;
@@ -302,8 +290,7 @@ int DameRecord(MYSQL *conn) {
 	return ID;
 }
 
-int AsignarIdPartida(MYSQL *conn)
-{
+int AsignarIdPartida(MYSQL *conn) {
 	MYSQL_RES *resultado;
 	MYSQL_ROW row;
 	int err;
@@ -349,9 +336,7 @@ int AsignarIdPartida(MYSQL *conn)
 
 //Envia a todos los usuarios de una partida activa la lista de jugadores
 //Se envia al cliente el mensaje: nombre1/nombre2/...
-
-void EnviarListaJugadoresPartidaActiva(int i)
-{
+void EnviarListaJugadoresPartidaActiva(int i) {
 	TPartida partida = lista_partidas.partida[i];
 	char mensaje[180];
 	
@@ -388,8 +373,8 @@ void *AtenderCliente (void *socket){
 	}
 	//inicializar la conexion, entrando nuestras claves de acceso y el nombre de la base de datos a la que queremos acceder 
 
-	//conn = mysql_real_connect (conn, "localhost","root", "mysql", "TG11",0, NULL, 0);
-	conn = mysql_real_connect (conn, "localhost", "root", "mysql", "TG11", 0, NULL, 0);
+	conn = mysql_real_connect (conn, "localhost","root", "mysql", "TG11",0, NULL, 0);
+	//conn = mysql_real_connect (conn, "shiva2.upc.es", "root", "mysql", "TG11", 0, NULL, 0);
 
 	if (conn==NULL) {
 		printf ("Error al inicializar la conexion: %u %s\n",
@@ -561,7 +546,7 @@ void *AtenderCliente (void *socket){
 			
 			//Asignamos una ID a la partida, miramos que no exista en la base de datos ni en la lista de partidas local
 			int id = AsignarIdPartida(conn);
-			lista_partidas.partida[lista_partidas.num].ID = lista_partidas.num;
+			lista_partidas.partida[lista_partidas.num].ID = id; //lista_partidas.num;
 			
 			lista_partidas.partida[lista_partidas.num].lista_jugadores.num = 1;
 			
@@ -583,6 +568,8 @@ void *AtenderCliente (void *socket){
 				}
 				p = strtok(NULL, "/");
 			}
+			sprintf(mensaje, "12$%d", id);
+			write (sock_conn, mensaje, strlen(mensaje));
 		}
 		
 		//Aceptar o rechazar la invitación
@@ -629,8 +616,25 @@ void *AtenderCliente (void *socket){
 				
 				//Enviamos a todos los jugadores de la partida la lista de jugadores actualizada
 				EnviarListaJugadoresPartidaActiva(l);
+				
+				//Enviamos a los jugadores de la partida un mensaje conforme el jugador ha aceptado la invitacion
+				char mensaje[100];
+				char mensaje2[100];
+				sprintf(mensaje, "10$%d/%s se ha unido a la partida.", partida.ID, nombre_invitado);
+				sprintf(mensaje2, "10$%d/Te has unido a la partida.", partida.ID);
+				for(int j = 0; j < partida.lista_jugadores.num; j++) {
+					if(partida.lista_jugadores.usuario[j].sock == sock_conn)
+						write (sock_conn, mensaje2, strlen(mensaje2));
+					else
+						write (partida.lista_jugadores.usuario[j].sock, mensaje, strlen(mensaje));
+				}
 			}
-			//Si se ha rechazado la invitacion, no hacemos nada, no lo unimos ni le enviamos nada
+			else {
+				char mensaje[100];
+				sprintf(mensaje, "10$%d/%s ha rechazado unirse a la partida.", lista_partidas.partida[l].ID, nombre_invitado);
+				for(int j = 0; j < lista_partidas.partida[l].lista_jugadores.num; j++)
+					write (lista_partidas.partida[l].lista_jugadores.usuario[j].sock, mensaje, strlen(mensaje));
+			}
 		}
 		
 		else if(codigo == 10) {
@@ -668,13 +672,14 @@ void *AtenderCliente (void *socket){
 			int k = 0;
 			encontrado = 0;
 			while (!encontrado && k < lista_partidas.partida[j].lista_jugadores.num) {
-				if(lista_partidas.partida[j].lista_jugadores.usuario[k].sock = sock_conn)
+				if(lista_partidas.partida[j].lista_jugadores.usuario[k].sock == sock_conn)
 					encontrado = 1;
 				else
 				   j++;
 			}
 			strcpy(lista_partidas.partida[j].lista_jugadores.usuario[k].nombre, "");
 			lista_partidas.partida[j].lista_jugadores.usuario[k].sock = -1;
+			lista_partidas.partida[j].lista_jugadores.num--;
 		}
 		
 		
@@ -684,7 +689,6 @@ void *AtenderCliente (void *socket){
 	// Se acabo el servicio para este cliente
 	close(sock_conn);
 }
-
 
 //Inicio del código
 int main(int argc, char *argv[]){
@@ -707,7 +711,7 @@ int main(int argc, char *argv[]){
 	serv_adr.sin_addr.s_addr = htonl(INADDR_ANY);
 	
 	//Escucharemos en el puerto indicado entre parenteis
-	serv_adr.sin_port = htons(9400);
+	serv_adr.sin_port = htons(9060);
 	if (bind(sock_listen, (struct sockaddr *) &serv_adr, sizeof(serv_adr)) < 0)
 		printf ("Error al bind\n");
 	if (listen(sock_listen, 2) < 0)

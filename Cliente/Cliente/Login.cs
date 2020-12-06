@@ -161,6 +161,14 @@ namespace Cliente
                     case 8:
                         main.TomaRespuesta8(mensaje);
                         break;
+
+                    case 10:
+                        main.TomaRespuesta10(mensaje);
+                        break;
+
+                    case 12:
+                        main.TomaRespuesta12(mensaje);
+                        break;
                 }
             }
         }
