@@ -17,12 +17,12 @@ namespace Cliente
         int ID;
         string usuario;
 
-        public NuevaPartida(Server server, string usuario, string mensaje)
+        public NuevaPartida(Server server, string usuario)
         {
             InitializeComponent();
             this.server = server;
             this.usuario = usuario;
-            server.Enviar(mensaje);
+            usuarioLbl.Text = this.usuario;
             chatLbl.Text = "¡Bienvenido a una nueva partida de poker! Espera a que tus contrincantes acepten tu invitación o pulsa el botón del centro de la mesa.";
         }
 
@@ -32,6 +32,8 @@ namespace Cliente
             this.server = server;
             this.usuario = usuario;
             this.ID = ID;
+            usuarioLbl.Text = this.usuario;
+            IDLbl.Text = "ID: " + this.ID;
             chatLbl.Text = "¡Bienvenido a una nueva partida de poker! Espera a que otros contrincantes acepten la invitación o a que el host pulse el botón del centro de la mesa.";
         }
 
@@ -42,17 +44,18 @@ namespace Cliente
 
         public void TomaRespuesta10(string mensaje)
         {
-
+            chatLbl.Text = chatLbl.Text + Environment.NewLine + mensaje;
         }
 
         public void TomaRespuesta12(string mensaje)
         {
             this.ID = Convert.ToInt32(mensaje);
+            IDLbl.Text = "ID: " + this.ID;
         }
 
         private void enviar_Btn_Click(object sender, EventArgs e)
         {
-            string mensaje = "10/" + this.ID + "/" + chatTextBox.Text;
+            string mensaje = "10/" + this.ID + "/" + this.usuario + ": " + chatTextBox.Text;
             server.Enviar(mensaje);
             chatTextBox.Text = "";
         }
@@ -68,6 +71,11 @@ namespace Cliente
             server.Enviar(mensaje);
             mensaje = "11/" + this.ID;
             server.Enviar(mensaje);
+        }
+
+        private void chatTextBox_Click(object sender, EventArgs e)
+        {
+            chatTextBox.Text = "";
         }
     }
 }

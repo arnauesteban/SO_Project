@@ -393,14 +393,13 @@ void *AtenderCliente (void *socket){
 	while(terminar == 0) {
 		// Ahora recibimos el mensaje del cliente, que dejamos en buff
 		ret=read(sock_conn,buff, sizeof(buff));
-		printf ("Recibido\n");
 		
 		// Tenemos que anadirle la marca de fin de string para que no escriba lo que hay despues en el buffer
 		buff[ret]='\0';
 		
 		//Escribimos el nombre en la consola del servidor
-		printf ("Se ha conectado: %s\n",buff);
-		
+		printf ("Se ha recibido %s\n",buff);
+
 		//Extraemos el codigo de peticion que nos ha enviado el cliente
 		char *p = strtok(buff, "/");
 		int codigo =  atoi (p);
@@ -457,6 +456,7 @@ void *AtenderCliente (void *socket){
 				printf("Error inesperado al registar al usuario.");
 			
 			//Enviamos el resultado
+			printf("Se ha enviado %s al cliente.\n", buff2);
 			write (sock_conn,buff2, strlen(buff2));
 		}
 		
@@ -488,6 +488,7 @@ void *AtenderCliente (void *socket){
 				printf("Error inesperado.");
 			
 			//Enviamos el resultado
+			printf("Se ha enviado %s al cliente.\n", buff2);
 			write (sock_conn,buff2, strlen(buff2));
 		}
 		
@@ -507,10 +508,9 @@ void *AtenderCliente (void *socket){
 			//Borramos la ultima '/'
 			lista[strlen(lista)-1] = '\0';
 			char listadefinitiva[500];
-			printf("%s\n", lista);
 			sprintf(listadefinitiva, "3$%s", lista);
-			printf("%s\n", listadefinitiva);
 
+			printf("Se ha enviado %s al cliente.\n", listadefinitiva);
 			write (sock_conn, listadefinitiva, strlen(listadefinitiva));
 			
 			char nombre[20];
@@ -562,13 +562,15 @@ void *AtenderCliente (void *socket){
 			for (int j = 0; j < num_invitados; j++) {
 				char nombre_invitado[20];
 				strcpy(nombre_invitado, p);
+				printf("Se ha enviado %s\n", mensaje);
 				for(int k = 0; k < lista_conectados.num; k++) {
 					if(strcmp(lista_conectados.usuario[k].nombre, nombre_invitado) == 0)
 						write (lista_conectados.usuario[k].sock, mensaje, strlen(mensaje));
 				}
 				p = strtok(NULL, "/");
 			}
-			sprintf(mensaje, "12$%d", id);
+			sprintf(mensaje, "12$%d", lista_partidas.partida[lista_partidas.num].ID);
+			printf("Se ha enviado %s\n", mensaje);
 			write (sock_conn, mensaje, strlen(mensaje));
 		}
 		
@@ -595,9 +597,11 @@ void *AtenderCliente (void *socket){
 			
 			//Buscamos la partida concreta en la lista de partidas
 			// l sera el valor del indice de la partida dentro de la lista
+			l = 0;
+			encontrado = 0;
 			while (!encontrado && l < lista_partidas.num) 
 			{
-					if(lista_partidas.partida[l].ID = ID_partida)
+					if(lista_partidas.partida[l].ID == ID_partida)
 						encontrado = 1;
 					else
 						l++;
@@ -608,30 +612,34 @@ void *AtenderCliente (void *socket){
 				//Se ha aceptado la invitacion
 				
 				//Unimos al usuario a la partida
-				TPartida partida = lista_partidas.partida[l];
 				
-				strcpy(partida.lista_jugadores.usuario[partida.lista_jugadores.num].nombre, nombre_invitado);
-				partida.lista_jugadores.usuario[partida.lista_jugadores.num].sock = sock_conn;
-				partida.lista_jugadores.num++;
+				strcpy(lista_partidas.partida[l].lista_jugadores.usuario[lista_partidas.partida[l].lista_jugadores.num].nombre, nombre_invitado);
+				lista_partidas.partida[l].lista_jugadores.usuario[lista_partidas.partida[l].lista_jugadores.num].sock = sock_conn;
+				lista_partidas.partida[l].lista_jugadores.num++;
 				
 				//Enviamos a todos los jugadores de la partida la lista de jugadores actualizada
-				EnviarListaJugadoresPartidaActiva(l);
+				//EnviarListaJugadoresPartidaActiva(l);
 				
 				//Enviamos a los jugadores de la partida un mensaje conforme el jugador ha aceptado la invitacion
 				char mensaje[100];
 				char mensaje2[100];
-				sprintf(mensaje, "10$%d/%s se ha unido a la partida.", partida.ID, nombre_invitado);
-				sprintf(mensaje2, "10$%d/Te has unido a la partida.", partida.ID);
-				for(int j = 0; j < partida.lista_jugadores.num; j++) {
-					if(partida.lista_jugadores.usuario[j].sock == sock_conn)
+				sprintf(mensaje, "10$%d/%s se ha unido a la partida.", lista_partidas.partida[l].ID, nombre_invitado);
+				sprintf(mensaje2, "10$%d/Te has unido a la partida.", lista_partidas.partida[l].ID);
+				for(int j = 0; j < lista_partidas.partida[l].lista_jugadores.num; j++) {
+					if(lista_partidas.partida[l].lista_jugadores.usuario[j].sock == sock_conn) {
+						printf("Se ha enviado %s\n", mensaje2);
 						write (sock_conn, mensaje2, strlen(mensaje2));
-					else
-						write (partida.lista_jugadores.usuario[j].sock, mensaje, strlen(mensaje));
+					}
+					else {
+						printf("Se ha enviado %s\n", mensaje);
+						write (lista_partidas.partida[l].lista_jugadores.usuario[j].sock, mensaje, strlen(mensaje));
+					}
 				}
 			}
 			else {
 				char mensaje[100];
 				sprintf(mensaje, "10$%d/%s ha rechazado unirse a la partida.", lista_partidas.partida[l].ID, nombre_invitado);
+				printf("Se ha enviado %s\n", mensaje);
 				for(int j = 0; j < lista_partidas.partida[l].lista_jugadores.num; j++)
 					write (lista_partidas.partida[l].lista_jugadores.usuario[j].sock, mensaje, strlen(mensaje));
 			}
@@ -654,8 +662,9 @@ void *AtenderCliente (void *socket){
 			}
 			char mensaje_final[250];
 			sprintf(mensaje_final, "10$%d/%s", ID_partida, mensaje);
+			printf("Se ha enviado %s\n", mensaje_final);
 			for(int k = 0; k < lista_partidas.partida[j].lista_jugadores.num; k++)
-				write (lista_partidas.partida[j].lista_jugadores.usuario[k].sock, mensaje, strlen(mensaje));
+				write (lista_partidas.partida[j].lista_jugadores.usuario[k].sock, mensaje_final, strlen(mensaje_final));
 		}
 		
 		else if(codigo = 11) {
@@ -681,10 +690,6 @@ void *AtenderCliente (void *socket){
 			lista_partidas.partida[j].lista_jugadores.usuario[k].sock = -1;
 			lista_partidas.partida[j].lista_jugadores.num--;
 		}
-		
-		
-		printf ("%s\n", buff2);
-		
 	}
 	// Se acabo el servicio para este cliente
 	close(sock_conn);
@@ -711,7 +716,7 @@ int main(int argc, char *argv[]){
 	serv_adr.sin_addr.s_addr = htonl(INADDR_ANY);
 	
 	//Escucharemos en el puerto indicado entre parenteis
-	serv_adr.sin_port = htons(9060);
+	serv_adr.sin_port = htons(9050);
 	if (bind(sock_listen, (struct sockaddr *) &serv_adr, sizeof(serv_adr)) < 0)
 		printf ("Error al bind\n");
 	if (listen(sock_listen, 2) < 0)

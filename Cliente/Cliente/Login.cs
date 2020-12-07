@@ -50,7 +50,15 @@ namespace Cliente
                 // Nos desconectamos
                 MessageBox.Show("Abortamos");
                 atender.Abort();
-            } 
+            }
+
+            claveIn.PasswordChar = '*';
+            // Change all text entered to be lowercase.
+            claveIn.CharacterCasing = CharacterCasing.Lower;
+
+            clave2In.PasswordChar = '*';
+            // Change all text entered to be lowercase.
+            clave2In.CharacterCasing = CharacterCasing.Lower;
         }
 
         private bool ComprobarCaracteres(string cadena, string campo)
@@ -116,7 +124,8 @@ namespace Cliente
         {
             main = new Main(server, nombreIn.Text);
             mainAbierto = true;
-            this.Close();
+            DelegadoLogin delegado = new DelegadoLogin(CerrarFormulario);
+            this.Invoke(delegado, new object[] {});
             main.ShowDialog();
         }
 
@@ -146,12 +155,6 @@ namespace Cliente
                             
                         }
                         break;
-
-                    /*case 3:
-                        NuevaPartida nueva_partida_form = main.GetFormNuevaPartida();
-                        nueva_partida_form.TomaRespuesta9(mensaje);
-                        break;*/
-
                     case 3:
                         //MessageBox.Show("Conectados recibidos");
                         if(main != null)

@@ -34,30 +34,45 @@ namespace Cliente
         public Main(Server server, string usuario)
         {
             InitializeComponent();
-            CheckForIllegalCrossThreadCalls = false;
             this.server = server;
             this.usuario = usuario;
+            CheckForIllegalCrossThreadCalls = false;
         }
 
         public void TomaRespuesta3(string mensaje)
         {
             string[] separado = mensaje.Split('/');
-
-            ConectadosGrid.ColumnCount = 1;
-            ConectadosGrid.RowCount = separado.Length;
-            ConectadosGrid.ColumnHeadersVisible = false;
-            ConectadosGrid.RowHeadersVisible = false;
-            ConectadosGrid.AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.Fill;
-            ConectadosGrid.AutoSizeRowsMode = DataGridViewAutoSizeRowsMode.AllCells;
-
-            //Introducimos el nombre de los usuarios conectados en la DataGridView
-            for (int j = 0; j < separado.Length; j++)
+            if (separado.Length > 1)
             {
-                ConectadosGrid[0, j].Value = separado[j];
-            }
+                ConectadosGrid.ColumnCount = 1;
+                ConectadosGrid.RowCount = separado.Length - 1;
+                ConectadosGrid.ColumnHeadersVisible = false;
+                ConectadosGrid.RowHeadersVisible = false;
+                ConectadosGrid.AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.Fill;
+                ConectadosGrid.AutoSizeRowsMode = DataGridViewAutoSizeRowsMode.AllCells;
+                ConectadosGrid.ClearSelection();
 
-            //Sets the alignment of all columns to middle center
-            this.ConectadosGrid.Columns[0].DefaultCellStyle.Alignment = DataGridViewContentAlignment.MiddleCenter;
+                //Introducimos el nombre de los usuarios conectados en la DataGridView
+                int j = 0;
+                bool encontrado = false;
+                while(j < separado.Length && !encontrado)
+                {
+
+                    if (separado[j] != this.usuario)
+                        ConectadosGrid[0, j].Value = separado[j];
+                    else
+                        encontrado = true;
+                    j++;
+                }
+                while (j < separado.Length)
+                {
+                    ConectadosGrid[0, j - 1].Value = separado[j];
+                    j++;
+                }
+
+                //Sets the alignment of all columns to middle center
+                this.ConectadosGrid.Columns[0].DefaultCellStyle.Alignment = DataGridViewContentAlignment.MiddleCenter;
+            }
         }
 
         public void TomaRespuesta8(string mensaje)
@@ -88,13 +103,13 @@ namespace Cliente
             for (int j = 0; j < cont_forms; j++)
                 if (lista_forms_partidas[j].getID() == Convert.ToInt32(separado[0]))
                 {
-                    //lista_forms_partidas[cont_forms - 1].TomaRespuesta10(separado[1]);
+                    lista_forms_partidas[cont_forms - 1].TomaRespuesta10(separado[1]);
                 }
         }
 
         public void TomaRespuesta12(string mensaje)
         {
-            //lista_forms_partidas[cont_forms - 1].TomaRespuesta12(mensaje);
+            lista_forms_partidas[cont_forms - 1].TomaRespuesta12(mensaje);
         }
 
         private void Form1_Load(object sender, EventArgs e)
@@ -103,6 +118,7 @@ namespace Cliente
 
             //Pedimos al servidor que nos envie la lista de conectados actualizada
             server.Enviar("3/");
+            ConectadosGrid.ClearSelection();
 
         }
 
@@ -134,9 +150,10 @@ namespace Cliente
 
         private void AbrirFormularioNuevaPartida(string mensaje)
         {
-            NuevaPartida form = new NuevaPartida(this.server, this.usuario, mensaje);
+            NuevaPartida form = new NuevaPartida(this.server, this.usuario);
             lista_forms_partidas.Add(form);
             cont_forms++;
+            server.Enviar(mensaje);
             form.ShowDialog();
         }
 

@@ -33,6 +33,8 @@ namespace Cliente
             this.enviar_Btn = new System.Windows.Forms.Button();
             this.chatLbl = new System.Windows.Forms.Label();
             this.empezarBtn = new System.Windows.Forms.Button();
+            this.usuarioLbl = new System.Windows.Forms.Label();
+            this.IDLbl = new System.Windows.Forms.Label();
             this.SuspendLayout();
             // 
             // chatTextBox
@@ -42,6 +44,7 @@ namespace Cliente
             this.chatTextBox.Size = new System.Drawing.Size(116, 20);
             this.chatTextBox.TabIndex = 6;
             this.chatTextBox.Text = "Escribe algo";
+            this.chatTextBox.Click += new System.EventHandler(this.chatTextBox_Click);
             // 
             // enviar_Btn
             // 
@@ -73,11 +76,31 @@ namespace Cliente
             this.empezarBtn.UseVisualStyleBackColor = true;
             this.empezarBtn.Click += new System.EventHandler(this.empezarBtn_Click);
             // 
+            // usuarioLbl
+            // 
+            this.usuarioLbl.AutoSize = true;
+            this.usuarioLbl.Location = new System.Drawing.Point(13, 13);
+            this.usuarioLbl.Name = "usuarioLbl";
+            this.usuarioLbl.Size = new System.Drawing.Size(45, 13);
+            this.usuarioLbl.TabIndex = 8;
+            this.usuarioLbl.Text = "Jugador";
+            // 
+            // IDLbl
+            // 
+            this.IDLbl.AutoSize = true;
+            this.IDLbl.Location = new System.Drawing.Point(16, 30);
+            this.IDLbl.Name = "IDLbl";
+            this.IDLbl.Size = new System.Drawing.Size(18, 13);
+            this.IDLbl.TabIndex = 9;
+            this.IDLbl.Text = "ID";
+            // 
             // NuevaPartida
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(625, 345);
+            this.Controls.Add(this.IDLbl);
+            this.Controls.Add(this.usuarioLbl);
             this.Controls.Add(this.empezarBtn);
             this.Controls.Add(this.chatTextBox);
             this.Controls.Add(this.enviar_Btn);
@@ -96,6 +119,8 @@ namespace Cliente
         private System.Windows.Forms.Button enviar_Btn;
         private System.Windows.Forms.Label chatLbl;
         private System.Windows.Forms.Button empezarBtn;
+        private System.Windows.Forms.Label usuarioLbl;
+        private System.Windows.Forms.Label IDLbl;
 
     }
 }
