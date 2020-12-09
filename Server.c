@@ -572,6 +572,7 @@ void *AtenderCliente (void *socket){
 			sprintf(mensaje, "12$%d", lista_partidas.partida[lista_partidas.num].ID);
 			printf("Se ha enviado %s\n", mensaje);
 			write (sock_conn, mensaje, strlen(mensaje));
+			lista_partidas.num++;
 		}
 		
 		//Aceptar o rechazar la invitación
@@ -607,10 +608,9 @@ void *AtenderCliente (void *socket){
 						l++;
 			}
 			
-			if(respuesta = 1) {
+			if(respuesta == 1) {
 				
 				//Se ha aceptado la invitacion
-				
 				//Unimos al usuario a la partida
 				
 				strcpy(lista_partidas.partida[l].lista_jugadores.usuario[lista_partidas.partida[l].lista_jugadores.num].nombre, nombre_invitado);
@@ -624,13 +624,8 @@ void *AtenderCliente (void *socket){
 				char mensaje[100];
 				char mensaje2[100];
 				sprintf(mensaje, "10$%d/%s se ha unido a la partida.", lista_partidas.partida[l].ID, nombre_invitado);
-				sprintf(mensaje2, "10$%d/Te has unido a la partida.", lista_partidas.partida[l].ID);
 				for(int j = 0; j < lista_partidas.partida[l].lista_jugadores.num; j++) {
-					if(lista_partidas.partida[l].lista_jugadores.usuario[j].sock == sock_conn) {
-						printf("Se ha enviado %s\n", mensaje2);
-						write (sock_conn, mensaje2, strlen(mensaje2));
-					}
-					else {
+					if(lista_partidas.partida[l].lista_jugadores.usuario[j].sock != sock_conn) {
 						printf("Se ha enviado %s\n", mensaje);
 						write (lista_partidas.partida[l].lista_jugadores.usuario[j].sock, mensaje, strlen(mensaje));
 					}
@@ -654,7 +649,7 @@ void *AtenderCliente (void *socket){
 			int j = 0;
 			int encontrado = 0;
 			while (!encontrado && j < lista_partidas.num) {
-				if(lista_partidas.partida[j].ID = ID_partida) {
+				if(lista_partidas.partida[j].ID == ID_partida) {
 					encontrado = 1;
 				}
 				else
@@ -667,13 +662,13 @@ void *AtenderCliente (void *socket){
 				write (lista_partidas.partida[j].lista_jugadores.usuario[k].sock, mensaje_final, strlen(mensaje_final));
 		}
 		
-		else if(codigo = 11) {
+		else if(codigo == 11) {
 			p = strtok(NULL, "/");
 			int ID_partida = atoi(p);
 			int j = 0;
 			int encontrado = 0;
 			while (!encontrado && j < lista_partidas.num) {
-				if(lista_partidas.partida[j].ID = ID_partida)
+				if(lista_partidas.partida[j].ID == ID_partida)
 					encontrado = 1;
 				else
 				   j++;
@@ -684,7 +679,7 @@ void *AtenderCliente (void *socket){
 				if(lista_partidas.partida[j].lista_jugadores.usuario[k].sock == sock_conn)
 					encontrado = 1;
 				else
-				   j++;
+				   k++;
 			}
 			strcpy(lista_partidas.partida[j].lista_jugadores.usuario[k].nombre, "");
 			lista_partidas.partida[j].lista_jugadores.usuario[k].sock = -1;
