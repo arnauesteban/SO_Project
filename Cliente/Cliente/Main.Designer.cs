@@ -48,10 +48,15 @@
             // 
             // ConectadosGrid
             // 
+            this.ConectadosGrid.AllowUserToAddRows = false;
+            this.ConectadosGrid.AllowUserToDeleteRows = false;
+            this.ConectadosGrid.AllowUserToResizeColumns = false;
+            this.ConectadosGrid.AllowUserToResizeRows = false;
             this.ConectadosGrid.BackgroundColor = System.Drawing.SystemColors.ActiveCaptionText;
             this.ConectadosGrid.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
             this.ConectadosGrid.Location = new System.Drawing.Point(735, 36);
             this.ConectadosGrid.Name = "ConectadosGrid";
+            this.ConectadosGrid.ReadOnly = true;
             this.ConectadosGrid.Size = new System.Drawing.Size(172, 298);
             this.ConectadosGrid.TabIndex = 13;
             this.ConectadosGrid.SelectionChanged += new System.EventHandler(this.ConectadosGrid_SelectionChanged);

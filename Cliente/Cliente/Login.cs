@@ -22,14 +22,18 @@ namespace Cliente
 
         bool mainAbierto;
 
+        public delegate void DelegadoLogin();
+
         public Login()
         {
+            //Constructor del formulario. Inicializa los objetos que contiene.
             InitializeComponent();
             
         }
 
         private void Login_Load(object sender, EventArgs e)
         {
+            //Evento de carga del formulario. Crea un objeto Server y configura parámetros de los objetos del formulario.
             server = new Server();
 
             mainAbierto = false;
@@ -46,31 +50,32 @@ namespace Cliente
             if (server.IsConnected())
             {
                 server.Desconectar();
-
-                // Nos desconectamos
+                //Si estábamos conectados al servidor, nos desconectamos
                 MessageBox.Show("Abortamos");
                 atender.Abort();
             }
 
+            //Configuramos los textBox de clave para que cuando se escriba en ellos se vea únicamente el carácter '*'.
             claveIn.PasswordChar = '*';
-            // Change all text entered to be lowercase.
-            claveIn.CharacterCasing = CharacterCasing.Lower;
-
             clave2In.PasswordChar = '*';
-            // Change all text entered to be lowercase.
-            clave2In.CharacterCasing = CharacterCasing.Lower;
         }
 
         private bool ComprobarCaracteres(string cadena, string campo)
         {
+            //Antes de enviar datos introducidos manualmente por el usuario, llamamos a esta función. Se encarga de verificar que 
+            //no haya ningún carácter dañino para la ejecución del código del servidor en los campos rellenados.
+            //Si se encuentra algún error, devuelve true.
             int i = 0;
             bool error = false;
+            //Error en caso de dejar el campo en blanco.
             if (cadena == null || cadena == "")
             {
                 error = true;
                 MessageBox.Show("Debes rellenar el campo " + campo);
             }
             else
+                //Este bucle buscará en cada carácter de la cadena de entrada letras con tildes, ñ, ç 
+                //y los carácteres '$', '/', '|', '&' y '%'.
                 while (i < cadena.Length && !error)
                 {
                     if (cadena[i] == '$' || cadena[i] == '/' || cadena[i] == '|' || cadena[i] == '&' || cadena[i] == '%')
@@ -113,8 +118,6 @@ namespace Cliente
             return error;
         }
 
-        public delegate void DelegadoLogin();
-
         public void CerrarFormulario()
         {
             this.Close();
@@ -122,6 +125,7 @@ namespace Cliente
 
         public void AbrirMain()
         {
+            //Esta función es llamada cuando se inicia sesión correctamente para cerrar este formulario y abrir el menú principal.
             main = new Main(server, nombreIn.Text);
             mainAbierto = true;
             DelegadoLogin delegado = new DelegadoLogin(CerrarFormulario);
@@ -131,56 +135,66 @@ namespace Cliente
 
         private void atenderServidor()
         {
+            //Función que ejecuta continuamente el thread de atención al servidor.
             while (server.IsConnected())
             {
                 //Recibimos la respuesta del servidor
                 string[] trozos = server.Recibir().Split('$');
-                int codigo = Convert.ToInt32(trozos[0]);
-                string mensaje = trozos[1].Split('\0')[0];
-
-                switch (codigo)
+                if (trozos.Length > 1)
                 {
-                    case 1:
-                        MessageBox.Show(mensaje);
-                        break;
+                    int codigo = Convert.ToInt32(trozos[0]);
+                    string mensaje = trozos[1].Split('\0')[0];
 
-                    case 2:
-                        MessageBox.Show(mensaje);
-                        if (mensaje == "Se ha iniciado sesion correctamente.")
-                        {
-                            //DelegadoLogin abrir = new DelegadoLogin(AbrirMain);
-                            ThreadStart ts = delegate { this.AbrirMain(); };
-                            thread_main = new Thread(ts);
-                            thread_main.Start();
-                            
-                        }
-                        break;
-                    case 3:
-                        //MessageBox.Show("Conectados recibidos");
-                        if(main != null)
-                            main.TomaRespuesta3(mensaje);
-                        break;
+                    switch (codigo)
+                    {
+                        case 1:
+                            //Respuesta a petición de registro en la base de datos
+                            MessageBox.Show(mensaje);
+                            break;
 
-                    case 8:
-                        main.TomaRespuesta8(mensaje);
-                        break;
+                        case 2:
+                            //Respuesta a petición de iniciar sesión
+                            MessageBox.Show(mensaje);
+                            if (mensaje == "Se ha iniciado sesion correctamente.")
+                            {
+                                ThreadStart ts = delegate { this.AbrirMain(); };
+                                thread_main = new Thread(ts);
+                                thread_main.Start();
 
-                    case 10:
-                        main.TomaRespuesta10(mensaje);
-                        break;
+                            }
+                            break;
+                        case 3:
+                            //Recepción y reenvío de la lista de conectados actualizada.
+                            if (main != null)
+                                main.TomaRespuesta3(mensaje);
+                            break;
 
-                    case 12:
-                        main.TomaRespuesta12(mensaje);
-                        break;
+                        case 8:
+                            //Recepción y reenvío de una invitación para jugar una partida.
+                            main.TomaRespuesta8(mensaje);
+                            break;
+
+                        case 10:
+                            //Recepción y reenvío de un mensaje de chat de alguna partida que está jugando el usuario.
+                            main.TomaRespuesta10(mensaje);
+                            break;
+
+                        case 12:
+                            //Recepción y reenvío de un mensaje con el identificador que tiene la partida que el usuario acaba de crear.
+                            main.TomaRespuesta12(mensaje);
+                            break;
+                    }
                 }
             }
         }
 
         private void enviarBtn_Click(object sender, EventArgs e)
         {
-
+            //Evento que es llamado cada vez que el usuario pulsa el botón inferior del formulario.
+            //En caso de que los datos introducidos no tengan errores de formato, envía la petición necesaria al servidor.
             if (enviarBtn.Text == "Registrarse")
             {
+                //Petición de registro
                 bool errorNombre = ComprobarCaracteres(nombreIn.Text, "'Nombre de usuario'");
                 bool errorClave = ComprobarCaracteres(claveIn.Text, "'Contraseña'");
 
@@ -214,6 +228,7 @@ namespace Cliente
             }
             else
             {
+                //Petición de inicio de sesión.
                 bool errorNombre = ComprobarCaracteres(nombreIn.Text, "'Nombre de usuario'");
                 bool errorClave = ComprobarCaracteres(claveIn.Text, "'Contraseña'");
 
@@ -249,6 +264,8 @@ namespace Cliente
 
         private void opcionBtn_Click(object sender, EventArgs e)
         {
+            //Evento llamado cada vez que el usuario quiere cambiar de opción en el formulario. Cambia los objetos del formulario
+            //para registrarse o iniciar sesión.
             if (enviarBtn.Text == "Registrarse")
             {
                 opcionBtn.Text = "Registrarse";
@@ -272,6 +289,7 @@ namespace Cliente
 
         private void Login_FormClosed(object sender, FormClosedEventArgs e)
         {
+            //Evento llamado cuando el formulario se ha cerrado. Si el thread de atención al servidor está en marcha lo detiene.
             if (atender != null && !mainAbierto)
                 if (atender.IsAlive)
                 {

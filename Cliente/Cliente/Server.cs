@@ -59,7 +59,14 @@ namespace Cliente
         public string Recibir()
         {
             byte[] msg2 = new byte[80];
-            server.Receive(msg2);
+            try
+            {
+                server.Receive(msg2);
+            }
+            catch (SocketException)
+            {
+                conectado = false;
+            }
             return Encoding.ASCII.GetString(msg2);
         }
         public void Enviar(string sentencia)

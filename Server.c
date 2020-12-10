@@ -94,9 +94,11 @@ int GetIndex(int socket) {
 
 void EnviarListaConectadosATodos() {
 	char lista[2105];
+	strcpy(lista, "");
 	GetListaConectados(lista);
 		
 	char mensaje[2105];
+	strcpy(mensaje, "");
 	sprintf(mensaje, "3$%s", lista);
 	
 	for(int i = 0; i < lista_conectados.num; i++)
