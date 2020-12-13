@@ -9,6 +9,8 @@
 #include <mysql.h>
 #include <pthread.h>
 
+#include <my_global.h>
+
 
 //Estructura usuario
 typedef struct {
@@ -159,7 +161,6 @@ int Registrarse (char usuario[20], char clave[20], MYSQL *conn) {
 	if (err!=0) {
 		printf ("Error al introducir datos la base %u %s\n", 
 		mysql_errno(conn), mysql_error(conn));
-
 		return -3;
 	}
 	return 0;
@@ -375,8 +376,8 @@ void *AtenderCliente (void *socket){
 	}
 	//inicializar la conexion, entrando nuestras claves de acceso y el nombre de la base de datos a la que queremos acceder 
 
-	conn = mysql_real_connect (conn, "localhost","root", "mysql", "TG11",0, NULL, 0);
-	//conn = mysql_real_connect (conn, "shiva2.upc.es", "root", "mysql", "TG11", 0, NULL, 0);
+	//conn = mysql_real_connect (conn, "localhost","root", "mysql", "TG11",0, NULL, 0);
+	conn = mysql_real_connect (conn, "shiva2.upc.es", "root", "mysql", "TG11", 0, NULL, 0);
 
 	if (conn==NULL) {
 		printf ("Error al inicializar la conexion: %u %s\n",
@@ -713,7 +714,7 @@ int main(int argc, char *argv[]){
 	serv_adr.sin_addr.s_addr = htonl(INADDR_ANY);
 	
 	//Escucharemos en el puerto indicado entre parenteis
-	serv_adr.sin_port = htons(9050);
+	serv_adr.sin_port = htons(50083);
 	if (bind(sock_listen, (struct sockaddr *) &serv_adr, sizeof(serv_adr)) < 0)
 		printf ("Error al bind\n");
 	if (listen(sock_listen, 2) < 0)

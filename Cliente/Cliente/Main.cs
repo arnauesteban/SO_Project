@@ -63,8 +63,7 @@ namespace Cliente
                     delegado = new DelegadoRespuesta(Accion12);
                     this.Invoke(delegado, new object[] { mensaje });
                     break;
-            }
-            
+            } 
         }
         public void Accion3(string mensaje)
         {
@@ -94,7 +93,6 @@ namespace Cliente
                 bool encontrado = false;
                 while(j < separado.Length && !encontrado)
                 {
-
                     if (separado[j] != this.usuario)
                         ConectadosGrid[0, j].Value = separado[j];
                     else
@@ -130,7 +128,6 @@ namespace Cliente
                 ThreadStart ts = delegate { AbrirFormularioPartidaCreada(Convert.ToInt32(separado[1])); };
                 ThreadNuevaPartida = new Thread(ts);
                 ThreadNuevaPartida.Start();
-
             }
             else
             {
@@ -147,9 +144,7 @@ namespace Cliente
             string[] separado = mensaje.Split('/');
             for (int j = 0; j < cont_forms; j++)
                 if (lista_forms_partidas[j].getID() == Convert.ToInt32(separado[0]))
-                {
                     lista_forms_partidas[j].TomaRespuesta(10, separado[1]);
-                }
         }
 
         public void Accion12(string mensaje)
@@ -177,9 +172,7 @@ namespace Cliente
             num_invitados = ConectadosGrid.SelectedCells.Count;
             lista_seleccionados = "";
             for (int i = 0; i < num_invitados; i++)
-            {
                 lista_seleccionados = lista_seleccionados + "/" + ConectadosGrid.SelectedCells[i].Value;
-            }
         }
 
         private void NuevaPartidaBtn_Click(object sender, EventArgs e)
@@ -231,7 +224,6 @@ namespace Cliente
             form.ShowDialog();
 
             //Eliminar de la lista de formularios, el formulario que se acaba de cerrar (con RemoveAt()?)
-
         }
 
         private void Main_FormClosing(object sender, FormClosingEventArgs e)

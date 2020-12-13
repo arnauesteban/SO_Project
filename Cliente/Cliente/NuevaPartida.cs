@@ -101,6 +101,7 @@ namespace Cliente
             server.Enviar(mensaje);
             mensaje = "11/" + this.ID;
             server.Enviar(mensaje);
+            this.ID = -1;
         }
 
         private void chatTextBox_Click(object sender, EventArgs e)
