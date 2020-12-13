@@ -166,22 +166,17 @@ namespace Cliente
                         case 3:
                             //Recepción y reenvío de la lista de conectados actualizada.
                             if (main != null)
-                                main.TomaRespuesta3(mensaje);
+                                main.TomaRespuesta(codigo, mensaje);
                             break;
 
                         case 8:
-                            //Recepción y reenvío de una invitación para jugar una partida.
-                            main.TomaRespuesta8(mensaje);
-                            break;
-
+                        //Recepción y reenvío de una invitación para jugar una partida.
                         case 10:
-                            //Recepción y reenvío de un mensaje de chat de alguna partida que está jugando el usuario.
-                            main.TomaRespuesta10(mensaje);
-                            break;
-
+                        //Recepción y reenvío de un mensaje de chat de alguna partida que está jugando el usuario.
                         case 12:
-                            //Recepción y reenvío de un mensaje con el identificador que tiene la partida que el usuario acaba de crear.
-                            main.TomaRespuesta12(mensaje);
+                        //Recepción y reenvío de un mensaje con el identificador que tiene la partida que el usuario acaba de crear
+
+                            main.TomaRespuesta(codigo, mensaje);
                             break;
                     }
                 }

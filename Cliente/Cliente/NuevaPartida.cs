@@ -18,6 +18,8 @@ namespace Cliente
         int ID;
         string usuario;
 
+        public delegate void DelegadoRespuesta(string mensaje);
+
         public NuevaPartida(Server server, string usuario)
         {
             //Constructor del formulario usado cuando el usuario es el host de la partida.
@@ -47,14 +49,31 @@ namespace Cliente
             return this.ID;
         }
 
-        public void TomaRespuesta10(string mensaje)
+        public void TomaRespuesta(int codigo, string mensaje)
+        {
+            DelegadoRespuesta delegado;
+            switch (codigo)
+            {
+                case 10:
+                    delegado = new DelegadoRespuesta(Accion10);
+                    this.Invoke(delegado, new object[] { mensaje });
+                    break;
+
+                case 12:
+                    delegado = new DelegadoRespuesta(Accion12);
+                    this.Invoke(delegado, new object[] { mensaje });
+                    break;
+            }
+        }
+
+        public void Accion10(string mensaje)
         {
             //Función que es llamada cada vez que se recibe un mensaje para el chat de esta partida. 
             //Añade el mensaje en una nueva línea del chat.
             chatLbl.Text = chatLbl.Text + Environment.NewLine + mensaje;
         }
 
-        public void TomaRespuesta12(string mensaje)
+        public void Accion12(string mensaje)
         {
             //Función que es llamada cuando el usuario host recibe el identificador de la partida que acaba de crear.
             this.ID = Convert.ToInt32(mensaje);

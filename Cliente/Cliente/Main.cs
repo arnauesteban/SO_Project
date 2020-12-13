@@ -28,7 +28,8 @@ namespace Cliente
         Thread ThreadNuevaPartida;
         int cont_forms = 0;
 
-        public delegate void DelegadoMain();
+        public delegate void DelegadoMain(NuevaPartida form);
+        public delegate void DelegadoRespuesta(string mensaje);
 
         public Main(Server server, string usuario)
         {
@@ -36,10 +37,36 @@ namespace Cliente
             InitializeComponent();
             this.server = server;
             this.usuario = usuario;
-            CheckForIllegalCrossThreadCalls = false;
         }
 
-        public void TomaRespuesta3(string mensaje)
+        public void TomaRespuesta(int codigo, string mensaje)
+        {
+            DelegadoRespuesta delegado;
+            switch (codigo)
+            {
+                case 3:
+                    delegado = new DelegadoRespuesta(Accion3);
+                    this.Invoke(delegado, new object[] { mensaje });
+                    break;
+
+                case 8:
+                    delegado = new DelegadoRespuesta(Accion8);
+                    this.Invoke(delegado, new object[] { mensaje });
+                    break;
+
+                case 10:
+                    delegado = new DelegadoRespuesta(Accion10);
+                    this.Invoke(delegado, new object[] { mensaje });
+                    break;
+
+                case 12:
+                    delegado = new DelegadoRespuesta(Accion12);
+                    this.Invoke(delegado, new object[] { mensaje });
+                    break;
+            }
+            
+        }
+        public void Accion3(string mensaje)
         {
             //Esta función es llamada cada vez que el thread de atención al servidor recibe un mensaje con el código 3,
             //que significa que la lista de usuarios conectados al servidor se ha actualizado. 
@@ -85,7 +112,7 @@ namespace Cliente
             }
         }
 
-        public void TomaRespuesta8(string mensaje)
+        public void Accion8(string mensaje)
         {
             //Esta función es llamada cada vez que un usuario recibe un mensaje con el código 8, es decir, cada vez que un usuario
             //recibe una invitación de otro jugador.
@@ -103,6 +130,7 @@ namespace Cliente
                 ThreadStart ts = delegate { AbrirFormularioPartidaCreada(Convert.ToInt32(separado[1])); };
                 ThreadNuevaPartida = new Thread(ts);
                 ThreadNuevaPartida.Start();
+
             }
             else
             {
@@ -111,7 +139,7 @@ namespace Cliente
             }
         }
 
-        public void TomaRespuesta10(string mensaje)
+        public void Accion10(string mensaje)
         {
             //Esta función es llamada cada vez que un usuario recibe un mensaje con el código 10, es decir, cada vez que el programa
             //recibe un mensaje para mostrar en algún chat de partida.
@@ -120,16 +148,16 @@ namespace Cliente
             for (int j = 0; j < cont_forms; j++)
                 if (lista_forms_partidas[j].getID() == Convert.ToInt32(separado[0]))
                 {
-                    lista_forms_partidas[j].TomaRespuesta10(separado[1]);
+                    lista_forms_partidas[j].TomaRespuesta(10, separado[1]);
                 }
         }
 
-        public void TomaRespuesta12(string mensaje)
+        public void Accion12(string mensaje)
         {
             //Esta función es llamada cada vez que un usuario recibe un mensaje con el código 12, es decir, cada vez que el programa
             //recibe un mensaje para asignar un identificador a una partida que el cliente acaba de crear..
             //Esta función se encarga de reenviar el mensaje al último formulario creado.
-            lista_forms_partidas[cont_forms - 1].TomaRespuesta12(mensaje);
+            lista_forms_partidas[cont_forms - 1].TomaRespuesta(12, mensaje);
         }
 
         private void Form1_Load(object sender, EventArgs e)
@@ -171,14 +199,25 @@ namespace Cliente
             }
         }
 
+        public void AnadirFormPartida(NuevaPartida form)
+        {
+            lista_forms_partidas.Add(form);
+            cont_forms++;
+        }
         private void AbrirFormularioPartidaCreada(int ID)
         {
             //Esta función es llamada cada vez que se inicia un thread para crear un formulario con una partida creada por otro usuario.
             //Se abre el otro formulario y se añade a la lista de formularios.
             NuevaPartida form = new NuevaPartida(this.server, this.usuario, ID);
-            lista_forms_partidas.Add(form);
-            cont_forms++;
+
+            DelegadoMain delegado = new DelegadoMain(AnadirFormPartida);
+            this.Invoke(delegado, new object[] {form});
+
             form.ShowDialog();
+
+
+            //Eliminar de la lista de formularios, el formulario que se acaba de cerrar (con RemoveAt()?)
+
         }
 
         private void AbrirFormularioNuevaPartida(string mensaje)
@@ -190,6 +229,9 @@ namespace Cliente
             cont_forms++;
             server.Enviar(mensaje);
             form.ShowDialog();
+
+            //Eliminar de la lista de formularios, el formulario que se acaba de cerrar (con RemoveAt()?)
+
         }
 
         private void Main_FormClosing(object sender, FormClosingEventArgs e)
