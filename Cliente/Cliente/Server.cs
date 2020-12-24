@@ -23,12 +23,12 @@ namespace Cliente
             //Creamos un IPEndPoint con el ip del servidor y puerto del servidor al que deseamos conectarnos
 
             //Parametros de shiva
-            IPAddress direc = IPAddress.Parse("147.83.117.22");
-            IPEndPoint ipep = new IPEndPoint(direc, 50083);
+            //IPAddress direc = IPAddress.Parse("147.83.117.22");
+            //IPEndPoint ipep = new IPEndPoint(direc, 50083);
 
             //Parametros de pruebas
-            //IPAddress direc = IPAddress.Parse("192.168.56.101");
-            //IPEndPoint ipep = new IPEndPoint(direc, 9050);
+            IPAddress direc = IPAddress.Parse("192.168.56.101"); //101 Sergi 102 Arnau
+            IPEndPoint ipep = new IPEndPoint(direc, 50083);
 
             //Creamos el socket 
             server = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);

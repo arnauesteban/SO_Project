@@ -169,12 +169,12 @@ namespace Cliente
                                 main.TomaRespuesta(codigo, mensaje);
                             break;
 
-                        case 8:
-                        //Recepción y reenvío de una invitación para jugar una partida.
-                        case 10:
-                        //Recepción y reenvío de un mensaje de chat de alguna partida que está jugando el usuario.
-                        case 12:
+                        case 4:
                         //Recepción y reenvío de un mensaje con el identificador que tiene la partida que el usuario acaba de crear
+                        case 5:
+                        //Recepción y reenvío de una invitación para jugar una partida.
+                        case 6:
+                        //Recepción y reenvío de un mensaje de chat de alguna partida que está jugando el usuario.
 
                             main.TomaRespuesta(codigo, mensaje);
                             break;

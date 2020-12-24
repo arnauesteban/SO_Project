@@ -49,22 +49,23 @@ namespace Cliente
                     this.Invoke(delegado, new object[] { mensaje });
                     break;
 
-                case 8:
-                    delegado = new DelegadoRespuesta(Accion8);
+                case 4:
+                    delegado = new DelegadoRespuesta(Accion4);
                     this.Invoke(delegado, new object[] { mensaje });
                     break;
 
-                case 10:
-                    delegado = new DelegadoRespuesta(Accion10);
+                case 5:
+                    delegado = new DelegadoRespuesta(Accion5);
                     this.Invoke(delegado, new object[] { mensaje });
                     break;
 
-                case 12:
-                    delegado = new DelegadoRespuesta(Accion12);
+                case 6:
+                    delegado = new DelegadoRespuesta(Accion6);
                     this.Invoke(delegado, new object[] { mensaje });
                     break;
             } 
         }
+
         public void Accion3(string mensaje)
         {
             //Esta función es llamada cada vez que el thread de atención al servidor recibe un mensaje con el código 3,
@@ -110,7 +111,15 @@ namespace Cliente
             }
         }
 
-        public void Accion8(string mensaje)
+        public void Accion4(string mensaje)
+        {
+            //Esta función es llamada cada vez que un usuario recibe un mensaje con el código 12, es decir, cada vez que el programa
+            //recibe un mensaje para asignar un identificador a una partida que el cliente acaba de crear..
+            //Esta función se encarga de reenviar el mensaje al último formulario creado.
+            lista_forms_partidas[cont_forms - 1].TomaRespuesta(4, mensaje);
+        }
+
+        public void Accion5(string mensaje)
         {
             //Esta función es llamada cada vez que un usuario recibe un mensaje con el código 8, es decir, cada vez que un usuario
             //recibe una invitación de otro jugador.
@@ -122,7 +131,7 @@ namespace Cliente
             if (respuesta == (DialogResult)1)
             {
                 //Se acepta la partida
-                server.Enviar("9/" + separado[1] + "/1");
+                server.Enviar("5/" + separado[1] + "/1");
 
                 //Abrimos el formulario que contiene la sala con la partida a la que se quiere jugar.
                 ThreadStart ts = delegate { AbrirFormularioPartidaCreada(Convert.ToInt32(separado[1])); };
@@ -132,11 +141,11 @@ namespace Cliente
             else
             {
                 //Se rechaza la partida
-                server.Enviar("9/" + separado[1] + "/0");
+                server.Enviar("5/" + separado[1] + "/0");
             }
         }
 
-        public void Accion10(string mensaje)
+        public void Accion6(string mensaje)
         {
             //Esta función es llamada cada vez que un usuario recibe un mensaje con el código 10, es decir, cada vez que el programa
             //recibe un mensaje para mostrar en algún chat de partida.
@@ -144,15 +153,7 @@ namespace Cliente
             string[] separado = mensaje.Split('/');
             for (int j = 0; j < cont_forms; j++)
                 if (lista_forms_partidas[j].getID() == Convert.ToInt32(separado[0]))
-                    lista_forms_partidas[j].TomaRespuesta(10, separado[1]);
-        }
-
-        public void Accion12(string mensaje)
-        {
-            //Esta función es llamada cada vez que un usuario recibe un mensaje con el código 12, es decir, cada vez que el programa
-            //recibe un mensaje para asignar un identificador a una partida que el cliente acaba de crear..
-            //Esta función se encarga de reenviar el mensaje al último formulario creado.
-            lista_forms_partidas[cont_forms - 1].TomaRespuesta(12, mensaje);
+                    lista_forms_partidas[j].TomaRespuesta(6, separado[1]);
         }
 
         private void Form1_Load(object sender, EventArgs e)
@@ -184,7 +185,7 @@ namespace Cliente
                 MessageBox.Show("Debes seleccionar a jugadores para invitarlos.");
             else
             {
-                string mensaje = "8/" + num_invitados + lista_seleccionados;
+                string mensaje = "4/" + num_invitados + lista_seleccionados;
                 //Iniciamos el thread de la partida.
                 ThreadStart ts = delegate { AbrirFormularioNuevaPartida(mensaje); };
                 ThreadNuevaPartida = new Thread(ts);
@@ -197,6 +198,7 @@ namespace Cliente
             lista_forms_partidas.Add(form);
             cont_forms++;
         }
+
         private void AbrirFormularioPartidaCreada(int ID)
         {
             //Esta función es llamada cada vez que se inicia un thread para crear un formulario con una partida creada por otro usuario.

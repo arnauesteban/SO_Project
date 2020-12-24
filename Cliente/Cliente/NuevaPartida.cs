@@ -54,36 +54,36 @@ namespace Cliente
             DelegadoRespuesta delegado;
             switch (codigo)
             {
-                case 10:
-                    delegado = new DelegadoRespuesta(Accion10);
+                case 4:
+                    delegado = new DelegadoRespuesta(Accion4);
                     this.Invoke(delegado, new object[] { mensaje });
                     break;
 
-                case 12:
-                    delegado = new DelegadoRespuesta(Accion12);
+                case 6:
+                    delegado = new DelegadoRespuesta(Accion6);
                     this.Invoke(delegado, new object[] { mensaje });
                     break;
             }
         }
 
-        public void Accion10(string mensaje)
-        {
-            //Función que es llamada cada vez que se recibe un mensaje para el chat de esta partida. 
-            //Añade el mensaje en una nueva línea del chat.
-            chatLbl.Text = chatLbl.Text + Environment.NewLine + mensaje;
-        }
-
-        public void Accion12(string mensaje)
+        public void Accion4(string mensaje)
         {
             //Función que es llamada cuando el usuario host recibe el identificador de la partida que acaba de crear.
             this.ID = Convert.ToInt32(mensaje);
             IDLbl.Text = "ID: " + this.ID;
         }
 
+        public void Accion6(string mensaje)
+        {
+            //Función que es llamada cada vez que se recibe un mensaje para el chat de esta partida. 
+            //Añade el mensaje en una nueva línea del chat.
+            chatLbl.Text = chatLbl.Text + Environment.NewLine + mensaje;
+        }
+
         private void enviar_Btn_Click(object sender, EventArgs e)
         {
             //Evento llamado cuando el usuario pulsa el botón "Enviar". Envía el mensaje que ha escrito en el textBox al servidor.
-            string mensaje = "10/" + this.ID + "/" + this.usuario + ": " + chatTextBox.Text;
+            string mensaje = "6/" + this.ID + "/" + this.usuario + ": " + chatTextBox.Text;
             server.Enviar(mensaje);
             chatTextBox.Text = "";
         }
@@ -97,9 +97,9 @@ namespace Cliente
         private void NuevaPartida_FormClosing(object sender, FormClosingEventArgs e)
         {
             //Evento llamado cuando el formulario se va a cerrar. Envía mensajes de desconexión al servidor para que tenga constancia.
-            string mensaje = "10/" + this.ID + "/" + this.usuario + " se ha ido de la partida.";
+            string mensaje = "6/" + this.ID + "/" + this.usuario + " se ha ido de la partida.";
             server.Enviar(mensaje);
-            mensaje = "11/" + this.ID;
+            mensaje = "7/" + this.ID;
             server.Enviar(mensaje);
             this.ID = -1;
         }
