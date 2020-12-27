@@ -172,10 +172,19 @@ namespace Cliente
                         case 4:
                         //Recepción y reenvío de un mensaje con el identificador que tiene la partida que el usuario acaba de crear
                         case 5:
-                        //Recepción y reenvío de una invitación para jugar una partida.
+                        //Recepción y reenvío de una invitación para jugar una partida
                         case 6:
-                        //Recepción y reenvío de un mensaje de chat de alguna partida que está jugando el usuario.
-
+                        //Recepción y reenvío de un mensaje de chat de alguna partida que está jugando el usuario
+                        case 7:
+                        //Recepción y reenvío de un mensaje que designa a este cliente como host de una partida
+                        case 8:
+                        //Recepción y reenvío de un mensaje de configuración de parámetros de una partida
+                        case 9:
+                        //Recepción y reenvío de un mensaje con cartas que puede ver el jugador
+                        case 10:
+                        //Recepción y reenvío de un mensaje con la acción que ha hecho algun jugador durante su turno
+                        case 11:
+                        //Recepción y reenvío de un mensaje que indica que es el turno del jugador que viene indicado
                             main.TomaRespuesta(codigo, mensaje);
                             break;
                     }

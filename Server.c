@@ -8,6 +8,7 @@
 #include <stdio.h>
 #include <mysql.h>
 #include <pthread.h>
+#include <time.h>
 
 
 //Estructura usuario
@@ -17,14 +18,35 @@ typedef struct {
 } TUsuario;
 
 //Lista de 100 usuarios como maximo
-typedef struct{
+typedef struct {
 	TUsuario usuario[100];
 	int num;
 } TListaUsuarios;
 
 typedef struct {
+	char nombre[20];
+	int sock;
+	int fichas;
+	int jugado;
+	char estado; //F = fold, C = call, R = raise, W = waiting, A = all in, O = out of money
+} TJugador;
+
+typedef struct {
+	TJugador usuario[100];
+	int num;
+} TListaJugadores;
+
+typedef struct {
 	int ID;
-	TListaUsuarios lista_jugadores;
+	TListaJugadores lista_jugadores;
+	int baraja[52];
+	int ciega;
+	int dineroInicial;
+	char host[20];
+	char dealer[20];
+	int puja;
+	int suma;
+	char estado; //B = beginning, F = flop, T = turn, R = river, E = ending
 } TPartida;
 
 typedef struct {
@@ -323,21 +345,41 @@ int AsignarIdPartida(MYSQL *conn) {
 	return id;	
 }
 
-void EnviarListaJugadoresPartidaActiva(int i) {
-	//Envia a todos los usuarios de una partida activa la lista de jugadores
-	//Se envia al cliente el mensaje: nombre1/nombre2/...
-	
-	TPartida partida = lista_partidas.partida[i];
-	char mensaje[180];
-	
-	//Creamos el mensaje
-	sprintf(mensaje, "3/");
-	for(int j = 0; j < partida.lista_jugadores.num; j++)
-		sprintf(mensaje, "%s%s/", mensaje, partida.lista_jugadores.usuario[j].nombre);
-	
-	//Enviamos el mensaje a todos los jugadores de una partida
-	for(int j = 0; j < partida.lista_jugadores.num; j++)
-		write (partida.lista_jugadores.usuario[j].sock, mensaje, strlen(mensaje));	
+void EnviarMensaje(char mensaje[100], int ID) {
+	int j = 0;
+	int encontrado = 0;
+	while (!encontrado && j < lista_partidas.num) {
+		if(lista_partidas.partida[j].ID == ID)
+			encontrado = 1;
+		else
+		    j++;
+	}
+	char mensaje_final[250];
+	sprintf(mensaje_final, "6$%d/%s", ID, mensaje);
+	printf("Se ha enviado %s a la partida %d\n", mensaje_final, ID);
+	for(int k = 0; k < lista_partidas.partida[j].lista_jugadores.num; k++)
+		write (lista_partidas.partida[j].lista_jugadores.usuario[k].sock, mensaje_final, strlen(mensaje_final));
+}
+
+void BarajarCartas(int l) {
+	for(int k = 0; k < 52; k++)
+		lista_partidas.partida[l].baraja[k] = -1;
+	int i = 0; 
+	while(i < 52) {
+		int test = rand() % 52;
+		int j = 0;
+		int encontrado = 0;
+		while (j < 52 && !encontrado) {
+			if(lista_partidas.partida[l].baraja[i] == test)
+				encontrado = 1;
+			else
+				j++;
+		}
+		if(!encontrado) {
+			lista_partidas.partida[l].baraja[i] = test;
+			i++;
+		}
+	}
 }
 
 void *AtenderCliente (void *socket){
@@ -367,6 +409,8 @@ void *AtenderCliente (void *socket){
 		exit(1);
 	}
 	
+	srand(time(NULL));
+	
 	//Variables necesarias en la counicacion con el cliente. 
 	//En buff se guarda el mensaje que se lee del cliente.
 	//En buff2 se guarda el mensaje que se debe enviar al cliente
@@ -390,6 +434,7 @@ void *AtenderCliente (void *socket){
 		int codigo =  atoi (p);
 		
 		//Quiere desconectarse del servidor
+		//El servidor recibe 0/
 		if (codigo == 0) {
 				p = strtok(NULL, "/");
 				int i = GetIndex(sock_conn);
@@ -413,8 +458,9 @@ void *AtenderCliente (void *socket){
 				terminar=1;
 			}
 				
-		//Quiere que lo registremos en la base de datos: 1/nombre/clave
-		else if (codigo ==1){
+		//Quiere que lo registremos en la base de datos
+		//El servidor recibe 1/nombre/clave
+		else if (codigo == 1) {
 			p = strtok(NULL, "/");
 			char nombre[20];
 			strcpy(nombre, p);
@@ -443,6 +489,7 @@ void *AtenderCliente (void *socket){
 		}
 		
 		//Quiere iniciar sesion
+		//El servidor recibe 2/nombre/clave
 		else if (codigo == 2) {
 			p = strtok(NULL, "/");
 			char nombre[20];
@@ -473,9 +520,9 @@ void *AtenderCliente (void *socket){
 			write (sock_conn,buff2, strlen(buff2));
 		}
 		
-		//Un cliente en concreto pide que se le envie la lista de conectados actualizada
-		else if (codigo == 3)
-		{
+		//Un cliente en concreto quiere que se le envie la lista de conectados actualizada
+		//El servidor recibe 3/
+		else if (codigo == 3) {
 			//Enviamos la lista al cliente en concreto
 			char lista[500];
 			strcpy(lista, "");
@@ -496,7 +543,7 @@ void *AtenderCliente (void *socket){
 			sprintf(buff2, "Enviada lista de conectados a %s: %d %d", nombre, sock_conn, lista_conectados.usuario[i].sock);
 		}
 		
-		//Invitar a jugadores a la partida
+		//Quiere invitar a jugadores a una partida
 		//  El servidor recibe 4/num_invitados/nombre_invitado1/nombre_invitado2/...
 		else if (codigo == 4) {
 			char nombre_host[20];
@@ -523,7 +570,10 @@ void *AtenderCliente (void *socket){
 			
 			//Asignamos una ID a la partida, miramos que no exista en la base de datos ni en la lista de partidas local
 			int id = AsignarIdPartida(conn);
-			lista_partidas.partida[lista_partidas.num].ID = id; //lista_partidas.num;
+			lista_partidas.partida[lista_partidas.num].ID = id;
+			
+			//Ponemos al jugador que ha creado la partida como host de la partida.
+			strcpy(lista_partidas.partida[lista_partidas.num].host, nombre_host);
 			
 			lista_partidas.partida[lista_partidas.num].lista_jugadores.num = 1;
 			
@@ -551,10 +601,9 @@ void *AtenderCliente (void *socket){
 			lista_partidas.num++;
 		}
 		
-		//Aceptar o rechazar la invitación
-		// El servidor recibe 5/id_partida/respuesta
-		//donde respuesta: 1 = SI, 0 = NO
-		else if(codigo == 5) {
+		//Quiere aceptar o rechazar una invitación recibida
+		// El servidor recibe 5/id_partida/respuesta (donde respuesta: 1 = SI, 0 = NO)
+		else if (codigo == 5) {
 			p = strtok(NULL, "/");
 			int ID_partida = atoi(p);
 			p = strtok(NULL, "/");
@@ -593,11 +642,20 @@ void *AtenderCliente (void *socket){
 				lista_partidas.partida[l].lista_jugadores.num++;
 				
 				//Enviamos a todos los jugadores de la partida la lista de jugadores actualizada
-				//EnviarListaJugadoresPartidaActiva(l);
+				char mensaje2[200];
+				strcpy(mensaje2, "");
+				for(int j = 0; j < lista_partidas.partida[l].lista_jugadores.num; j++)
+					sprintf(mensaje2, "%s%s/", mensaje2, lista_partidas.partida[l].lista_jugadores.usuario[j].nombre);
+				//eliminamos el ultimo caracter '/'
+				mensaje2[strlen(mensaje2)-1] = '\0';
+				char mensaje2final[200];
+				sprintf(mensaje2final, "8$%d/2/%d/%d/%d/%s", ID_partida, lista_partidas.partida[l].dineroInicial, lista_partidas.partida[l].ciega, lista_partidas.partida[l].lista_jugadores.num, mensaje2);
+				for(int j = 0; j < lista_partidas.partida[l].lista_jugadores.num; j++)
+					write(lista_partidas.partida[l].lista_jugadores.usuario[j].sock, mensaje2final, strlen(mensaje2final));
+				printf("Se ha enviado %s\n", mensaje2final);
 				
 				//Enviamos a los jugadores de la partida un mensaje conforme el jugador ha aceptado la invitacion
 				char mensaje[100];
-				char mensaje2[100];
 				sprintf(mensaje, "6$%d/%s se ha unido a la partida.", lista_partidas.partida[l].ID, nombre_invitado);
 				for(int j = 0; j < lista_partidas.partida[l].lista_jugadores.num; j++)
 					if(lista_partidas.partida[l].lista_jugadores.usuario[j].sock != sock_conn) {
@@ -614,28 +672,20 @@ void *AtenderCliente (void *socket){
 			}
 		}
 		
-		else if(codigo == 6) {
+		//Quiere enviar mensajes al chat de una partida
+		//El servidor recibe 6/id_partida/mensaje
+		else if (codigo == 6) {
 			p = strtok(NULL, "/");
 			int ID_partida = atoi(p);
 			p = strtok(NULL, "/");
 			char mensaje[200];
 			strcpy(mensaje, p);
-			int j = 0;
-			int encontrado = 0;
-			while (!encontrado && j < lista_partidas.num) {
-				if(lista_partidas.partida[j].ID == ID_partida)
-					encontrado = 1;
-				else
-				   j++;
-			}
-			char mensaje_final[250];
-			sprintf(mensaje_final, "6$%d/%s", ID_partida, mensaje);
-			printf("Se ha enviado %s\n", mensaje_final);
-			for(int k = 0; k < lista_partidas.partida[j].lista_jugadores.num; k++)
-				write (lista_partidas.partida[j].lista_jugadores.usuario[k].sock, mensaje_final, strlen(mensaje_final));
+			EnviarMensaje(mensaje, ID_partida);
 		}
 		
-		else if(codigo == 7) {
+		//Quiere salir de una partida
+		//El servidor recibe 7/id_partida
+		else if (codigo == 7) {
 			p = strtok(NULL, "/");
 			int ID_partida = atoi(p);
 			int j = 0;
@@ -654,9 +704,490 @@ void *AtenderCliente (void *socket){
 				else
 				    k++;
 			}
+			encontrado = 0;
+			int l = 0;
+			int index;
+			if(strcmp(lista_partidas.partida[j].lista_jugadores.usuario[k].nombre, lista_partidas.partida[j].host) == 0) {
+				if (k == lista_partidas.partida[j].lista_jugadores.num)
+					index = 0;
+				else
+					index = k + 1;
+				while(!encontrado && l < index != k) {
+					if(strcmp(lista_partidas.partida[j].lista_jugadores.usuario[index].nombre, "") != 0)
+						encontrado = 1;
+					else {
+						if (index == lista_partidas.partida[j].lista_jugadores.num)
+							index = 0;
+						else
+							index++;
+					}
+				}
+				if(encontrado) {
+					char mensaje[100];
+					sprintf(mensaje, "7$%d", ID_partida);
+					write(lista_partidas.partida[j].lista_jugadores.usuario[index].sock, mensaje, strlen(mensaje));
+					char mensaje2[100];
+					sprintf(mensaje2, "%s es el nuevo host.", lista_partidas.partida[j].lista_jugadores.usuario[index].nombre);
+					EnviarMensaje(mensaje2, ID_partida);
+				}
+			}
 			strcpy(lista_partidas.partida[j].lista_jugadores.usuario[k].nombre, "");
 			lista_partidas.partida[j].lista_jugadores.usuario[k].sock = -1;
 			lista_partidas.partida[j].lista_jugadores.num--;
+		}
+	
+		//Quiere configurar los parametros iniciales de una partida
+		//El servidor recibe 8/id_partida/dineroInicial/ciega
+		else if (codigo == 8) {
+			p = strtok(NULL, "/");
+			int ID_partida = atoi(p);
+			p = strtok(NULL, "/");
+			int numConfig = atoi(p);
+			
+			//Buscamos la partida concreta en la lista de partidas
+			// l sera el valor del indice de la partida dentro de la lista
+			int l = 0;
+			int encontrado = 0;
+			while (!encontrado && l < lista_partidas.num) {
+				if(lista_partidas.partida[l].ID == ID_partida)
+					encontrado = 1;
+				else
+					l++;
+			}
+			
+			//Enviar cambios al resto de jugadores
+			if(numConfig == 0)
+			{
+				p = strtok(NULL, "/");
+				int dinero = atoi(p);
+				lista_partidas.partida[ID_partida].dineroInicial = dinero;
+				p = strtok(NULL, "/");
+				int ciega = atoi(p);
+				lista_partidas.partida[ID_partida].ciega = ciega;
+				char mensaje[100];
+				sprintf(mensaje, "8$%d/0/%d/%d", ID_partida, dinero, ciega);
+				printf("Se ha enviado %s.\n", mensaje);
+				
+				for(int j = 0; j < lista_partidas.partida[l].lista_jugadores.num; j++)
+					if(lista_partidas.partida[l].lista_jugadores.usuario[j].sock != sock_conn)
+						write(lista_partidas.partida[l].lista_jugadores.usuario[j].sock, mensaje, strlen(mensaje));
+			}
+			else if(numConfig == 2)
+			{
+				char mensaje2[200];
+				strcpy(mensaje2, "");
+				for(int j = 0; j < lista_partidas.partida[l].lista_jugadores.num; j++)
+					sprintf(mensaje2, "%s%s/", mensaje2, lista_partidas.partida[l].lista_jugadores.usuario[j].nombre);
+				//eliminamos el ultimo caracter '/'
+				mensaje2[strlen(mensaje2)-1] = '\0';
+				char mensaje2final[200];
+				sprintf(mensaje2final, "8$%d/2/%d/%d/%d/%s", ID_partida, lista_partidas.partida[l].dineroInicial, lista_partidas.partida[l].ciega, lista_partidas.partida[l].lista_jugadores.num, mensaje2);
+				printf("Se ha enviado %s.\n", mensaje2final);
+				write(sock_conn, mensaje2final, strlen(mensaje2final));
+			}
+		}
+	
+		//Quiere comenzar una partida
+		//El servidor recibe 9/id_partida
+		else if (codigo == 9) {
+			p = strtok(NULL, "/");
+			int ID_partida = atoi(p);
+			char mensaje[100];
+			strcpy(mensaje, "Comienza la partida");
+			EnviarMensaje(mensaje, ID_partida);
+			
+			//Buscamos la partida en la lista
+			int l = 0;
+			int encontrado = 0;
+			while (!encontrado && l < lista_partidas.num) {
+				if(lista_partidas.partida[l].ID == ID_partida)
+					encontrado = 1;
+				else
+					l++;
+			}
+			
+			pthread_mutex_lock(&mutex);
+			
+			lista_partidas.partida[l].puja = 2 * lista_partidas.partida[l].ciega;
+			lista_partidas.partida[l].suma = 3 * lista_partidas.partida[l].ciega;
+			
+			lista_partidas.partida[l].estado = 'B';
+			
+			//Asignamos al host de la partida como dealer de la primera ronda
+			strcpy(lista_partidas.partida[l].dealer, lista_partidas.partida[l].host);
+			
+			//Configuramos la cantidad inicial de fichas de cada jugador
+			for(int k = 0; k < lista_partidas.partida[l].lista_jugadores.num; k++) {
+				lista_partidas.partida[l].lista_jugadores.usuario[k].fichas = lista_partidas.partida[l].dineroInicial;
+				lista_partidas.partida[l].lista_jugadores.usuario[k].estado = 'W';
+			}
+			
+			//Contabilizamos las apuestas ciegas de los jugadores que las deben hacer
+			lista_partidas.partida[l].lista_jugadores.usuario[1].jugado = lista_partidas.partida[l].ciega;
+			if(lista_partidas.partida[l].lista_jugadores.num > 2)
+				lista_partidas.partida[l].lista_jugadores.usuario[2].jugado = 2 * lista_partidas.partida[l].ciega;
+			else
+				lista_partidas.partida[l].lista_jugadores.usuario[0].jugado = 2 * lista_partidas.partida[l].ciega;
+			
+			//Barajamos las cartas
+			BarajarCartas(l);
+			pthread_mutex_unlock(&mutex);
+			
+			//Repartimos las cartas
+			int carta = 0;
+			int j = 0;
+			while(j < lista_partidas.partida[l].lista_jugadores.num) {
+				char mensaje[100];
+				sprintf(mensaje, "9$%d/0/%d/%d/%s", ID_partida, lista_partidas.partida[l].baraja[carta], 
+						lista_partidas.partida[l].baraja[carta + 1], lista_partidas.partida[l].dealer);
+				write (lista_partidas.partida[l].lista_jugadores.usuario[j].sock, mensaje, strlen(mensaje));
+				printf("Se ha enviado %s\n", mensaje);
+				
+				carta = carta + 2;
+				j++;
+			}
+			char mensaje2[100];
+			if(lista_partidas.partida[l].lista_jugadores.num > 3)
+				sprintf(mensaje2, "11$%d/%s", ID_partida, lista_partidas.partida[l].lista_jugadores.usuario[3].nombre);
+			else
+				sprintf(mensaje2, "11$%d/%s", ID_partida, lista_partidas.partida[l].lista_jugadores.usuario[3 - lista_partidas.partida[l].lista_jugadores.num].nombre);
+			for(j = 0; j < lista_partidas.partida[l].lista_jugadores.num; j++)
+				write (lista_partidas.partida[l].lista_jugadores.usuario[j].sock, mensaje2, strlen(mensaje2));
+			printf("Se ha enviado %s\n", mensaje2);
+		}
+	
+		//Ha hecho una accion en una partida (ir, no ir o subir)
+		//El servidor recibe 10/id_partida/accion (-1 si no va, N si apuesta N fichas)
+		else if (codigo == 10) {
+			p = strtok(NULL, "/");
+			int ID_partida = atoi(p);
+			p = strtok(NULL, "/");
+			int accion = atoi(p);
+			
+			//Buscamos la partida en la lista
+			int l = 0;
+			int encontrado = 0;
+			while (!encontrado && l < lista_partidas.num) {
+				if(lista_partidas.partida[l].ID == ID_partida)
+					encontrado = 1;
+				else
+					l++;
+			}
+			
+			//Buscamos al jugador en la lista de la partida
+			int k = 0;
+			encontrado = 0;
+			while (!encontrado && k < lista_partidas.partida[l].lista_jugadores.num) {
+				if(lista_partidas.partida[l].lista_jugadores.usuario[k].sock == sock_conn)
+					encontrado = 1;
+				else
+					k++;
+			}
+			
+			//Enviamos la acción del jugador al resto de jugadores
+			char mensaje0[100];
+			sprintf(mensaje0, "10$%d/%d/%d", ID_partida, k, accion);
+			EnviarMensaje(mensaje0, ID_partida);
+			//Miramos que accion ha realizado el cliente
+			pthread_mutex_lock(&mutex);
+			//Ha dejado sus cartas en la mesa
+			if(accion == -1) {
+				lista_partidas.partida[l].lista_jugadores.usuario[k].estado = 'F';
+				char mensaje[100];
+				sprintf(mensaje, "%s no va.", lista_partidas.partida[l].lista_jugadores.usuario[k].nombre);
+				EnviarMensaje(mensaje, ID_partida);
+			}
+			
+			//Se juega todas las fichas que tiene
+			else if(accion + lista_partidas.partida[l].lista_jugadores.usuario[k].jugado >= lista_partidas.partida[l].lista_jugadores.usuario[k].fichas) {
+				lista_partidas.partida[l].lista_jugadores.usuario[k].jugado = lista_partidas.partida[l].lista_jugadores.usuario[k].fichas;
+				if(lista_partidas.partida[l].puja < lista_partidas.partida[l].lista_jugadores.usuario[k].fichas)
+					lista_partidas.partida[l].puja = lista_partidas.partida[l].lista_jugadores.usuario[k].fichas;
+				lista_partidas.partida[l].suma += accion;
+				lista_partidas.partida[l].lista_jugadores.usuario[k].estado = 'A';
+				char mensaje[100];
+				sprintf(mensaje, "%s lo apuesta todo: %d fichas.", lista_partidas.partida[l].lista_jugadores.usuario[k].nombre, lista_partidas.partida[l].lista_jugadores.usuario[k].fichas);
+				EnviarMensaje(mensaje, ID_partida);
+			}
+			
+			//Ve la apuesta
+			else if(accion + lista_partidas.partida[l].lista_jugadores.usuario[k].jugado == lista_partidas.partida[l].puja) {
+				lista_partidas.partida[l].lista_jugadores.usuario[k].jugado += accion;
+				lista_partidas.partida[l].suma += accion;
+				lista_partidas.partida[l].lista_jugadores.usuario[k].estado = 'C';
+				char mensaje[100];
+				sprintf(mensaje, "%s ve la apuesta: %d fichas.", lista_partidas.partida[l].lista_jugadores.usuario[k].nombre, accion);
+				EnviarMensaje(mensaje, ID_partida);
+			}
+			
+			//Sube la apuesta
+			else if(accion + lista_partidas.partida[l].lista_jugadores.usuario[k].jugado > lista_partidas.partida[l].puja) {
+				lista_partidas.partida[l].lista_jugadores.usuario[k].jugado += accion;
+				lista_partidas.partida[l].puja = lista_partidas.partida[l].lista_jugadores.usuario[k].jugado;
+				lista_partidas.partida[l].suma += accion;
+				lista_partidas.partida[l].lista_jugadores.usuario[k].estado = 'R';
+				char mensaje[100];
+				sprintf(mensaje, "%s sube la apuesta: %d fichas.", lista_partidas.partida[l].lista_jugadores.usuario[k].nombre, accion);
+				EnviarMensaje(mensaje, ID_partida);
+			}
+			else
+				printf("Error inesperado en la acción del jugador.");
+			pthread_mutex_unlock(&mutex);
+			
+			//Verificamos que la fase ha terminado
+			int retirados = 0;
+			int resto = 0;
+			
+			//Comprobamos el estado de los jugadores
+			for(int n = 0; n < lista_partidas.partida[l].lista_jugadores.num; n++) {
+				if(lista_partidas.partida[l].lista_jugadores.usuario[n].estado == 'F' || lista_partidas.partida[l].lista_jugadores.usuario[n].estado == 'O')
+					retirados++;
+				else if(lista_partidas.partida[l].lista_jugadores.usuario[n].estado == 'C'|| lista_partidas.partida[l].lista_jugadores.usuario[n].estado == 'R' || lista_partidas.partida[l].lista_jugadores.usuario[n].estado == 'A')
+					resto++;
+			}
+			
+			//Solo queda un jugador en la ronda. Gana la apuesta y se pasa a la ronda siguiente
+			if(retirados + resto == lista_partidas.partida[l].lista_jugadores.num && resto == 1) {
+				pthread_mutex_lock(&mutex);
+				for(int n = 0; n < lista_partidas.partida[l].lista_jugadores.num; n++) {
+					if(lista_partidas.partida[l].lista_jugadores.usuario[n].estado == 'C'|| lista_partidas.partida[l].lista_jugadores.usuario[n].estado == 'R' || lista_partidas.partida[l].lista_jugadores.usuario[n].estado == 'A') {
+						lista_partidas.partida[l].lista_jugadores.usuario[n].fichas += (lista_partidas.partida[l].suma - lista_partidas.partida[l].lista_jugadores.usuario[n].jugado);
+						char mensaje[100];
+						sprintf(mensaje, "%s ha ganado la ronda. Se lleva %d fichas.", lista_partidas.partida[l].lista_jugadores.usuario[n].nombre, lista_partidas.partida[l].suma);
+						EnviarMensaje(mensaje, ID_partida);
+					}
+					else
+						lista_partidas.partida[l].lista_jugadores.usuario[n].fichas -= lista_partidas.partida[l].lista_jugadores.usuario[n].jugado;
+					if(lista_partidas.partida[l].lista_jugadores.usuario[n].fichas == 0)
+						lista_partidas.partida[l].lista_jugadores.usuario[n].estado = 'O';
+					else
+						lista_partidas.partida[l].lista_jugadores.usuario[n].estado = 'W';
+					lista_partidas.partida[l].lista_jugadores.usuario[n].jugado = 0;
+				}
+				lista_partidas.partida[l].suma = 0;
+				lista_partidas.partida[l].puja = 0;
+				pthread_mutex_unlock(&mutex);
+				
+				//Pasamos el dealer al siguiente jugador
+				int m = 0;
+				encontrado = 0;
+				while(m < lista_partidas.partida[l].lista_jugadores.num && !encontrado) {
+					if(strcmp(lista_partidas.partida[l].lista_jugadores.usuario[m].nombre, lista_partidas.partida[l].dealer) == 0)
+						encontrado = 1;
+					else
+						m++;
+				}
+				int o;
+				if (m == lista_partidas.partida[l].lista_jugadores.num)
+					o = 0;
+				else
+					o = m + 1;
+				encontrado = 0;
+				while(m != o && !encontrado) {
+					if(lista_partidas.partida[l].lista_jugadores.usuario[o].estado == 'W')
+						encontrado = 1;
+					else if (m == lista_partidas.partida[l].lista_jugadores.num)
+						o = 0;
+					else
+						o++;
+				}
+				pthread_mutex_lock(&mutex);
+				
+				lista_partidas.partida[l].puja = 2 * lista_partidas.partida[l].ciega;
+				lista_partidas.partida[l].suma = 3 * lista_partidas.partida[l].ciega;
+				
+				lista_partidas.partida[l].estado = 'B';
+				
+				strcpy(lista_partidas.partida[l].dealer, lista_partidas.partida[l].lista_jugadores.usuario[o].nombre);
+				
+				//Contabilizamos las apuestas ciegas de los jugadores que las deben hacer
+				if (o == lista_partidas.partida[l].lista_jugadores.num)
+					m = 0;
+				else
+					m = o + 1;
+				encontrado = 0;
+				while(!encontrado && m != o) {
+					if(lista_partidas.partida[l].lista_jugadores.usuario[m].estado != 'O')
+						encontrado = 1;
+					else if(m == lista_partidas.partida[l].lista_jugadores.num)
+						m = 0;
+					else
+						m++;
+				}
+				lista_partidas.partida[l].lista_jugadores.usuario[m].jugado = lista_partidas.partida[l].ciega;
+				if(m == lista_partidas.partida[l].lista_jugadores.num)
+					m = 0;
+				else
+					m++;
+				encontrado = 0;
+				while(!encontrado && m != o) {
+					if(lista_partidas.partida[l].lista_jugadores.usuario[m].estado != 'O')
+						encontrado = 1;
+					else if(m == lista_partidas.partida[l].lista_jugadores.num)
+						m = 0;
+					else
+						m++;
+				}
+				lista_partidas.partida[l].lista_jugadores.usuario[m].jugado = 2 * lista_partidas.partida[l].ciega;
+				
+				//Barajamos las cartas
+				BarajarCartas(l);
+				pthread_mutex_unlock(&mutex);
+				
+				//Repartimos las cartas
+				int carta = 0;
+				int j = 0;
+				while(j < lista_partidas.partida[l].lista_jugadores.num) {
+					char mensaje[100];
+					sprintf(mensaje, "9$%d/0/%d/%d/%s", ID_partida, lista_partidas.partida[l].baraja[carta], 
+							lista_partidas.partida[l].baraja[carta + 1], lista_partidas.partida[l].dealer);
+					write (lista_partidas.partida[l].lista_jugadores.usuario[j].sock, mensaje, strlen(mensaje));
+					
+					carta = carta + 2;
+					j++;
+				}
+				if(m == lista_partidas.partida[l].lista_jugadores.num)
+					  m = 0;
+				else
+					m++;
+				encontrado = 0;
+				while(!encontrado && m != o) {
+					if(lista_partidas.partida[l].lista_jugadores.usuario[m].estado != 'O')
+						encontrado = 1;
+					else if(m == lista_partidas.partida[l].lista_jugadores.num)
+						m = 0;
+					else
+						m++;
+				}
+				char mensaje2[100];
+				sprintf(mensaje2, "11$%d/%s", ID_partida, lista_partidas.partida[l].lista_jugadores.usuario[m].nombre);
+				write (lista_partidas.partida[l].lista_jugadores.usuario[j].sock, mensaje2, strlen(mensaje2));
+			}
+			
+			//Comprobamos que todos los jugadores que continuan en la ronda tengan las mismas fichas en juego (excepto all in)
+			//Si esto se cumple se pasa de ronda. Si no, se pasa el turno al siguiente jugador activo en la ronda
+			else if(retirados + resto == lista_partidas.partida[l].lista_jugadores.num) {
+				int n = 0;
+				int encontrado = 0;
+				while(!encontrado && n < lista_partidas.partida[l].lista_jugadores.num) {
+					if(lista_partidas.partida[l].lista_jugadores.usuario[k].estado == 'C' || lista_partidas.partida[l].lista_jugadores.usuario[n].estado == 'R') {
+						if(lista_partidas.partida[l].lista_jugadores.usuario[k].fichas != lista_partidas.partida[l].puja)
+							encontrado = 1;
+						else
+							n++;
+					}
+					else
+					    n++;
+				}
+				
+				if(!encontrado) {
+					pthread_mutex_lock(&mutex);
+					//Pasamos de fase
+					if(lista_partidas.partida[l].estado == 'B') {
+						lista_partidas.partida[l].estado = 'F';
+						char mensaje[100];
+						sprintf(mensaje, "9$%d/1/%d/%d/%d", ID_partida, lista_partidas.partida[l].baraja[2 * lista_partidas.partida[l].lista_jugadores.num], 
+								lista_partidas.partida[l].baraja[2 * lista_partidas.partida[l].lista_jugadores.num + 1], 
+								lista_partidas.partida[l].baraja[2 * lista_partidas.partida[l].lista_jugadores.num + 2]);
+						for(int j = 0; j < lista_partidas.partida[l].lista_jugadores.num; j++)
+							write (lista_partidas.partida[l].lista_jugadores.usuario[j].sock, mensaje, strlen(mensaje));
+					}
+					else if(lista_partidas.partida[l].estado == 'F') {
+						lista_partidas.partida[l].estado = 'T';
+						char mensaje[100];
+						sprintf(mensaje, "9$%d/2/%d", ID_partida, lista_partidas.partida[l].baraja[2 * lista_partidas.partida[l].lista_jugadores.num + 3]);
+						for(int j = 0; j < lista_partidas.partida[l].lista_jugadores.num; j++)
+							write (lista_partidas.partida[l].lista_jugadores.usuario[j].sock, mensaje, strlen(mensaje));
+					}
+					else if(lista_partidas.partida[l].estado == 'T') {
+						lista_partidas.partida[l].estado = 'R';
+						char mensaje[100];
+						sprintf(mensaje, "9$%d/3/%d", ID_partida, lista_partidas.partida[l].baraja[2 * lista_partidas.partida[l].lista_jugadores.num + 4]);
+						for(int j = 0; j < lista_partidas.partida[l].lista_jugadores.num; j++)
+							write (lista_partidas.partida[l].lista_jugadores.usuario[j].sock, mensaje, strlen(mensaje));
+					}
+					else if(lista_partidas.partida[l].estado == 'R') {
+						lista_partidas.partida[l].estado = 'E';
+						
+						//COMPRUEBA COMBINACIONES DE CARTAS DE TO CRISTO QUE SIGA
+						//GENERA SIGUIENTE RONDA!!!!!!!!
+					}
+					else
+						printf("Error inesperado al pasar de fase.");
+					pthread_mutex_unlock(&mutex);
+					
+					//Pasamos el turno al jugador de después del dealer
+					int m = 0;
+					encontrado = 0;
+					while(m < lista_partidas.partida[l].lista_jugadores.num && !encontrado) {
+						if(strcmp(lista_partidas.partida[l].lista_jugadores.usuario[m].nombre, lista_partidas.partida[l].dealer) == 0)
+							encontrado = 1;
+						else
+							m++;
+					}
+					int o = m + 1;
+					encontrado = 0;
+					while(m != o && !encontrado) {
+						if(lista_partidas.partida[l].lista_jugadores.usuario[o].estado == 'C' || lista_partidas.partida[l].lista_jugadores.usuario[o].estado == 'R' || lista_partidas.partida[l].lista_jugadores.usuario[o].estado == 'W')
+							encontrado = 1;
+						else if (m == lista_partidas.partida[l].lista_jugadores.num)
+							o = 0;
+						else
+							o++;
+					}
+					char mensaje3[100];
+					sprintf(mensaje3, "11$%d/%s", ID_partida, lista_partidas.partida[l].lista_jugadores.usuario[m].nombre);
+					EnviarMensaje(mensaje3, ID_partida);
+				}
+				else {
+					//Pasamos el turno al siguiente jugador
+					int m = k;
+					if(m == lista_partidas.partida[l].lista_jugadores.num)
+						m = 0;
+					else
+						m++;
+					encontrado = 0;
+					while(!encontrado && m != k) {
+						if(lista_partidas.partida[l].lista_jugadores.usuario[m].estado != 'A' && lista_partidas.partida[l].lista_jugadores.usuario[m].estado != 'O' && lista_partidas.partida[l].lista_jugadores.usuario[m].estado != 'F')
+							encontrado = 1;
+						else if(m = lista_partidas.partida[l].lista_jugadores.num)
+							m = 0;
+						else
+							m++;
+					}
+					if(encontrado) {
+						char mensaje3[100];
+						sprintf(mensaje3, "11$%d/%s", ID_partida, lista_partidas.partida[l].lista_jugadores.usuario[m].nombre);
+						EnviarMensaje(mensaje3, ID_partida);
+					}
+					else
+					   printf("Error inesperado al pasar turno.");
+				}
+			}
+			else {
+				//Pasamos el turno al siguiente jugador
+				int m = k;
+				if(m == lista_partidas.partida[l].lista_jugadores.num)
+					m = 0;
+				else
+					m++;
+				encontrado = 0;
+				while(!encontrado && m != k) {
+					if(lista_partidas.partida[l].lista_jugadores.usuario[m].estado != 'A' && lista_partidas.partida[l].lista_jugadores.usuario[m].estado != 'O' && lista_partidas.partida[l].lista_jugadores.usuario[m].estado != 'F')
+						encontrado = 1;
+					else if(m = lista_partidas.partida[l].lista_jugadores.num)
+						m = 0;
+					else
+						m++;
+				}
+				if(encontrado) {
+					char mensaje3[100];
+					sprintf(mensaje3, "11$%d/%s", ID_partida, lista_partidas.partida[l].lista_jugadores.usuario[m].nombre);
+					EnviarMensaje(mensaje3, ID_partida);
+				}
+				else
+				   printf("Error inesperado al pasar turno.");
+			}
 		}
 	}
 	// Se acabo el servicio para este cliente
@@ -685,7 +1216,7 @@ int main(int argc, char *argv[]){
 	serv_adr.sin_addr.s_addr = htonl(INADDR_ANY);
 	
 	//Escucharemos en el puerto indicado entre parenteis
-	serv_adr.sin_port = htons(50083);
+	serv_adr.sin_port = htons(50082);
 	if (bind(sock_listen, (struct sockaddr *) &serv_adr, sizeof(serv_adr)) < 0)
 		printf ("Error al bind\n");
 	if (listen(sock_listen, 2) < 0)

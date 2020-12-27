@@ -63,6 +63,29 @@ namespace Cliente
                     delegado = new DelegadoRespuesta(Accion6);
                     this.Invoke(delegado, new object[] { mensaje });
                     break;
+
+                case 7:
+                    delegado = new DelegadoRespuesta(Accion7);
+                    this.Invoke(delegado, new object[] { mensaje });
+                    break;
+
+                case 8:
+                    delegado = new DelegadoRespuesta(Accion8);
+                    this.Invoke(delegado, new object[] { mensaje });
+                    break;
+
+                case 9:
+                    delegado = new DelegadoRespuesta(Accion9);
+                    this.Invoke(delegado, new object[] { mensaje });
+                    break;
+                case 10:
+                    delegado = new DelegadoRespuesta(Accion10);
+                    this.Invoke(delegado, new object[] { mensaje });
+                    break;
+                case 11:
+                    delegado = new DelegadoRespuesta(Accion11);
+                    this.Invoke(delegado, new object[] { mensaje });
+                    break;
             } 
         }
 
@@ -154,6 +177,82 @@ namespace Cliente
             for (int j = 0; j < cont_forms; j++)
                 if (lista_forms_partidas[j].getID() == Convert.ToInt32(separado[0]))
                     lista_forms_partidas[j].TomaRespuesta(6, separado[1]);
+        }
+
+        public void Accion7(string mensaje)
+        {
+            //Esta función es llamada cada vez que un usuario recibe un mensaje con el código 7, es decir, cuando el host de una partida se
+            //ha ido y este cliente debe pasar a ser el nuevo host.
+            //Esta función se encarga de averiguar la partida a la cual pertenece el mensaje y lo reenvía al formulario en cuestión.
+            string[] separado = mensaje.Split('/');
+            for (int j = 0; j < cont_forms; j++)
+                if (lista_forms_partidas[j].getID() == Convert.ToInt32(separado[0]))
+                    lista_forms_partidas[j].TomaRespuesta(7, "");
+        }
+
+        public void Accion8(string mensaje)
+        {
+            //Esta función es llamada cada vez que un usuario recibe un mensaje con el código 10, es decir, cada vez que el programa
+            //recibe un mensaje para mostrar en algún chat de partida.
+            //Esta función se encarga de averiguar la partida a la cual pertenece el mensaje y lo reenvía al formulario en cuestión.
+            string[] separado = mensaje.Split('/');
+            for (int j = 0; j < cont_forms; j++)
+                if (lista_forms_partidas[j].getID() == Convert.ToInt32(separado[0]))
+                {
+                    if(Convert.ToInt32(separado[1]) == 0)
+                        lista_forms_partidas[j].TomaRespuesta(8, separado[1] + "/" + separado[2] + "/" + separado[3]);
+                    else if (Convert.ToInt32(separado[1]) == 2)
+                    {
+                        if(Convert.ToInt32(separado[4]) == 1)
+                            lista_forms_partidas[j].TomaRespuesta(8, separado[1] + "/" + separado[2] + "/" + separado[3] + "/" + separado[4] + "/" + separado[5]);
+                        else if (Convert.ToInt32(separado[4]) == 2)
+                            lista_forms_partidas[j].TomaRespuesta(8, separado[1] + "/" + separado[2] + "/" + separado[3] + "/" + separado[4] + "/" + separado[5] + "/" + separado[6]);
+                        else if (Convert.ToInt32(separado[4]) == 3)
+                            lista_forms_partidas[j].TomaRespuesta(8, separado[1] + "/" + separado[2] + "/" + separado[3] + "/" + separado[4] + "/" + separado[5] + "/" + separado[6] + "/" + separado[7]);
+                        else if (Convert.ToInt32(separado[4]) == 4)
+                            lista_forms_partidas[j].TomaRespuesta(8, separado[1] + "/" + separado[2] + "/" + separado[3] + "/" + separado[4] + "/" + separado[5] + "/" + separado[6] + "/" + separado[7] + "/" + separado[8]);
+                        else if (Convert.ToInt32(separado[4]) == 5)
+                            lista_forms_partidas[j].TomaRespuesta(8, separado[1] + "/" + separado[2] + "/" + separado[3] + "/" + separado[4] + "/" + separado[5] + "/" + separado[6] + "/" + separado[7] + "/" + separado[8] + "/" + separado[9]);
+                        else if (Convert.ToInt32(separado[4]) == 6)
+                            lista_forms_partidas[j].TomaRespuesta(8, separado[1] + "/" + separado[2] + "/" + separado[3] + "/" + separado[4] + "/" + separado[5] + "/" + separado[6] + "/" + separado[7] + "/" + separado[8] + "/" + separado[9] + "/" + separado[10]);
+                        else if (Convert.ToInt32(separado[4]) == 7)
+                            lista_forms_partidas[j].TomaRespuesta(8, separado[1] + "/" + separado[2] + "/" + separado[3] + "/" + separado[4] + "/" + separado[5] + "/" + separado[6] + "/" + separado[7] + "/" + separado[8] + "/" + separado[9] + "/" + separado[10] + "/" + separado[11]);
+                        else if (Convert.ToInt32(separado[4]) == 8)
+                            lista_forms_partidas[j].TomaRespuesta(8, separado[1] + "/" + separado[2] + "/" + separado[3] + "/" + separado[4] + "/" + separado[5] + "/" + separado[6] + "/" + separado[7] + "/" + separado[8] + "/" + separado[9] + "/" + separado[10] + "/" + separado[11] + "/" + separado[12]);
+                    }
+                }
+        }
+
+        public void Accion9(string mensaje)
+        {
+            //Esta función es llamada cada vez que un usuario recibe un mensaje con el código 10, es decir, cada vez que el programa
+            //recibe un mensaje para mostrar en algún chat de partida.
+            //Esta función se encarga de averiguar la partida a la cual pertenece el mensaje y lo reenvía al formulario en cuestión.
+            string[] separado = mensaje.Split('/');
+            for (int j = 0; j < cont_forms; j++)
+                if (lista_forms_partidas[j].getID() == Convert.ToInt32(separado[0]))
+                {
+                    if (Convert.ToInt32(separado[1]) == 0 || Convert.ToInt32(separado[1]) == 1)
+                        lista_forms_partidas[j].TomaRespuesta(9, separado[1] + "/" + separado[2] + "/" + separado[3] + "/" + separado[4]);
+                    else if (Convert.ToInt32(separado[1]) == 2 || Convert.ToInt32(separado[1]) == 3)
+                        lista_forms_partidas[j].TomaRespuesta(9, separado[1] + "/" + separado[2]);
+                }
+        }
+
+        public void Accion10(string mensaje)
+        {
+            string[] separado = mensaje.Split('/');
+            for (int j = 0; j < cont_forms; j++)
+                if (lista_forms_partidas[j].getID() == Convert.ToInt32(separado[0]))
+                    lista_forms_partidas[j].TomaRespuesta(10, separado[1] + "/" + separado[2]);
+        }
+
+        public void Accion11(string mensaje)
+        {
+            string[] separado = mensaje.Split('/');
+            for (int j = 0; j < cont_forms; j++)
+                if (lista_forms_partidas[j].getID() == Convert.ToInt32(separado[0]))
+                    lista_forms_partidas[j].TomaRespuesta(11, separado[1]);
         }
 
         private void Form1_Load(object sender, EventArgs e)
