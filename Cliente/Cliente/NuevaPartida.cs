@@ -26,6 +26,7 @@ namespace Cliente
         {
             //Constructor del formulario usado cuando el usuario es el host de la partida.
             InitializeComponent();
+            CheckForIllegalCrossThreadCalls = false;
             this.server = server;
             this.usuario = usuario;
             usuarioLbl.Text = this.usuario;
@@ -42,12 +43,51 @@ namespace Cliente
             subirBtn.Visible = false;
             subirNum.Enabled = false;
             subirNum.Visible = false;
+
+            /*
+            jugador2NombreLbl.Text = "";
+            jugador2Carta1Lbl.Text = "";
+            jugador2Carta2Lbl.Text = "";
+            jugador2FichasLbl.Text = "";
+            jugador2JugadoLbl.Text = "";
+            jugador3NombreLbl.Text = "";
+            jugador3Carta1Lbl.Text = "";
+            jugador3Carta2Lbl.Text = "";
+            jugador3FichasLbl.Text = "";
+            jugador3JugadoLbl.Text = "";
+            jugador4NombreLbl.Text = "";
+            jugador4Carta1Lbl.Text = "";
+            jugador4Carta2Lbl.Text = "";
+            jugador4FichasLbl.Text = "";
+            jugador4JugadoLbl.Text = "";
+            jugador5NombreLbl.Text = "";
+            jugador5Carta1Lbl.Text = "";
+            jugador5Carta2Lbl.Text = "";
+            jugador5FichasLbl.Text = "";
+            jugador5JugadoLbl.Text = "";
+            jugador6NombreLbl.Text = "";
+            jugador6Carta1Lbl.Text = "";
+            jugador6Carta2Lbl.Text = "";
+            jugador6FichasLbl.Text = "";
+            jugador6JugadoLbl.Text = "";
+            jugador7NombreLbl.Text = "";
+            jugador7Carta1Lbl.Text = "";
+            jugador7Carta2Lbl.Text = "";
+            jugador7FichasLbl.Text = "";
+            jugador7JugadoLbl.Text = "";
+            jugador8NombreLbl.Text = "";
+            jugador8Carta1Lbl.Text = "";
+            jugador8Carta2Lbl.Text = "";
+            jugador8FichasLbl.Text = "";
+            jugador8JugadoLbl.Text = "";
+            */
         }
 
         public NuevaPartida(Server server, string usuario, int ID)
         {
             //Constructor del formulario usado cuando el usuario acepta una invitación de otro jugador.
             InitializeComponent();
+            CheckForIllegalCrossThreadCalls = false;
             this.server = server;
             this.usuario = usuario;
             this.ID = ID;
@@ -96,8 +136,9 @@ namespace Cliente
                     break;
 
                 case 8:
-                    delegado = new DelegadoRespuesta(Accion8);
-                    this.Invoke(delegado, new object[] { mensaje });
+                    //delegado = new DelegadoRespuesta(Accion8);
+                    //this.Invoke(delegado, new object[] { mensaje });
+                    Accion8(mensaje);
                     break;
 
                 case 9:
@@ -150,37 +191,41 @@ namespace Cliente
             {
                 int n = Convert.ToInt32(separado[3]);
                 jugador1NombreLbl.Text = separado[4];
+                jugador1FichasLbl.Text = fichasNum.Value.ToString();
+                jugador1JugadoLbl.Text = "0";
                 jugador2NombreLbl.Text = separado[5];
+                jugador2FichasLbl.Text = fichasNum.Value.ToString();
+                jugador2JugadoLbl.Text = "0";
                 if (n > 2)
                 {
                     jugador3NombreLbl.Text = separado[6];
-                    jugador3FichasLbl.Text = "Fichas: " + fichasNum.Value;
-                    jugador3JugadoLbl.Text = "Jugado: 0";
+                    jugador3FichasLbl.Text = fichasNum.Value.ToString();
+                    jugador3JugadoLbl.Text = "0";
                     if (n > 3)
                     {
                         jugador4NombreLbl.Text = separado[7];
-                        jugador4FichasLbl.Text = "Fichas: " + fichasNum.Value;
-                        jugador4JugadoLbl.Text = "Jugado: 0";
+                        jugador4FichasLbl.Text = fichasNum.Value.ToString();
+                        jugador4JugadoLbl.Text = "0";
                         if (n > 4)
                         {
                             jugador5NombreLbl.Text = separado[8];
-                            jugador5FichasLbl.Text = "Fichas: " + fichasNum.Value;
-                            jugador5JugadoLbl.Text = "Jugado: 0";
+                            jugador5FichasLbl.Text = fichasNum.Value.ToString();
+                            jugador5JugadoLbl.Text = "0";
                             if (n > 5)
                             {
                                 jugador6NombreLbl.Text = separado[9];
-                                jugador6FichasLbl.Text = "Fichas: " + fichasNum.Value;
-                                jugador6JugadoLbl.Text = "Jugado: 0";
+                                jugador6FichasLbl.Text = fichasNum.Value.ToString();
+                                jugador6JugadoLbl.Text = "0";
                                 if (n > 6)
                                 {
                                     jugador7NombreLbl.Text = separado[10];
-                                    jugador7FichasLbl.Text = "Fichas: " + fichasNum.Value;
-                                    jugador7JugadoLbl.Text = "Jugado: 0";
+                                    jugador7FichasLbl.Text = fichasNum.Value.ToString();
+                                    jugador7JugadoLbl.Text = "0";
                                     if (n > 7)
                                     {
                                         jugador8NombreLbl.Text = separado[11];
-                                        jugador8FichasLbl.Text = "Fichas: " + fichasNum.Value;
-                                        jugador8JugadoLbl.Text = "Jugado: 0";
+                                        jugador8FichasLbl.Text = fichasNum.Value.ToString();
+                                        jugador8JugadoLbl.Text = "0";
                                     }
                                     else
                                     {
@@ -279,7 +324,7 @@ namespace Cliente
                 }
                 else
                 {
-                    jugador3NombreLbl.Text = "";
+                    /*jugador3NombreLbl.Text = "";
                     jugador3Carta1Lbl.Text = "";
                     jugador3Carta2Lbl.Text = "";
                     jugador3FichasLbl.Text = "";
@@ -308,13 +353,18 @@ namespace Cliente
                     jugador8Carta1Lbl.Text = "";
                     jugador8Carta2Lbl.Text = "";
                     jugador8FichasLbl.Text = "";
-                    jugador8JugadoLbl.Text = "";
+                    jugador8JugadoLbl.Text = "";*/
                 }
             }
         }
 
         public void Accion9(string mensaje)
         {
+            empezarBtn.Visible = false;
+            fichasNum.Visible = false;
+            fichasLbl.Visible = false;
+            ciegaLbl.Visible = false;
+            ciegaNum.Visible = false;
             string[] separado = mensaje.Split('/');
             if (Convert.ToInt32(separado[0]) == 0)
             {

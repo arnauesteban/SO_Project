@@ -576,7 +576,8 @@ void *AtenderCliente (void *socket){
 			strcpy(lista_partidas.partida[lista_partidas.num].host, nombre_host);
 			
 			lista_partidas.partida[lista_partidas.num].lista_jugadores.num = 1;
-			
+			lista_partidas.partida[lista_partidas.num].ciega = 1;
+			lista_partidas.partida[lista_partidas.num].dineroInicial = 200;
 			pthread_mutex_unlock(&mutex);
 			
 			char mensaje[200];
@@ -641,7 +642,7 @@ void *AtenderCliente (void *socket){
 				lista_partidas.partida[l].lista_jugadores.usuario[lista_partidas.partida[l].lista_jugadores.num].sock = sock_conn;
 				lista_partidas.partida[l].lista_jugadores.num++;
 				
-				//Enviamos a todos los jugadores de la partida la lista de jugadores actualizada
+				//Enviamos a todos los jugadores de la partida la lista de jugadores actualizada y los parámetros iniciales actualizados
 				char mensaje2[200];
 				strcpy(mensaje2, "");
 				for(int j = 0; j < lista_partidas.partida[l].lista_jugadores.num; j++)
@@ -758,6 +759,8 @@ void *AtenderCliente (void *socket){
 			//Enviar cambios al resto de jugadores
 			if(numConfig == 0)
 			{
+				//Si el parámetro numConfig vale 0, solo se debe reenviar las fichas y la ciega pequeña iniciales llegadas como parámetros
+				//Esta variante se envía a todos los jugadores de la partida
 				p = strtok(NULL, "/");
 				int dinero = atoi(p);
 				lista_partidas.partida[ID_partida].dineroInicial = dinero;
@@ -774,6 +777,8 @@ void *AtenderCliente (void *socket){
 			}
 			else if(numConfig == 2)
 			{
+				//Si el parámetro numConfig vale 2, además de enviar fichas y ciega, también se envía la lista de jugadores actualizada.
+				//Esta variante solo se envía a quien la solicita, no a toda la lista
 				char mensaje2[200];
 				strcpy(mensaje2, "");
 				for(int j = 0; j < lista_partidas.partida[l].lista_jugadores.num; j++)
@@ -808,9 +813,11 @@ void *AtenderCliente (void *socket){
 			
 			pthread_mutex_lock(&mutex);
 			
+			//Contabilizamos en las apuestas realizadas las ciegas iniciales
 			lista_partidas.partida[l].puja = 2 * lista_partidas.partida[l].ciega;
 			lista_partidas.partida[l].suma = 3 * lista_partidas.partida[l].ciega;
 			
+			//Configuramos el estado de la partida a "beginning"
 			lista_partidas.partida[l].estado = 'B';
 			
 			//Asignamos al host de la partida como dealer de la primera ronda
@@ -833,11 +840,11 @@ void *AtenderCliente (void *socket){
 			BarajarCartas(l);
 			pthread_mutex_unlock(&mutex);
 			
-			//Repartimos las cartas
+			//Repartimos las cartas. Cada jugador recibe las dos cartas que tiene en la mano
 			int carta = 0;
 			int j = 0;
+			strcpy(mensaje, "");
 			while(j < lista_partidas.partida[l].lista_jugadores.num) {
-				char mensaje[100];
 				sprintf(mensaje, "9$%d/0/%d/%d/%s", ID_partida, lista_partidas.partida[l].baraja[carta], 
 						lista_partidas.partida[l].baraja[carta + 1], lista_partidas.partida[l].dealer);
 				write (lista_partidas.partida[l].lista_jugadores.usuario[j].sock, mensaje, strlen(mensaje));
@@ -846,14 +853,16 @@ void *AtenderCliente (void *socket){
 				carta = carta + 2;
 				j++;
 			}
-			char mensaje2[100];
+			
+			//Se establece el turno del jugador siguiente al que ha hecho la ciega grande
+			char mensajeturno[100];
 			if(lista_partidas.partida[l].lista_jugadores.num > 3)
-				sprintf(mensaje2, "11$%d/%s", ID_partida, lista_partidas.partida[l].lista_jugadores.usuario[3].nombre);
+				sprintf(mensajeturno, "11$%d/%s", ID_partida, lista_partidas.partida[l].lista_jugadores.usuario[3].nombre);
 			else
-				sprintf(mensaje2, "11$%d/%s", ID_partida, lista_partidas.partida[l].lista_jugadores.usuario[3 - lista_partidas.partida[l].lista_jugadores.num].nombre);
+				sprintf(mensajeturno, "11$%d/%s", ID_partida, lista_partidas.partida[l].lista_jugadores.usuario[3 - lista_partidas.partida[l].lista_jugadores.num].nombre);
 			for(j = 0; j < lista_partidas.partida[l].lista_jugadores.num; j++)
-				write (lista_partidas.partida[l].lista_jugadores.usuario[j].sock, mensaje2, strlen(mensaje2));
-			printf("Se ha enviado %s\n", mensaje2);
+				write (lista_partidas.partida[l].lista_jugadores.usuario[j].sock, mensajeturno, strlen(mensajeturno));
+			printf("Se ha enviado %s\n", mensajeturno);
 		}
 	
 		//Ha hecho una accion en una partida (ir, no ir o subir)
@@ -874,7 +883,7 @@ void *AtenderCliente (void *socket){
 					l++;
 			}
 			
-			//Buscamos al jugador en la lista de la partida
+			//Buscamos al jugador que ha enviado el mensaje en la lista de la partida
 			int k = 0;
 			encontrado = 0;
 			while (!encontrado && k < lista_partidas.partida[l].lista_jugadores.num) {
@@ -884,12 +893,15 @@ void *AtenderCliente (void *socket){
 					k++;
 			}
 			
-			//Enviamos la acción del jugador al resto de jugadores
+			//Reenviamos la acción del jugador al resto de jugadores
 			char mensaje0[100];
 			sprintf(mensaje0, "10$%d/%d/%d", ID_partida, k, accion);
-			EnviarMensaje(mensaje0, ID_partida);
+			for(int q = 0; q < lista_partidas.partida[l].lista_jugadores.num; q++)
+				write(lista_partidas.partida[l].lista_jugadores.usuario[q].sock, mensaje0, strlen(mensaje0));
+			printf("se ha enviado %s\n", mensaje0);
 			//Miramos que accion ha realizado el cliente
 			pthread_mutex_lock(&mutex);
+			
 			//Ha dejado sus cartas en la mesa
 			if(accion == -1) {
 				lista_partidas.partida[l].lista_jugadores.usuario[k].estado = 'F';
@@ -934,11 +946,9 @@ void *AtenderCliente (void *socket){
 				printf("Error inesperado en la acción del jugador.");
 			pthread_mutex_unlock(&mutex);
 			
-			//Verificamos que la fase ha terminado
+			//Comprobamos el estado de los jugadores
 			int retirados = 0;
 			int resto = 0;
-			
-			//Comprobamos el estado de los jugadores
 			for(int n = 0; n < lista_partidas.partida[l].lista_jugadores.num; n++) {
 				if(lista_partidas.partida[l].lista_jugadores.usuario[n].estado == 'F' || lista_partidas.partida[l].lista_jugadores.usuario[n].estado == 'O')
 					retirados++;
@@ -949,6 +959,7 @@ void *AtenderCliente (void *socket){
 			//Solo queda un jugador en la ronda. Gana la apuesta y se pasa a la ronda siguiente
 			if(retirados + resto == lista_partidas.partida[l].lista_jugadores.num && resto == 1) {
 				pthread_mutex_lock(&mutex);
+				//Recorrido en la lista de jugadores de la partida: Al ganador se le agrega la suma de todo lo apostado en la ronda y al resto se les resta lo apostado de las fichas que tiene
 				for(int n = 0; n < lista_partidas.partida[l].lista_jugadores.num; n++) {
 					if(lista_partidas.partida[l].lista_jugadores.usuario[n].estado == 'C'|| lista_partidas.partida[l].lista_jugadores.usuario[n].estado == 'R' || lista_partidas.partida[l].lista_jugadores.usuario[n].estado == 'A') {
 						lista_partidas.partida[l].lista_jugadores.usuario[n].fichas += (lista_partidas.partida[l].suma - lista_partidas.partida[l].lista_jugadores.usuario[n].jugado);
@@ -958,12 +969,15 @@ void *AtenderCliente (void *socket){
 					}
 					else
 						lista_partidas.partida[l].lista_jugadores.usuario[n].fichas -= lista_partidas.partida[l].lista_jugadores.usuario[n].jugado;
+					
+					//Si el jugador se ha quedado sin fichas, se pone su estado en "Out of money", si no, se le pone en "Waiting"
 					if(lista_partidas.partida[l].lista_jugadores.usuario[n].fichas == 0)
 						lista_partidas.partida[l].lista_jugadores.usuario[n].estado = 'O';
 					else
 						lista_partidas.partida[l].lista_jugadores.usuario[n].estado = 'W';
 					lista_partidas.partida[l].lista_jugadores.usuario[n].jugado = 0;
 				}
+				//Reseteamos los parámetros gereales de la ronda
 				lista_partidas.partida[l].suma = 0;
 				lista_partidas.partida[l].puja = 0;
 				pthread_mutex_unlock(&mutex);
@@ -971,18 +985,21 @@ void *AtenderCliente (void *socket){
 				//Pasamos el dealer al siguiente jugador
 				int m = 0;
 				encontrado = 0;
+				//Bucle para encontrar al Dealer en la lista de jugadores de la partida
 				while(m < lista_partidas.partida[l].lista_jugadores.num && !encontrado) {
 					if(strcmp(lista_partidas.partida[l].lista_jugadores.usuario[m].nombre, lista_partidas.partida[l].dealer) == 0)
 						encontrado = 1;
 					else
 						m++;
 				}
+				//Cuando se encuentra el dealer, se suma 1 al indice o se retorna a 0 si es el ultimo de la lista
 				int o;
 				if (m == lista_partidas.partida[l].lista_jugadores.num)
 					o = 0;
 				else
 					o = m + 1;
 				encontrado = 0;
+				//Bucle para encontrar al nuevo dealer: Será el siguiente jugador activo en la partida, es decir, con fichas
 				while(m != o && !encontrado) {
 					if(lista_partidas.partida[l].lista_jugadores.usuario[o].estado == 'W')
 						encontrado = 1;
@@ -992,13 +1009,15 @@ void *AtenderCliente (void *socket){
 						o++;
 				}
 				pthread_mutex_lock(&mutex);
+				//Se asigna al nuevo dealer
+				strcpy(lista_partidas.partida[l].dealer, lista_partidas.partida[l].lista_jugadores.usuario[o].nombre);
 				
+				//Se contabiliza las ciegas en los parámetros generales de la ronda
 				lista_partidas.partida[l].puja = 2 * lista_partidas.partida[l].ciega;
 				lista_partidas.partida[l].suma = 3 * lista_partidas.partida[l].ciega;
 				
+				//Se pone el estado de la ronda en "Beginning"
 				lista_partidas.partida[l].estado = 'B';
-				
-				strcpy(lista_partidas.partida[l].dealer, lista_partidas.partida[l].lista_jugadores.usuario[o].nombre);
 				
 				//Contabilizamos las apuestas ciegas de los jugadores que las deben hacer
 				if (o == lista_partidas.partida[l].lista_jugadores.num)
@@ -1006,6 +1025,7 @@ void *AtenderCliente (void *socket){
 				else
 					m = o + 1;
 				encontrado = 0;
+				//Bucle para encotrar al primer jugador que debe hacer la ciega pequeña
 				while(!encontrado && m != o) {
 					if(lista_partidas.partida[l].lista_jugadores.usuario[m].estado != 'O')
 						encontrado = 1;
@@ -1015,11 +1035,13 @@ void *AtenderCliente (void *socket){
 						m++;
 				}
 				lista_partidas.partida[l].lista_jugadores.usuario[m].jugado = lista_partidas.partida[l].ciega;
+				//Una vez se ha encontrado al jugador, se suma 1 al índice o se retorna a 0 si esta en el limite
 				if(m == lista_partidas.partida[l].lista_jugadores.num)
 					m = 0;
 				else
 					m++;
 				encontrado = 0;
+				//Bucle para encontrar al jugador que debe hacer la ciega grande
 				while(!encontrado && m != o) {
 					if(lista_partidas.partida[l].lista_jugadores.usuario[m].estado != 'O')
 						encontrado = 1;
@@ -1046,11 +1068,15 @@ void *AtenderCliente (void *socket){
 					carta = carta + 2;
 					j++;
 				}
+				
+				//Pasamos el turno al jugador siguiente al que ha abonado la ciega grande
+				//Sumamos 1 al indice en el que se encuentra el jugador de la ciega grande
 				if(m == lista_partidas.partida[l].lista_jugadores.num)
 					  m = 0;
 				else
 					m++;
 				encontrado = 0;
+				//Bucle para buscar a un jugador activo en la partida (con fichas)
 				while(!encontrado && m != o) {
 					if(lista_partidas.partida[l].lista_jugadores.usuario[m].estado != 'O')
 						encontrado = 1;
@@ -1059,19 +1085,22 @@ void *AtenderCliente (void *socket){
 					else
 						m++;
 				}
+				//Enviamos al jugador en cuestion el mensaje conforme es su turno
 				char mensaje2[100];
 				sprintf(mensaje2, "11$%d/%s", ID_partida, lista_partidas.partida[l].lista_jugadores.usuario[m].nombre);
 				write (lista_partidas.partida[l].lista_jugadores.usuario[j].sock, mensaje2, strlen(mensaje2));
 			}
 			
-			//Comprobamos que todos los jugadores que continuan en la ronda tengan las mismas fichas en juego (excepto all in)
-			//Si esto se cumple se pasa de ronda. Si no, se pasa el turno al siguiente jugador activo en la ronda
+			//Comprobamos que todos los jugadores que continuan en la ronda tengan las mismas fichas en juego (excepto all in) y comprobamos que no haya jugadores en espera
+			//Si esto se cumple se pasa de fase
 			else if(retirados + resto == lista_partidas.partida[l].lista_jugadores.num) {
 				int n = 0;
 				int encontrado = 0;
+				//Bucle para buscar a jugadores activos con fichas que no se hayan jugado lo mismo que el resto
+				//Si se encuentra algun ugador que cumple estas condiciones, no se puede pasar de fase
 				while(!encontrado && n < lista_partidas.partida[l].lista_jugadores.num) {
 					if(lista_partidas.partida[l].lista_jugadores.usuario[k].estado == 'C' || lista_partidas.partida[l].lista_jugadores.usuario[n].estado == 'R') {
-						if(lista_partidas.partida[l].lista_jugadores.usuario[k].fichas != lista_partidas.partida[l].puja)
+						if(lista_partidas.partida[l].lista_jugadores.usuario[k].jugado != lista_partidas.partida[l].puja)
 							encontrado = 1;
 						else
 							n++;
@@ -1083,6 +1112,7 @@ void *AtenderCliente (void *socket){
 				if(!encontrado) {
 					pthread_mutex_lock(&mutex);
 					//Pasamos de fase
+					//Si estabamos en "Beginning" pasamos a "Flop"
 					if(lista_partidas.partida[l].estado == 'B') {
 						lista_partidas.partida[l].estado = 'F';
 						char mensaje[100];
@@ -1092,6 +1122,7 @@ void *AtenderCliente (void *socket){
 						for(int j = 0; j < lista_partidas.partida[l].lista_jugadores.num; j++)
 							write (lista_partidas.partida[l].lista_jugadores.usuario[j].sock, mensaje, strlen(mensaje));
 					}
+					//Si estabamos en "Flop" pasamos a "Turn"
 					else if(lista_partidas.partida[l].estado == 'F') {
 						lista_partidas.partida[l].estado = 'T';
 						char mensaje[100];
@@ -1099,6 +1130,7 @@ void *AtenderCliente (void *socket){
 						for(int j = 0; j < lista_partidas.partida[l].lista_jugadores.num; j++)
 							write (lista_partidas.partida[l].lista_jugadores.usuario[j].sock, mensaje, strlen(mensaje));
 					}
+					//Si estabamos en "Turn" pasamos a "River"
 					else if(lista_partidas.partida[l].estado == 'T') {
 						lista_partidas.partida[l].estado = 'R';
 						char mensaje[100];
@@ -1106,59 +1138,69 @@ void *AtenderCliente (void *socket){
 						for(int j = 0; j < lista_partidas.partida[l].lista_jugadores.num; j++)
 							write (lista_partidas.partida[l].lista_jugadores.usuario[j].sock, mensaje, strlen(mensaje));
 					}
+					//"Si estabamos en "River" pasamos a "Ending"
 					else if(lista_partidas.partida[l].estado == 'R') {
 						lista_partidas.partida[l].estado = 'E';
 						
 						//COMPRUEBA COMBINACIONES DE CARTAS DE TO CRISTO QUE SIGA
 						//GENERA SIGUIENTE RONDA!!!!!!!!
 					}
+					//Si no se puede pasar de fase, pasamos el turno al siguiente jugador
 					else
 						printf("Error inesperado al pasar de fase.");
 					pthread_mutex_unlock(&mutex);
 					
-					//Pasamos el turno al jugador de después del dealer
+					//Pasamos el turno al jugador de después del actual
+					//Buscamos al jugador actual en la lista de jugadores de la partida
 					int m = 0;
 					encontrado = 0;
 					while(m < lista_partidas.partida[l].lista_jugadores.num && !encontrado) {
-						if(strcmp(lista_partidas.partida[l].lista_jugadores.usuario[m].nombre, lista_partidas.partida[l].dealer) == 0)
+						if(sock_conn == lista_partidas.partida[l].lista_jugadores.usuario[m].sock)
 							encontrado = 1;
 						else
 							m++;
 					}
+					//Buscamos al siguiente jugador activo en la partida (con fichas y sin all-in) y le enviamos mensaje dandole el turno
 					int o = m + 1;
 					encontrado = 0;
 					while(m != o && !encontrado) {
 						if(lista_partidas.partida[l].lista_jugadores.usuario[o].estado == 'C' || lista_partidas.partida[l].lista_jugadores.usuario[o].estado == 'R' || lista_partidas.partida[l].lista_jugadores.usuario[o].estado == 'W')
 							encontrado = 1;
-						else if (m == lista_partidas.partida[l].lista_jugadores.num)
+						else if (m == lista_partidas.partida[l].lista_jugadores.num - 1)
 							o = 0;
 						else
 							o++;
 					}
 					char mensaje3[100];
 					sprintf(mensaje3, "11$%d/%s", ID_partida, lista_partidas.partida[l].lista_jugadores.usuario[m].nombre);
-					EnviarMensaje(mensaje3, ID_partida);
+					for(int q = 0; q < lista_partidas.partida[l].lista_jugadores.num; q++)
+						write(lista_partidas.partida[l].lista_jugadores.usuario[q].sock, mensaje3, strlen(mensaje3));
+					printf("se ha enviado %s\n", mensaje3);
 				}
 				else {
 					//Pasamos el turno al siguiente jugador
 					int m = k;
-					if(m == lista_partidas.partida[l].lista_jugadores.num)
+					if(m == lista_partidas.partida[l].lista_jugadores.num - 1)
 						m = 0;
 					else
 						m++;
 					encontrado = 0;
+					//Buscamos a algun jugador activo en la ronda (con fichas, sin fold y sin all-in)
 					while(!encontrado && m != k) {
 						if(lista_partidas.partida[l].lista_jugadores.usuario[m].estado != 'A' && lista_partidas.partida[l].lista_jugadores.usuario[m].estado != 'O' && lista_partidas.partida[l].lista_jugadores.usuario[m].estado != 'F')
 							encontrado = 1;
-						else if(m = lista_partidas.partida[l].lista_jugadores.num)
+						else if(m == lista_partidas.partida[l].lista_jugadores.num - 1)
 							m = 0;
 						else
 							m++;
 					}
+					//Se le pasa el turno al jugador encontrado
 					if(encontrado) {
 						char mensaje3[100];
 						sprintf(mensaje3, "11$%d/%s", ID_partida, lista_partidas.partida[l].lista_jugadores.usuario[m].nombre);
-						EnviarMensaje(mensaje3, ID_partida);
+						for(int q = 0; q < lista_partidas.partida[l].lista_jugadores.num; q++)
+							write(lista_partidas.partida[l].lista_jugadores.usuario[q].sock, mensaje3, strlen(mensaje3));
+						printf("se ha enviado %s\n", mensaje3);
 					}
 					else
 					   printf("Error inesperado al pasar turno.");
@@ -1167,23 +1209,27 @@ void *AtenderCliente (void *socket){
 			else {
 				//Pasamos el turno al siguiente jugador
 				int m = k;
-				if(m == lista_partidas.partida[l].lista_jugadores.num)
+				if(m == lista_partidas.partida[l].lista_jugadores.num - 1)
 					m = 0;
 				else
 					m++;
 				encontrado = 0;
+				//Buscamos al siguiente nugador activo en la ronda
 				while(!encontrado && m != k) {
 					if(lista_partidas.partida[l].lista_jugadores.usuario[m].estado != 'A' && lista_partidas.partida[l].lista_jugadores.usuario[m].estado != 'O' && lista_partidas.partida[l].lista_jugadores.usuario[m].estado != 'F')
 						encontrado = 1;
-					else if(m = lista_partidas.partida[l].lista_jugadores.num)
+					else if(m == lista_partidas.partida[l].lista_jugadores.num - 1)
 						m = 0;
 					else
 						m++;
 				}
 				if(encontrado) {
+					//Se envía mensaje al jugador encontrado
 					char mensaje3[100];
 					sprintf(mensaje3, "11$%d/%s", ID_partida, lista_partidas.partida[l].lista_jugadores.usuario[m].nombre);
-					EnviarMensaje(mensaje3, ID_partida);
+					for(int q = 0; q < lista_partidas.partida[l].lista_jugadores.num; q++)
+						write(lista_partidas.partida[l].lista_jugadores.usuario[q].sock, mensaje3, strlen(mensaje3));
+					printf("se ha enviado %s\n", mensaje3);
 				}
 				else
 				   printf("Error inesperado al pasar turno.");

@@ -183,6 +183,8 @@ namespace Cliente
                         //Recepción y reenvío de un mensaje con cartas que puede ver el jugador
                         case 10:
                         //Recepción y reenvío de un mensaje con la acción que ha hecho algun jugador durante su turno
+                            main.TomaRespuesta(codigo, mensaje);
+                            break;
                         case 11:
                         //Recepción y reenvío de un mensaje que indica que es el turno del jugador que viene indicado
                             main.TomaRespuesta(codigo, mensaje);
