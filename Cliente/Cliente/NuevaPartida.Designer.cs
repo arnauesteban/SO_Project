@@ -34,15 +34,6 @@ namespace Cliente
             this.chatLbl = new System.Windows.Forms.Label();
             this.empezarBtn = new System.Windows.Forms.Button();
             this.usuarioLbl = new System.Windows.Forms.Label();
-            this.fichasLbl = new System.Windows.Forms.Label();
-            this.ciegaLbl = new System.Windows.Forms.Label();
-            this.fichasNum = new System.Windows.Forms.NumericUpDown();
-            this.ciegaNum = new System.Windows.Forms.NumericUpDown();
-            this.carta1Lbl = new System.Windows.Forms.Label();
-            this.carta2Lbl = new System.Windows.Forms.Label();
-            this.carta3Lbl = new System.Windows.Forms.Label();
-            this.carta4Lbl = new System.Windows.Forms.Label();
-            this.carta5Lbl = new System.Windows.Forms.Label();
             this.jugador1NombreLbl = new System.Windows.Forms.Label();
             this.jugador1FichasLbl = new System.Windows.Forms.Label();
             this.jugador1JugadoLbl = new System.Windows.Forms.Label();
@@ -83,13 +74,11 @@ namespace Cliente
             this.jugador5JugadoLbl = new System.Windows.Forms.Label();
             this.jugador5FichasLbl = new System.Windows.Forms.Label();
             this.jugador5NombreLbl = new System.Windows.Forms.Label();
-            this.noIrBtn = new System.Windows.Forms.Button();
-            this.irBtn = new System.Windows.Forms.Button();
-            this.subirBtn = new System.Windows.Forms.Button();
-            this.subirNum = new System.Windows.Forms.NumericUpDown();
-            ((System.ComponentModel.ISupportInitialize)(this.fichasNum)).BeginInit();
-            ((System.ComponentModel.ISupportInitialize)(this.ciegaNum)).BeginInit();
-            ((System.ComponentModel.ISupportInitialize)(this.subirNum)).BeginInit();
+            this.pedirBtn = new System.Windows.Forms.Button();
+            this.plantarseBtn = new System.Windows.Forms.Button();
+            this.apostarBtn = new System.Windows.Forms.Button();
+            this.apostarNum = new System.Windows.Forms.NumericUpDown();
+            ((System.ComponentModel.ISupportInitialize)(this.apostarNum)).BeginInit();
             this.SuspendLayout();
             // 
             // chatTextBox
@@ -123,7 +112,7 @@ namespace Cliente
             // 
             // empezarBtn
             // 
-            this.empezarBtn.Location = new System.Drawing.Point(222, 175);
+            this.empezarBtn.Location = new System.Drawing.Point(231, 200);
             this.empezarBtn.Name = "empezarBtn";
             this.empezarBtn.Size = new System.Drawing.Size(75, 23);
             this.empezarBtn.TabIndex = 7;
@@ -139,115 +128,6 @@ namespace Cliente
             this.usuarioLbl.Size = new System.Drawing.Size(45, 13);
             this.usuarioLbl.TabIndex = 8;
             this.usuarioLbl.Text = "Jugador";
-            // 
-            // fichasLbl
-            // 
-            this.fichasLbl.AutoSize = true;
-            this.fichasLbl.Location = new System.Drawing.Point(432, 11);
-            this.fichasLbl.Name = "fichasLbl";
-            this.fichasLbl.Size = new System.Drawing.Size(81, 13);
-            this.fichasLbl.TabIndex = 9;
-            this.fichasLbl.Text = "Fichas iniciales:";
-            // 
-            // ciegaLbl
-            // 
-            this.ciegaLbl.AutoSize = true;
-            this.ciegaLbl.Location = new System.Drawing.Point(402, 44);
-            this.ciegaLbl.Name = "ciegaLbl";
-            this.ciegaLbl.Size = new System.Drawing.Size(111, 13);
-            this.ciegaLbl.TabIndex = 10;
-            this.ciegaLbl.Text = "Ciega pequeña inicial:";
-            // 
-            // fichasNum
-            // 
-            this.fichasNum.Increment = new decimal(new int[] {
-            10,
-            0,
-            0,
-            0});
-            this.fichasNum.Location = new System.Drawing.Point(522, 9);
-            this.fichasNum.Maximum = new decimal(new int[] {
-            1000,
-            0,
-            0,
-            0});
-            this.fichasNum.Minimum = new decimal(new int[] {
-            100,
-            0,
-            0,
-            0});
-            this.fichasNum.Name = "fichasNum";
-            this.fichasNum.Size = new System.Drawing.Size(44, 20);
-            this.fichasNum.TabIndex = 11;
-            this.fichasNum.Value = new decimal(new int[] {
-            200,
-            0,
-            0,
-            0});
-            this.fichasNum.ValueChanged += new System.EventHandler(this.fichasNum_ValueChanged);
-            // 
-            // ciegaNum
-            // 
-            this.ciegaNum.Location = new System.Drawing.Point(522, 42);
-            this.ciegaNum.Minimum = new decimal(new int[] {
-            1,
-            0,
-            0,
-            0});
-            this.ciegaNum.Name = "ciegaNum";
-            this.ciegaNum.Size = new System.Drawing.Size(44, 20);
-            this.ciegaNum.TabIndex = 12;
-            this.ciegaNum.Value = new decimal(new int[] {
-            1,
-            0,
-            0,
-            0});
-            this.ciegaNum.ValueChanged += new System.EventHandler(this.ciegaNum_ValueChanged);
-            // 
-            // carta1Lbl
-            // 
-            this.carta1Lbl.AutoSize = true;
-            this.carta1Lbl.Location = new System.Drawing.Point(148, 212);
-            this.carta1Lbl.Name = "carta1Lbl";
-            this.carta1Lbl.Size = new System.Drawing.Size(38, 13);
-            this.carta1Lbl.TabIndex = 13;
-            this.carta1Lbl.Text = "Carta1";
-            // 
-            // carta2Lbl
-            // 
-            this.carta2Lbl.AutoSize = true;
-            this.carta2Lbl.Location = new System.Drawing.Point(192, 212);
-            this.carta2Lbl.Name = "carta2Lbl";
-            this.carta2Lbl.Size = new System.Drawing.Size(41, 13);
-            this.carta2Lbl.TabIndex = 14;
-            this.carta2Lbl.Text = "Carta 2";
-            // 
-            // carta3Lbl
-            // 
-            this.carta3Lbl.AutoSize = true;
-            this.carta3Lbl.Location = new System.Drawing.Point(239, 212);
-            this.carta3Lbl.Name = "carta3Lbl";
-            this.carta3Lbl.Size = new System.Drawing.Size(41, 13);
-            this.carta3Lbl.TabIndex = 15;
-            this.carta3Lbl.Text = "Carta 3";
-            // 
-            // carta4Lbl
-            // 
-            this.carta4Lbl.AutoSize = true;
-            this.carta4Lbl.Location = new System.Drawing.Point(286, 212);
-            this.carta4Lbl.Name = "carta4Lbl";
-            this.carta4Lbl.Size = new System.Drawing.Size(41, 13);
-            this.carta4Lbl.TabIndex = 16;
-            this.carta4Lbl.Text = "Carta 4";
-            // 
-            // carta5Lbl
-            // 
-            this.carta5Lbl.AutoSize = true;
-            this.carta5Lbl.Location = new System.Drawing.Point(333, 212);
-            this.carta5Lbl.Name = "carta5Lbl";
-            this.carta5Lbl.Size = new System.Drawing.Size(41, 13);
-            this.carta5Lbl.TabIndex = 17;
-            this.carta5Lbl.Text = "Carta 5";
             // 
             // jugador1NombreLbl
             // 
@@ -609,52 +489,52 @@ namespace Cliente
             this.jugador5NombreLbl.TabIndex = 38;
             this.jugador5NombreLbl.Text = "Jugador 5";
             // 
-            // noIrBtn
+            // pedirBtn
             // 
-            this.noIrBtn.Location = new System.Drawing.Point(99, 379);
-            this.noIrBtn.Name = "noIrBtn";
-            this.noIrBtn.Size = new System.Drawing.Size(75, 23);
-            this.noIrBtn.TabIndex = 58;
-            this.noIrBtn.Text = "No ir";
-            this.noIrBtn.UseVisualStyleBackColor = true;
-            this.noIrBtn.Click += new System.EventHandler(this.noIrBtn_Click);
+            this.pedirBtn.Location = new System.Drawing.Point(99, 379);
+            this.pedirBtn.Name = "pedirBtn";
+            this.pedirBtn.Size = new System.Drawing.Size(75, 23);
+            this.pedirBtn.TabIndex = 58;
+            this.pedirBtn.Text = "Pedir carta";
+            this.pedirBtn.UseVisualStyleBackColor = true;
+            this.pedirBtn.Click += new System.EventHandler(this.noIrBtn_Click);
             // 
-            // irBtn
+            // plantarseBtn
             // 
-            this.irBtn.Location = new System.Drawing.Point(231, 379);
-            this.irBtn.Name = "irBtn";
-            this.irBtn.Size = new System.Drawing.Size(75, 23);
-            this.irBtn.TabIndex = 59;
-            this.irBtn.Text = "Ir";
-            this.irBtn.UseVisualStyleBackColor = true;
-            this.irBtn.Click += new System.EventHandler(this.irBtn_Click);
+            this.plantarseBtn.Location = new System.Drawing.Point(231, 379);
+            this.plantarseBtn.Name = "plantarseBtn";
+            this.plantarseBtn.Size = new System.Drawing.Size(75, 23);
+            this.plantarseBtn.TabIndex = 59;
+            this.plantarseBtn.Text = "Plantarse";
+            this.plantarseBtn.UseVisualStyleBackColor = true;
+            this.plantarseBtn.Click += new System.EventHandler(this.irBtn_Click);
             // 
-            // subirBtn
+            // apostarBtn
             // 
-            this.subirBtn.Location = new System.Drawing.Point(358, 379);
-            this.subirBtn.Name = "subirBtn";
-            this.subirBtn.Size = new System.Drawing.Size(75, 23);
-            this.subirBtn.TabIndex = 60;
-            this.subirBtn.Text = "Subir";
-            this.subirBtn.UseVisualStyleBackColor = true;
-            this.subirBtn.Click += new System.EventHandler(this.subirBtn_Click);
+            this.apostarBtn.Location = new System.Drawing.Point(358, 379);
+            this.apostarBtn.Name = "apostarBtn";
+            this.apostarBtn.Size = new System.Drawing.Size(75, 23);
+            this.apostarBtn.TabIndex = 60;
+            this.apostarBtn.Text = "Apostar";
+            this.apostarBtn.UseVisualStyleBackColor = true;
+            this.apostarBtn.Click += new System.EventHandler(this.subirBtn_Click);
             // 
-            // subirNum
+            // apostarNum
             // 
-            this.subirNum.Location = new System.Drawing.Point(439, 382);
-            this.subirNum.Name = "subirNum";
-            this.subirNum.Size = new System.Drawing.Size(44, 20);
-            this.subirNum.TabIndex = 61;
+            this.apostarNum.Location = new System.Drawing.Point(439, 382);
+            this.apostarNum.Name = "apostarNum";
+            this.apostarNum.Size = new System.Drawing.Size(44, 20);
+            this.apostarNum.TabIndex = 61;
             // 
             // NuevaPartida
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(784, 424);
-            this.Controls.Add(this.subirNum);
-            this.Controls.Add(this.subirBtn);
-            this.Controls.Add(this.irBtn);
-            this.Controls.Add(this.noIrBtn);
+            this.Controls.Add(this.apostarNum);
+            this.Controls.Add(this.apostarBtn);
+            this.Controls.Add(this.plantarseBtn);
+            this.Controls.Add(this.pedirBtn);
             this.Controls.Add(this.jugador8Carta2Lbl);
             this.Controls.Add(this.jugador8Carta1Lbl);
             this.Controls.Add(this.jugador8JugadoLbl);
@@ -695,15 +575,6 @@ namespace Cliente
             this.Controls.Add(this.jugador1JugadoLbl);
             this.Controls.Add(this.jugador1FichasLbl);
             this.Controls.Add(this.jugador1NombreLbl);
-            this.Controls.Add(this.carta5Lbl);
-            this.Controls.Add(this.carta4Lbl);
-            this.Controls.Add(this.carta3Lbl);
-            this.Controls.Add(this.carta2Lbl);
-            this.Controls.Add(this.carta1Lbl);
-            this.Controls.Add(this.ciegaNum);
-            this.Controls.Add(this.fichasNum);
-            this.Controls.Add(this.ciegaLbl);
-            this.Controls.Add(this.fichasLbl);
             this.Controls.Add(this.usuarioLbl);
             this.Controls.Add(this.empezarBtn);
             this.Controls.Add(this.chatTextBox);
@@ -712,9 +583,7 @@ namespace Cliente
             this.Name = "NuevaPartida";
             this.Text = "Partida";
             this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.NuevaPartida_FormClosing);
-            ((System.ComponentModel.ISupportInitialize)(this.fichasNum)).EndInit();
-            ((System.ComponentModel.ISupportInitialize)(this.ciegaNum)).EndInit();
-            ((System.ComponentModel.ISupportInitialize)(this.subirNum)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.apostarNum)).EndInit();
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -727,15 +596,6 @@ namespace Cliente
         private System.Windows.Forms.Label chatLbl;
         private System.Windows.Forms.Button empezarBtn;
         private System.Windows.Forms.Label usuarioLbl;
-        private System.Windows.Forms.Label fichasLbl;
-        private System.Windows.Forms.Label ciegaLbl;
-        private System.Windows.Forms.NumericUpDown fichasNum;
-        private System.Windows.Forms.NumericUpDown ciegaNum;
-        private System.Windows.Forms.Label carta1Lbl;
-        private System.Windows.Forms.Label carta2Lbl;
-        private System.Windows.Forms.Label carta3Lbl;
-        private System.Windows.Forms.Label carta4Lbl;
-        private System.Windows.Forms.Label carta5Lbl;
         private System.Windows.Forms.Label jugador1NombreLbl;
         private System.Windows.Forms.Label jugador1FichasLbl;
         private System.Windows.Forms.Label jugador1JugadoLbl;
@@ -776,10 +636,10 @@ namespace Cliente
         private System.Windows.Forms.Label jugador5JugadoLbl;
         private System.Windows.Forms.Label jugador5FichasLbl;
         private System.Windows.Forms.Label jugador5NombreLbl;
-        private System.Windows.Forms.Button noIrBtn;
-        private System.Windows.Forms.Button irBtn;
-        private System.Windows.Forms.Button subirBtn;
-        private System.Windows.Forms.NumericUpDown subirNum;
+        private System.Windows.Forms.Button pedirBtn;
+        private System.Windows.Forms.Button plantarseBtn;
+        private System.Windows.Forms.Button apostarBtn;
+        private System.Windows.Forms.NumericUpDown apostarNum;
 
     }
 }

@@ -14,7 +14,6 @@ namespace Cliente
 {
     public partial class Login : Form
     {
-
         Main main;
         Server server;
         Thread atender;
@@ -151,7 +150,6 @@ namespace Cliente
                             //Respuesta a petición de registro en la base de datos
                             MessageBox.Show(mensaje);
                             break;
-
                         case 2:
                             //Respuesta a petición de iniciar sesión
                             MessageBox.Show(mensaje);
@@ -160,7 +158,6 @@ namespace Cliente
                                 ThreadStart ts = delegate { this.AbrirMain(); };
                                 thread_main = new Thread(ts);
                                 thread_main.Start();
-
                             }
                             break;
                         case 3:
@@ -181,6 +178,8 @@ namespace Cliente
                         //Recepción y reenvío de un mensaje de configuración de parámetros de una partida
                         case 9:
                         //Recepción y reenvío de un mensaje con cartas que puede ver el jugador
+                            main.TomaRespuesta(codigo, mensaje);
+                            break;
                         case 10:
                         //Recepción y reenvío de un mensaje con la acción que ha hecho algun jugador durante su turno
                             main.TomaRespuesta(codigo, mensaje);

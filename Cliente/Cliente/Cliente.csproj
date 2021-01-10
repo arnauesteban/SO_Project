@@ -46,6 +46,12 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="darse_de_baja.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="darse_de_baja.Designer.cs">
+      <DependentUpon>darse_de_baja.cs</DependentUpon>
+    </Compile>
     <Compile Include="Server.cs" />
     <Compile Include="InvitacionRecibida.cs">
       <SubType>Form</SubType>
@@ -73,6 +79,9 @@
     </Compile>
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <EmbeddedResource Include="darse_de_baja.resx">
+      <DependentUpon>darse_de_baja.cs</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="InvitacionRecibida.resx">
       <DependentUpon>InvitacionRecibida.cs</DependentUpon>
     </EmbeddedResource>

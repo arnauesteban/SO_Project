@@ -19,6 +19,7 @@ namespace Cliente
         string usuario;
         string dealer;
         int maxJugado;
+        int lineasChat;
 
         public delegate void DelegadoRespuesta(string mensaje);
 
@@ -31,18 +32,19 @@ namespace Cliente
             this.usuario = usuario;
             usuarioLbl.Text = this.usuario;
             chatLbl.Text = "¡Bienvenido a una nueva partida de poker! Espera a que tus contrincantes acepten tu invitación o pulsa el botón del centro de la mesa.";
-            fichasNum.Enabled = true;
+            lineasChat = 4;
+            /*fichasNum.Enabled = true;
             ciegaNum.Enabled = true;
             string mensaje = "8/" + this.ID + "/0/" + fichasNum.Value + "/" + ciegaNum.Value;
             server.Enviar(mensaje);
-            noIrBtn.Enabled = false;
-            noIrBtn.Visible = false;
-            irBtn.Enabled = false;
-            irBtn.Visible = false;
-            subirBtn.Enabled = false;
-            subirBtn.Visible = false;
-            subirNum.Enabled = false;
-            subirNum.Visible = false;
+            pedirBtn.Enabled = false;
+            pedirBtn.Visible = false;
+            plantarseBtn.Enabled = false;
+            plantarseBtn.Visible = false;
+            apostarBtn.Enabled = false;
+            apostarBtn.Visible = false;
+            apostarNum.Enabled = false;
+            apostarNum.Visible = false;*/
 
             /*
             jugador2NombreLbl.Text = "";
@@ -95,18 +97,19 @@ namespace Cliente
             empezarBtn.Enabled = false;
             this.Text = "Partida " + this.ID;
             chatLbl.Text = "¡Bienvenido a una nueva partida de poker! Espera a que otros contrincantes acepten la invitación o a que el host pulse el botón del centro de la mesa.";
-            fichasNum.Enabled = false;
+            lineasChat = 4;
+            /*fichasNum.Enabled = false;
             ciegaNum.Enabled = false;
             string mensaje = "8/" + this.ID + "/2";
             server.Enviar(mensaje);
-            noIrBtn.Enabled = false;
-            noIrBtn.Visible = false;
-            irBtn.Enabled = false;
-            irBtn.Visible = false;
-            subirBtn.Enabled = false;
-            subirBtn.Visible = false;
-            subirNum.Enabled = false;
-            subirNum.Visible = false;
+            pedirBtn.Enabled = false;
+            pedirBtn.Visible = false;
+            plantarseBtn.Enabled = false;
+            plantarseBtn.Visible = false;
+            apostarBtn.Enabled = false;
+            apostarBtn.Visible = false;
+            apostarNum.Enabled = false;
+            apostarNum.Visible = false;*/
         }
 
         public int getID()
@@ -169,24 +172,38 @@ namespace Cliente
         {
             //Función que es llamada cada vez que se recibe un mensaje para el chat de esta partida. 
             //Añade el mensaje en una nueva línea del chat.
-            chatLbl.Text = chatLbl.Text + Environment.NewLine + mensaje;
+            lineasChat += (mensaje.Length / 32 + 1);
+            if(lineasChat > 28)
+            {
+                string[] separado = chatLbl.Text.Split('\n');
+                chatLbl.Text = separado[1];
+                for(int i = 2; i < separado.Length; i++)
+                    chatLbl.Text = chatLbl.Text + '\n' + separado[i];
+            }
+            chatLbl.Text = chatLbl.Text + '\n' + mensaje;
         }
 
         public void Accion7(string mensaje)
         {
-            empezarBtn.Enabled = true;
+            //Función que es llamada cuando se recibe un mensaje para que este jugador pase a ser el host de la partida. 
+            //Permite usar los objetos del formulario reservados al host
+            /*empezarBtn.Enabled = true;
             fichasNum.Enabled = true;
-            ciegaNum.Enabled = true;
+            ciegaNum.Enabled = true;*/
         }
 
         public void Accion8(string mensaje)
         {
-            string[] separado = mensaje.Split('/');
+            //Función que es llamada cada vez que se recibe un mensaje para configurar los parámetros iniciales de esta partida
+            //Guarda los nuevos valores y los muestra al usuario
+            /*string[] separado = mensaje.Split('/');
+            //Si numConfig vale 0, solo se nos ha enviado las fichas y ciega iniciales
             if (Convert.ToInt32(separado[0]) != 1)
             {
                 fichasNum.Value = Convert.ToInt32(separado[1]);
                 ciegaNum.Value = Convert.ToInt32(separado[2]);
             }
+            //Si numConfig vale 2, además de las fichas y ciega también se nos envia la lista de jugadores de la partida
             if (Convert.ToInt32(separado[0]) != 0)
             {
                 int n = Convert.ToInt32(separado[3]);
@@ -353,19 +370,22 @@ namespace Cliente
                     jugador8Carta1Lbl.Text = "";
                     jugador8Carta2Lbl.Text = "";
                     jugador8FichasLbl.Text = "";
-                    jugador8JugadoLbl.Text = "";*/
+                    jugador8JugadoLbl.Text = "";
                 }
-            }
+            }*/
         }
 
         public void Accion9(string mensaje)
         {
-            empezarBtn.Visible = false;
+            //Función que es llamada cada vez que se recibe un mensaje para mostrar cartas
+            //Quita los objetos de los parámetros iniciales y muestra las cartas que lleguen
+            /*empezarBtn.Visible = false;
             fichasNum.Visible = false;
             fichasLbl.Visible = false;
             ciegaLbl.Visible = false;
             ciegaNum.Visible = false;
             string[] separado = mensaje.Split('/');
+            //Si el estado vale 0, la ronda acaba de comenzar y se nos ha enviado ls cartas de la mano
             if (Convert.ToInt32(separado[0]) == 0)
             {
                 this.dealer = separado[3];
@@ -410,25 +430,99 @@ namespace Cliente
                     jugador8Carta2Lbl.Text = separado[2];
                 }
             }
+            //Si el estado vale 1, se nos está enviando las tres primeras cartas del centro
             else if (Convert.ToInt32(separado[0]) == 1)
             {
                 carta1Lbl.Text = separado[1];
                 carta2Lbl.Text = separado[2];
                 carta3Lbl.Text = separado[3];
             }
+            //Si el estado vale 2, se nos está enviando la cuarta carta del centro
             else if (Convert.ToInt32(separado[0]) == 2)
             {
                 carta4Lbl.Text = separado[1];
             }
+            //Si el estado vale 3, se nos está enviando la quinta carta del centro
             else if (Convert.ToInt32(separado[0]) == 3)
             {
                 carta5Lbl.Text = separado[1];
             }
+            //Si el estado vale 5, se nos está enviando el número del ganador de la ronda. Se le debe sumar a las fichas lo jugado por todos
+            else if (Convert.ToInt32(separado[0]) == 5)
+            {
+                int suma = Convert.ToInt32(jugador1JugadoLbl.Text) + Convert.ToInt32(jugador2JugadoLbl.Text) + Convert.ToInt32(jugador3JugadoLbl.Text) +
+                    Convert.ToInt32(jugador4JugadoLbl.Text) + Convert.ToInt32(jugador5JugadoLbl.Text) + Convert.ToInt32(jugador6JugadoLbl.Text) + 
+                    Convert.ToInt32(jugador7JugadoLbl.Text) + Convert.ToInt32(jugador8JugadoLbl.Text);
+                int n = Convert.ToInt32(separado[1]);
+                if (n == 0)
+                    jugador1FichasLbl.Text = (Convert.ToInt32(jugador1FichasLbl.Text) + suma).ToString();
+                else
+                    jugador1FichasLbl.Text = (Convert.ToInt32(jugador1FichasLbl.Text) - (Convert.ToInt32(jugador1JugadoLbl.Text))).ToString();
+                if (n == 1)
+                    jugador2FichasLbl.Text = (Convert.ToInt32(jugador2FichasLbl.Text) + suma).ToString();
+                else
+                    jugador2FichasLbl.Text = (Convert.ToInt32(jugador2FichasLbl.Text) - (Convert.ToInt32(jugador2JugadoLbl.Text))).ToString();
+                if (n == 2)
+                    jugador3FichasLbl.Text = (Convert.ToInt32(jugador3FichasLbl.Text) + suma).ToString();
+                else
+                    jugador3FichasLbl.Text = (Convert.ToInt32(jugador3FichasLbl.Text) - (Convert.ToInt32(jugador3JugadoLbl.Text))).ToString();
+                if (n == 3)
+                    jugador4FichasLbl.Text = (Convert.ToInt32(jugador4FichasLbl.Text) + suma).ToString();
+                else
+                    jugador4FichasLbl.Text = (Convert.ToInt32(jugador4FichasLbl.Text) - (Convert.ToInt32(jugador4JugadoLbl.Text))).ToString();
+                if (n == 4)
+                    jugador5FichasLbl.Text = (Convert.ToInt32(jugador5FichasLbl.Text) + suma).ToString();
+                else
+                    jugador5FichasLbl.Text = (Convert.ToInt32(jugador5FichasLbl.Text) - (Convert.ToInt32(jugador5JugadoLbl.Text))).ToString();
+                if (n == 5)
+                    jugador6FichasLbl.Text = (Convert.ToInt32(jugador6FichasLbl.Text) + suma).ToString();
+                else
+                    jugador6FichasLbl.Text = (Convert.ToInt32(jugador6FichasLbl.Text) - (Convert.ToInt32(jugador6JugadoLbl.Text))).ToString();
+                if (n == 6)
+                    jugador7FichasLbl.Text = (Convert.ToInt32(jugador7FichasLbl.Text) + suma).ToString();
+                else
+                    jugador7FichasLbl.Text = (Convert.ToInt32(jugador7FichasLbl.Text) - (Convert.ToInt32(jugador7JugadoLbl.Text))).ToString();
+                if (n == 7)
+                    jugador8FichasLbl.Text = (Convert.ToInt32(jugador8FichasLbl.Text) + suma).ToString();
+                else
+                    jugador8FichasLbl.Text = (Convert.ToInt32(jugador8FichasLbl.Text) - (Convert.ToInt32(jugador8JugadoLbl.Text))).ToString();
+                jugador1JugadoLbl.Text = "0";
+                jugador1Carta1Lbl.Text = "Carta 1";
+                jugador1Carta2Lbl.Text = "Carta 2";
+                jugador2JugadoLbl.Text = "0";
+                jugador2Carta1Lbl.Text = "Carta 1";
+                jugador2Carta2Lbl.Text = "Carta 2";
+                jugador3JugadoLbl.Text = "0";
+                jugador3Carta1Lbl.Text = "Carta 1";
+                jugador3Carta2Lbl.Text = "Carta 2";
+                jugador4JugadoLbl.Text = "0";
+                jugador4Carta1Lbl.Text = "Carta 1";
+                jugador4Carta2Lbl.Text = "Carta 2";
+                jugador5JugadoLbl.Text = "0";
+                jugador5Carta1Lbl.Text = "Carta 1";
+                jugador5Carta2Lbl.Text = "Carta 2";
+                jugador6JugadoLbl.Text = "0";
+                jugador6Carta1Lbl.Text = "Carta 1";
+                jugador6Carta2Lbl.Text = "Carta 2";
+                jugador7JugadoLbl.Text = "0";
+                jugador7Carta1Lbl.Text = "Carta 1";
+                jugador7Carta2Lbl.Text = "Carta 2";
+                jugador8JugadoLbl.Text = "0";
+                jugador8Carta1Lbl.Text = "Carta 1";
+                jugador8Carta2Lbl.Text = "Carta 2";
+                carta1Lbl.Text = "Carta 1";
+                carta2Lbl.Text = "Carta 2";
+                carta3Lbl.Text = "Carta 3";
+                carta4Lbl.Text = "Carta 4";
+                carta5Lbl.Text = "Carta 5";
+            }*/
 
         }
 
         public void Accion10(string mensaje)
         {
+            //Función que es llamada cada vez que se recibe un mensaje para mostrar la acción de algún jugador
+            //Actualiza las etiquetas del jugador que ha hecho la acción
             string[] separado = mensaje.Split('/');
             int n = Convert.ToInt32(separado[0]);
             int accion = Convert.ToInt32(separado[1]);
@@ -516,8 +610,11 @@ namespace Cliente
 
         public void Accion11(string mensaje)
         {
+            //Función que es llamada cada vez que se recibe un mensaje para dar el turno a algún jugador
+            //Habilita los botones de acciones si es el turno de este jugador
             if (mensaje == this.usuario)
             {
+                //Buscamos cual es la puja máxima que se ha ehcho hasta el momento en las ronda
                 if (Convert.ToInt32(jugador1JugadoLbl.Text) > maxJugado)
                     maxJugado = Convert.ToInt32(jugador1JugadoLbl.Text);
                 if (Convert.ToInt32(jugador2JugadoLbl.Text) > maxJugado)
@@ -535,160 +632,161 @@ namespace Cliente
                 if (Convert.ToInt32(jugador8JugadoLbl.Text) > maxJugado)
                     maxJugado = Convert.ToInt32(jugador1JugadoLbl.Text);
 
+                //Editamos los textos de los botones según la situación de fichas del jugador
                 if (jugador1NombreLbl.Text == this.usuario)
                 {
                     if (maxJugado < Convert.ToInt32(jugador1FichasLbl.Text))
                     {
-                        subirNum.Minimum = maxJugado - Convert.ToInt32(jugador1JugadoLbl.Text);
-                        subirBtn.Text = "Subir";
+                        apostarNum.Minimum = maxJugado - Convert.ToInt32(jugador1JugadoLbl.Text);
+                        apostarBtn.Text = "Subir";
                     }
                     else
                     {
-                        subirNum.Minimum = Convert.ToInt32(jugador1FichasLbl.Text) - Convert.ToInt32(jugador1JugadoLbl.Text);
-                        subirBtn.Text = "Jugarlo todo";
+                        apostarNum.Minimum = Convert.ToInt32(jugador1FichasLbl.Text) - Convert.ToInt32(jugador1JugadoLbl.Text);
+                        apostarBtn.Text = "Jugarlo todo";
                     }
-                    subirNum.Maximum = Convert.ToInt32(jugador1FichasLbl.Text) - Convert.ToInt32(jugador1JugadoLbl.Text);
+                    apostarNum.Maximum = Convert.ToInt32(jugador1FichasLbl.Text) - Convert.ToInt32(jugador1JugadoLbl.Text);
                     if(maxJugado == Convert.ToInt32(jugador1JugadoLbl.Text))
-                        irBtn.Text = "Pasar";
+                        plantarseBtn.Text = "Pasar";
                     else
-                        irBtn.Text = "ir";
-
+                        plantarseBtn.Text = "ir";
                 }
                 else if (jugador2NombreLbl.Text == this.usuario)
                 {
                     if (maxJugado < Convert.ToInt32(jugador2FichasLbl.Text))
                     {
-                        subirNum.Minimum = maxJugado - Convert.ToInt32(jugador2JugadoLbl.Text);
-                        subirBtn.Text = "Subir";
+                        apostarNum.Minimum = maxJugado - Convert.ToInt32(jugador2JugadoLbl.Text);
+                        apostarBtn.Text = "Subir";
                     }
                     else
                     {
-                        subirNum.Minimum = Convert.ToInt32(jugador2FichasLbl.Text) - Convert.ToInt32(jugador2JugadoLbl.Text);
-                        subirBtn.Text = "Jugarlo todo";
+                        apostarNum.Minimum = Convert.ToInt32(jugador2FichasLbl.Text) - Convert.ToInt32(jugador2JugadoLbl.Text);
+                        apostarBtn.Text = "Jugarlo todo";
                     }
-                    subirNum.Maximum = Convert.ToInt32(jugador2FichasLbl.Text) - Convert.ToInt32(jugador2JugadoLbl.Text);
+                    apostarNum.Maximum = Convert.ToInt32(jugador2FichasLbl.Text) - Convert.ToInt32(jugador2JugadoLbl.Text);
                     if (maxJugado == Convert.ToInt32(jugador2JugadoLbl.Text))
-                        irBtn.Text = "Pasar";
+                        plantarseBtn.Text = "Pasar";
                     else
-                        irBtn.Text = "ir";
+                        plantarseBtn.Text = "ir";
                 }
                 else if (jugador3NombreLbl.Text == this.usuario)
                 {
                     if (maxJugado < Convert.ToInt32(jugador3FichasLbl.Text))
                     {
-                        subirNum.Minimum = maxJugado - Convert.ToInt32(jugador3JugadoLbl.Text);
-                        subirBtn.Text = "Subir";
+                        apostarNum.Minimum = maxJugado - Convert.ToInt32(jugador3JugadoLbl.Text);
+                        apostarBtn.Text = "Subir";
                     }
                     else
                     {
-                        subirNum.Minimum = Convert.ToInt32(jugador3FichasLbl.Text) - Convert.ToInt32(jugador3JugadoLbl.Text);
-                        subirBtn.Text = "Jugarlo todo";
+                        apostarNum.Minimum = Convert.ToInt32(jugador3FichasLbl.Text) - Convert.ToInt32(jugador3JugadoLbl.Text);
+                        apostarBtn.Text = "Jugarlo todo";
                     }
-                    subirNum.Maximum = Convert.ToInt32(jugador3FichasLbl.Text) - Convert.ToInt32(jugador3JugadoLbl.Text);
+                    apostarNum.Maximum = Convert.ToInt32(jugador3FichasLbl.Text) - Convert.ToInt32(jugador3JugadoLbl.Text);
                     if (maxJugado == Convert.ToInt32(jugador3JugadoLbl.Text))
-                        irBtn.Text = "Pasar";
+                        plantarseBtn.Text = "Pasar";
                     else
-                        irBtn.Text = "ir";
+                        plantarseBtn.Text = "ir";
                 }
                 else if (jugador4NombreLbl.Text == this.usuario)
                 {
                     if (maxJugado < Convert.ToInt32(jugador4FichasLbl.Text))
                     {
-                        subirNum.Minimum = maxJugado - Convert.ToInt32(jugador4JugadoLbl.Text);
-                        subirBtn.Text = "Subir";
+                        apostarNum.Minimum = maxJugado - Convert.ToInt32(jugador4JugadoLbl.Text);
+                        apostarBtn.Text = "Subir";
                     }
                     else
                     {
-                        subirNum.Minimum = Convert.ToInt32(jugador4FichasLbl.Text) - Convert.ToInt32(jugador4JugadoLbl.Text);
-                        subirBtn.Text = "Jugarlo todo";
+                        apostarNum.Minimum = Convert.ToInt32(jugador4FichasLbl.Text) - Convert.ToInt32(jugador4JugadoLbl.Text);
+                        apostarBtn.Text = "Jugarlo todo";
                     }
-                    subirNum.Maximum = Convert.ToInt32(jugador4FichasLbl.Text) - Convert.ToInt32(jugador4JugadoLbl.Text);
+                    apostarNum.Maximum = Convert.ToInt32(jugador4FichasLbl.Text) - Convert.ToInt32(jugador4JugadoLbl.Text);
                     if (maxJugado == Convert.ToInt32(jugador4JugadoLbl.Text))
-                        irBtn.Text = "Pasar";
+                        plantarseBtn.Text = "Pasar";
                     else
-                        irBtn.Text = "ir";
+                        plantarseBtn.Text = "ir";
                 }
                 else if (jugador5NombreLbl.Text == this.usuario)
                 {
                     if (maxJugado < Convert.ToInt32(jugador5FichasLbl.Text))
                     {
-                        subirNum.Minimum = maxJugado - Convert.ToInt32(jugador5JugadoLbl.Text);
-                        subirBtn.Text = "Subir";
+                        apostarNum.Minimum = maxJugado - Convert.ToInt32(jugador5JugadoLbl.Text);
+                        apostarBtn.Text = "Subir";
                     }
                     else
                     {
-                        subirNum.Minimum = Convert.ToInt32(jugador5FichasLbl.Text) - Convert.ToInt32(jugador5JugadoLbl.Text);
-                        subirBtn.Text = "Jugarlo todo";
+                        apostarNum.Minimum = Convert.ToInt32(jugador5FichasLbl.Text) - Convert.ToInt32(jugador5JugadoLbl.Text);
+                        apostarBtn.Text = "Jugarlo todo";
                     }
-                    subirNum.Maximum = Convert.ToInt32(jugador5FichasLbl.Text) - Convert.ToInt32(jugador5JugadoLbl.Text);
+                    apostarNum.Maximum = Convert.ToInt32(jugador5FichasLbl.Text) - Convert.ToInt32(jugador5JugadoLbl.Text);
                     if (maxJugado == Convert.ToInt32(jugador5JugadoLbl.Text))
-                        irBtn.Text = "Pasar";
+                        plantarseBtn.Text = "Pasar";
                     else
-                        irBtn.Text = "ir";
+                        plantarseBtn.Text = "ir";
                 }
                 else if (jugador6NombreLbl.Text == this.usuario)
                 {
                     if (maxJugado < Convert.ToInt32(jugador6FichasLbl.Text))
                     {
-                        subirNum.Minimum = maxJugado - Convert.ToInt32(jugador6JugadoLbl.Text);
-                        subirBtn.Text = "Subir";
+                        apostarNum.Minimum = maxJugado - Convert.ToInt32(jugador6JugadoLbl.Text);
+                        apostarBtn.Text = "Subir";
                     }
                     else
                     {
-                        subirNum.Minimum = Convert.ToInt32(jugador6FichasLbl.Text) - Convert.ToInt32(jugador6JugadoLbl.Text);
-                        subirBtn.Text = "Jugarlo todo";
+                        apostarNum.Minimum = Convert.ToInt32(jugador6FichasLbl.Text) - Convert.ToInt32(jugador6JugadoLbl.Text);
+                        apostarBtn.Text = "Jugarlo todo";
                     }
-                    subirNum.Maximum = Convert.ToInt32(jugador6FichasLbl.Text) - Convert.ToInt32(jugador6JugadoLbl.Text);
+                    apostarNum.Maximum = Convert.ToInt32(jugador6FichasLbl.Text) - Convert.ToInt32(jugador6JugadoLbl.Text);
                     if (maxJugado == Convert.ToInt32(jugador6JugadoLbl.Text))
-                        irBtn.Text = "Pasar";
+                        plantarseBtn.Text = "Pasar";
                     else
-                        irBtn.Text = "ir";
+                        plantarseBtn.Text = "ir";
                 }
                 else if (jugador7NombreLbl.Text == this.usuario)
                 {
                     if (maxJugado < Convert.ToInt32(jugador7FichasLbl.Text))
                     {
-                        subirNum.Minimum = maxJugado - Convert.ToInt32(jugador7JugadoLbl.Text);
-                        subirBtn.Text = "Subir";
+                        apostarNum.Minimum = maxJugado - Convert.ToInt32(jugador7JugadoLbl.Text);
+                        apostarBtn.Text = "Subir";
                     }
                     else
                     {
-                        subirNum.Minimum = Convert.ToInt32(jugador7FichasLbl.Text) - Convert.ToInt32(jugador7JugadoLbl.Text);
-                        subirBtn.Text = "Jugarlo todo";
+                        apostarNum.Minimum = Convert.ToInt32(jugador7FichasLbl.Text) - Convert.ToInt32(jugador7JugadoLbl.Text);
+                        apostarBtn.Text = "Jugarlo todo";
                     }
-                    subirNum.Maximum = Convert.ToInt32(jugador7FichasLbl.Text) - Convert.ToInt32(jugador7JugadoLbl.Text);
+                    apostarNum.Maximum = Convert.ToInt32(jugador7FichasLbl.Text) - Convert.ToInt32(jugador7JugadoLbl.Text);
                     if (maxJugado == Convert.ToInt32(jugador7JugadoLbl.Text))
-                        irBtn.Text = "Pasar";
+                        plantarseBtn.Text = "Pasar";
                     else
-                        irBtn.Text = "ir";
+                        plantarseBtn.Text = "ir";
                 }
                 else if (jugador8NombreLbl.Text == this.usuario)
                 {
                     if (maxJugado < Convert.ToInt32(jugador8FichasLbl.Text))
                     {
-                        subirNum.Minimum = maxJugado - Convert.ToInt32(jugador8JugadoLbl.Text);
-                        subirBtn.Text = "Subir";
+                        apostarNum.Minimum = maxJugado - Convert.ToInt32(jugador8JugadoLbl.Text);
+                        apostarBtn.Text = "Subir";
                     }
                     else
                     {
-                        subirNum.Minimum = Convert.ToInt32(jugador8FichasLbl.Text) - Convert.ToInt32(jugador8JugadoLbl.Text);
-                        subirBtn.Text = "Jugarlo todo";
+                        apostarNum.Minimum = Convert.ToInt32(jugador8FichasLbl.Text) - Convert.ToInt32(jugador8JugadoLbl.Text);
+                        apostarBtn.Text = "Jugarlo todo";
                     }
-                    subirNum.Maximum = Convert.ToInt32(jugador8FichasLbl.Text) - Convert.ToInt32(jugador8JugadoLbl.Text);
+                    apostarNum.Maximum = Convert.ToInt32(jugador8FichasLbl.Text) - Convert.ToInt32(jugador8JugadoLbl.Text);
                     if (maxJugado == Convert.ToInt32(jugador8JugadoLbl.Text))
-                        irBtn.Text = "Pasar";
+                        plantarseBtn.Text = "Pasar";
                     else
-                        irBtn.Text = "ir";
+                        plantarseBtn.Text = "ir";
                 }
 
-                noIrBtn.Enabled = true;
-                noIrBtn.Visible = true;
-                irBtn.Enabled = true;
-                irBtn.Visible = true;
-                subirBtn.Enabled = true;
-                subirBtn.Visible = true;
-                subirNum.Enabled = true;
-                subirNum.Visible = true;
+                //Habilitamos los objetos de acciones de la ronda para que el usuario decida qué hacer
+                pedirBtn.Enabled = true;
+                pedirBtn.Visible = true;
+                plantarseBtn.Enabled = true;
+                plantarseBtn.Visible = true;
+                apostarBtn.Enabled = true;
+                apostarBtn.Visible = true;
+                apostarNum.Enabled = true;
+                apostarNum.Visible = true;
             }
         }
 
@@ -697,21 +795,20 @@ namespace Cliente
             //Evento llamado cuando el usuario pulsa el botón "Enviar". Envía el mensaje que ha escrito en el textBox al servidor.
             string mensaje = "6/" + this.ID + "/" + this.usuario + ": " + chatTextBox.Text;
             server.Enviar(mensaje);
-            chatTextBox.Text = "";
+            chatTextBox.Text = "Escribe algo";
         }
 
         private void empezarBtn_Click(object sender, EventArgs e)
         {
-            //Evento llamado cuando el hsot quiere comenzar a jugar la partida.
-            //MessageBox.Show("Juego no implementado.");
-            empezarBtn.Enabled = false;
+            //Evento llamado cuando el host quiere comenzar a jugar la partida.
+            /*empezarBtn.Enabled = false;
             empezarBtn.Visible = false;
             fichasLbl.Visible = false;
             fichasNum.Visible = false;
             ciegaLbl.Visible = false;
             ciegaNum.Visible = false;
             string mensaje = "9/" + this.ID;
-            server.Enviar(mensaje);
+            server.Enviar(mensaje);*/
         }
 
         private void NuevaPartida_FormClosing(object sender, FormClosingEventArgs e)
@@ -734,57 +831,63 @@ namespace Cliente
         private void fichasNum_ValueChanged(object sender, EventArgs e)
         {
             //Evento llamado cuando el usuario cambia el valor de fichas iniciales. Envía los parametros de esta partida configurados.
-            string mensaje = "8/" + this.ID + "/0/" + fichasNum.Value + "/" + ciegaNum.Value;
-            server.Enviar(mensaje);
+            /*string mensaje = "8/" + this.ID + "/0/" + fichasNum.Value + "/" + ciegaNum.Value;
+            server.Enviar(mensaje);*/
         }
 
         private void ciegaNum_ValueChanged(object sender, EventArgs e)
         {
             //Evento llamado cuando el usuario cambia el valor de ciega inicial. Envía los parametros de esta partida configurados.
-            string mensaje = "8/" + this.ID + "/0/" + fichasNum.Value + "/" + ciegaNum.Value;
-            server.Enviar(mensaje);
+            /*string mensaje = "8/" + this.ID + "/0/" + fichasNum.Value + "/" + ciegaNum.Value;
+            server.Enviar(mensaje);*/
         }
 
         private void noIrBtn_Click(object sender, EventArgs e)
         {
+            //En su turno, el jugador decide dejar las cartas y no hacer la apuesta que se le exige. 
+            //Se envia la decisión al servidor y bloqueamos los objetos relacionados con acciones en la ronda
             string mensaje = "10/" + this.ID + "/-1";
             server.Enviar(mensaje);
-            noIrBtn.Enabled = false;
-            noIrBtn.Visible = false;
-            irBtn.Enabled = false;
-            irBtn.Visible = false;
-            subirBtn.Enabled = false;
-            subirBtn.Visible = false;
-            subirNum.Enabled = false;
-            subirNum.Visible = false;
+            pedirBtn.Enabled = false;
+            pedirBtn.Visible = false;
+            plantarseBtn.Enabled = false;
+            plantarseBtn.Visible = false;
+            apostarBtn.Enabled = false;
+            apostarBtn.Visible = false;
+            apostarNum.Enabled = false;
+            apostarNum.Visible = false;
         }
 
         private void irBtn_Click(object sender, EventArgs e)
         {
-            string mensaje = "10/" + this.ID + "/" + subirNum.Minimum;
+            //En su turno, el jugador decide hacer la apuesta que se le exige. 
+            //Se envia la decisión al servidor y bloqueamos los objetos relacionados con acciones en la ronda
+            string mensaje = "10/" + this.ID + "/" + apostarNum.Minimum;
             server.Enviar(mensaje);
-            noIrBtn.Enabled = false;
-            noIrBtn.Visible = false;
-            irBtn.Enabled = false;
-            irBtn.Visible = false;
-            subirBtn.Enabled = false;
-            subirBtn.Visible = false;
-            subirNum.Enabled = false;
-            subirNum.Visible = false;
+            pedirBtn.Enabled = false;
+            pedirBtn.Visible = false;
+            plantarseBtn.Enabled = false;
+            plantarseBtn.Visible = false;
+            apostarBtn.Enabled = false;
+            apostarBtn.Visible = false;
+            apostarNum.Enabled = false;
+            apostarNum.Visible = false;
         }
 
         private void subirBtn_Click(object sender, EventArgs e)
         {
-            string mensaje = "10/" + this.ID + "/" + subirNum.Value;
+            //En su turno, el jugador decide subir la puja con la cantidad indicada en el numericUpDown. 
+            //Se envia la decisión al servidor y bloqueamos los objetos relacionados con acciones en la ronda
+            string mensaje = "10/" + this.ID + "/" + apostarNum.Value;
             server.Enviar(mensaje);
-            noIrBtn.Enabled = false;
-            noIrBtn.Visible = false;
-            irBtn.Enabled = false;
-            irBtn.Visible = false;
-            subirBtn.Enabled = false;
-            subirBtn.Visible = false;
-            subirNum.Enabled = false;
-            subirNum.Visible = false;
+            pedirBtn.Enabled = false;
+            pedirBtn.Visible = false;
+            plantarseBtn.Enabled = false;
+            plantarseBtn.Visible = false;
+            apostarBtn.Enabled = false;
+            apostarBtn.Visible = false;
+            apostarNum.Enabled = false;
+            apostarNum.Visible = false;
         }
     }
 }
