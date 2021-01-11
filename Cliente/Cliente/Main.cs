@@ -88,6 +88,21 @@ namespace Cliente
                     delegado = new DelegadoRespuesta(Accion11);
                     this.Invoke(delegado, new object[] { mensaje });
                     break;
+
+                case 12:
+                    delegado = new DelegadoRespuesta(Accion12);
+                    this.Invoke(delegado, new object[] { mensaje });
+                    break;
+
+                case 13:
+                    delegado = new DelegadoRespuesta(Accion13);
+                    this.Invoke(delegado, new object[] { mensaje });
+                    break;
+
+                case 14:
+                    delegado = new DelegadoRespuesta(Accion14);
+                    this.Invoke(delegado, new object[] { mensaje });
+                    break;
             } 
         }
 
@@ -208,42 +223,65 @@ namespace Cliente
 
         public void Accion9(string mensaje)
         {
-            //Esta función es llamada cada vez que un usuario recibe un mensaje con el código 9, es decir, cada vez que el programa
-            //recibe un mensaje con cartas que involucran al jugador
-            //Esta función se encarga de averiguar la partida a la cual pertenece el mensaje y lo reenvía al formulario en cuestión.
-            string[] separado = mensaje.Split('/');
-            for (int j = 0; j < cont_forms; j++)
-                if (lista_forms_partidas[j].getID() == Convert.ToInt32(separado[0]))
-                {
-                    //Si la partida está comenzando se recibe las dos cartas de la mano y el nombre del dealer, si está en fase "Flop" se recibe las tres cartas
-                    if (Convert.ToInt32(separado[1]) == 0 || Convert.ToInt32(separado[1]) == 1)
-                        lista_forms_partidas[j].TomaRespuesta(9, separado[1] + "/" + separado[2] + "/" + separado[3] + "/" + separado[4]);
-                    //Si la partida está en "Turn" o "River" se recibe una carta
-                    else if (Convert.ToInt32(separado[1]) == 2 || Convert.ToInt32(separado[1]) == 3)
-                        lista_forms_partidas[j].TomaRespuesta(9, separado[1] + "/" + separado[2]);
-                }
+            
         }
 
         public void Accion10(string mensaje)
         {
-            //Esta función es llamada cada vez que un usuario recibe un mensaje con el código 10, es decir, cada vez que el programa
-            //recibe un mensaje con una acción que ha hecho algun jugador.
-            //Esta función se encarga de averiguar la partida a la cual pertenece el mensaje y lo reenvía al formulario en cuestión.
-            string[] separado = mensaje.Split('/');
-            for (int j = 0; j < cont_forms; j++)
-                if (lista_forms_partidas[j].getID() == Convert.ToInt32(separado[0]))
-                    lista_forms_partidas[j].TomaRespuesta(10, separado[1] + "/" + separado[2]);
+            
         }
 
         public void Accion11(string mensaje)
         {
-            //Esta función es llamada cada vez que un usuario recibe un mensaje con el código 11, es decir, cada vez que el programa
-            //recibe un mensaje con el turno de algun jugador en una partida.
-            //Esta función se encarga de averiguar la partida a la cual pertenece el mensaje y lo reenvía al formulario en cuestión.
+            
+        }
+
+        public void Accion12(string mensaje)
+        {
             string[] separado = mensaje.Split('/');
             for (int j = 0; j < cont_forms; j++)
                 if (lista_forms_partidas[j].getID() == Convert.ToInt32(separado[0]))
-                    lista_forms_partidas[j].TomaRespuesta(11, separado[1]);
+                {
+                    if (Convert.ToInt32(separado[1]) == 1)
+                        lista_forms_partidas[j].TomaRespuesta(12, separado[1] + "/" + separado[2]);
+                    else if (Convert.ToInt32(separado[1]) == 2)
+                        lista_forms_partidas[j].TomaRespuesta(12, separado[1] + "/" + separado[2] + "/" + separado[3]);
+                    else if (Convert.ToInt32(separado[1]) == 3)
+                        lista_forms_partidas[j].TomaRespuesta(12, separado[1] + "/" + separado[2] + "/" + separado[3] + "/" + separado[4]);
+                    else if (Convert.ToInt32(separado[1]) == 4)
+                        lista_forms_partidas[j].TomaRespuesta(12, separado[1] + "/" + separado[2] + "/" + separado[3] + "/" + separado[4] + "/" + separado[5]);
+                    else if (Convert.ToInt32(separado[1]) == 5)
+                        lista_forms_partidas[j].TomaRespuesta(12, separado[1] + "/" + separado[2] + "/" + separado[3] + "/" + separado[4] + "/" + separado[5] + "/" + separado[6]);
+                    else if (Convert.ToInt32(separado[1]) == 6)
+                        lista_forms_partidas[j].TomaRespuesta(12, separado[1] + "/" + separado[2] + "/" + separado[3] + "/" + separado[4] + "/" + separado[5] + "/" + separado[6] + "/" + separado[7]);
+                    else if (Convert.ToInt32(separado[1]) == 7)
+                        lista_forms_partidas[j].TomaRespuesta(12, separado[1] + "/" + separado[2] + "/" + separado[3] + "/" + separado[4] + "/" + separado[5] + "/" + separado[6] + "/" + separado[7] + "/" + separado[8]);
+                    else if (Convert.ToInt32(separado[1]) == 8)
+                        lista_forms_partidas[j].TomaRespuesta(12, separado[1] + "/" + separado[2] + "/" + separado[3] + "/" + separado[4] + "/" + separado[5] + "/" + separado[6] + "/" + separado[7] + "/" + separado[8] + "/" + separado[9]);
+                }
+        }
+
+        public void Accion13(string mensaje)
+        {
+            string[] separado = mensaje.Split('/');
+            for (int j = 0; j < cont_forms; j++)
+                if (lista_forms_partidas[j].getID() == Convert.ToInt32(separado[0]))
+                    lista_forms_partidas[j].TomaRespuesta(13, separado[1] + "/" + separado[2] + "/" + separado[3]);
+        }
+
+        public void Accion14(string mensaje)
+        {
+            string[] separado = mensaje.Split('/');
+            for (int j = 0; j < cont_forms; j++)
+                if (lista_forms_partidas[j].getID() == Convert.ToInt32(separado[0]))
+                    if(separado[2] == "0")
+                        lista_forms_partidas[j].TomaRespuesta(14, separado[1] + "/" + separado[2] + "/" + separado[3]);
+                    else if(separado[2] == "-1")
+                        lista_forms_partidas[j].TomaRespuesta(14, separado[1] + "/" + separado[2]);
+                    else if (separado[2] == "1")
+                        lista_forms_partidas[j].TomaRespuesta(14, separado[1] + "/" + separado[2] + "/" + separado[3] + "/" + separado[4]);
+                    else if (separado[2] == "3")
+                        lista_forms_partidas[j].TomaRespuesta(14, separado[1] + "/" + separado[2] + "/" + separado[3] + "/" + separado[4]);
         }
 
         private void Form1_Load(object sender, EventArgs e)

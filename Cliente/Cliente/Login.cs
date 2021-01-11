@@ -167,25 +167,27 @@ namespace Cliente
                             break;
 
                         case 4:
-                        //Recepción y reenvío de un mensaje con el identificador que tiene la partida que el usuario acaba de crear
+                            //Recepción y reenvío de un mensaje con el identificador que tiene la partida que el usuario acaba de crear
                         case 5:
-                        //Recepción y reenvío de una invitación para jugar una partida
+                            //Recepción y reenvío de una invitación para jugar una partida
                         case 6:
-                        //Recepción y reenvío de un mensaje de chat de alguna partida que está jugando el usuario
+                            //Recepción y reenvío de un mensaje de chat de alguna partida que está jugando el usuario
                         case 7:
-                        //Recepción y reenvío de un mensaje que designa a este cliente como host de una partida
+                            //Recepción y reenvío de un mensaje que designa a este cliente como host de una partida
                         case 8:
-                        //Recepción y reenvío de un mensaje de configuración de parámetros de una partida
+                            //Recepción y reenvío de un mensaje de respuesta a una peticion de baja del juego
                         case 9:
-                        //Recepción y reenvío de un mensaje con cartas que puede ver el jugador
-                            main.TomaRespuesta(codigo, mensaje);
-                            break;
+                            //Recepción y reenvío de un mensaje con la respuesta a la petición 1 a la base de datos
                         case 10:
-                        //Recepción y reenvío de un mensaje con la acción que ha hecho algun jugador durante su turno
-                            main.TomaRespuesta(codigo, mensaje);
-                            break;
+                            //Recepción y reenvío de un mensaje con la respuesta a la petición 2 a la base de datos
                         case 11:
-                        //Recepción y reenvío de un mensaje que indica que es el turno del jugador que viene indicado
+                            //Recepción y reenvío de un mensaje con la respuesta a la petición 3 a la base de datos
+                        case 12:
+                            //Recepción y reenvío de un mensaje con información de la partida (jugadores, fichas...)
+                        case 13:
+                            //Recepción y reenvío de un mensaje con cartas que puede ver el jugador
+                        case 14:
+                            //Recepción y reenvío de un mensaje con la acción que algun jugador ha realizado en la partida
                             main.TomaRespuesta(codigo, mensaje);
                             break;
                     }
