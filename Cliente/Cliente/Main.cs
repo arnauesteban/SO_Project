@@ -297,14 +297,20 @@ namespace Cliente
             string[] separado = mensaje.Split('/');
             for (int j = 0; j < cont_forms; j++)
                 if (lista_forms_partidas[j].getID() == Convert.ToInt32(separado[0]))
-                    if(separado[2] == "0")
+                {
+                    //Accion = 0/N cuando al principio apuesta N fichas
+                    if (separado[2] == "0")
                         lista_forms_partidas[j].TomaRespuesta(14, separado[1] + "/" + separado[2] + "/" + separado[3]);
-                    else if(separado[2] == "-1")
+                    //-1 cuando se retira
+                    else if (separado[2] == "-1")
                         lista_forms_partidas[j].TomaRespuesta(14, separado[1] + "/" + separado[2]);
+                    //1 cuando pide carta
                     else if (separado[2] == "1")
                         lista_forms_partidas[j].TomaRespuesta(14, separado[1] + "/" + separado[2] + "/" + separado[3] + "/" + separado[4]);
+                    //3 cuando dobla
                     else if (separado[2] == "3")
                         lista_forms_partidas[j].TomaRespuesta(14, separado[1] + "/" + separado[2] + "/" + separado[3] + "/" + separado[4]);
+                }
         }
 
         private void Form1_Load(object sender, EventArgs e)
