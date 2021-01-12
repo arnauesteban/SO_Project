@@ -411,7 +411,8 @@ int getIndexPartida(int ID_partida) {
 void sumarPuntos(int l, int j, int carta) {
 	if(lista_partidas.partida[l].baraja.numero[carta] == 1) {
 		if(lista_partidas.partida[l].baraja.numero[carta] 
-				+ lista_partidas.partida[l].lista_jugadores.usuario[j].puntos <= 21) {
+				+ lista_partidas.partida[l].lista_jugadores.usuario[j].puntos <= 21) 
+		{
 			lista_partidas.partida[l].lista_jugadores.usuario[j].as++;
 			lista_partidas.partida[l].lista_jugadores.usuario[j].puntos += 11;
 		}
@@ -891,7 +892,7 @@ void *AtenderCliente (void *socket){
 					
 					while (row != NULL){
 						char var[400];
-						strcpy(var, row);
+						strcpy(var, row[0]);
 						sprintf(ganadores, "/%s",var);
 						i++;
 						row = mysql_fetch_row (resultado);
@@ -994,6 +995,7 @@ void *AtenderCliente (void *socket){
 			
 			int l = getIndexPartida(ID_partida);
 			
+			//Buscamos al jugador en la lista de jugadores de la partida
 			int k = 0;
 			int encontrado = 0;
 			while (!encontrado && k < lista_partidas.partida[l].lista_jugadores.num) {
@@ -1033,7 +1035,8 @@ void *AtenderCliente (void *socket){
 				//Pide otra carta
 				sumarPuntos(l, k, lista_partidas.partida[l].baraja.repartidas);
 				char mensaje[100];
-				sprintf(mensaje, "13$%d/%d/1/%d/%d-%d", ID_partida, k, lista_partidas.partida[l].lista_jugadores.usuario[k].puntos,
+				//Enviamos 14$ID_partida/numJugador/1/puntos/carta
+				sprintf(mensaje, "14$%d/%d/1/%d/%d-%d", ID_partida, k, lista_partidas.partida[l].lista_jugadores.usuario[k].puntos,
 						lista_partidas.partida[l].baraja.numero[lista_partidas.partida[l].baraja.repartidas], 
 						lista_partidas.partida[l].baraja.palo[lista_partidas.partida[l].baraja.repartidas]);
 				lista_partidas.partida[l].baraja.repartidas++;
