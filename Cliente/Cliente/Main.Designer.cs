@@ -37,6 +37,7 @@
             this.usuarioToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.darseDeBajaToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.consultarToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.resultadosToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             ((System.ComponentModel.ISupportInitialize)(this.ConectadosGrid)).BeginInit();
             this.menuStrip1.SuspendLayout();
             this.SuspendLayout();
@@ -111,16 +112,25 @@
             // darseDeBajaToolStripMenuItem
             // 
             this.darseDeBajaToolStripMenuItem.Name = "darseDeBajaToolStripMenuItem";
-            this.darseDeBajaToolStripMenuItem.Size = new System.Drawing.Size(152, 22);
+            this.darseDeBajaToolStripMenuItem.Size = new System.Drawing.Size(144, 22);
             this.darseDeBajaToolStripMenuItem.Text = "Darse de baja";
             this.darseDeBajaToolStripMenuItem.Click += new System.EventHandler(this.darseDeBajaToolStripMenuItem_Click);
             // 
             // consultarToolStripMenuItem
             // 
+            this.consultarToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.resultadosToolStripMenuItem});
             this.consultarToolStripMenuItem.ForeColor = System.Drawing.Color.White;
             this.consultarToolStripMenuItem.Name = "consultarToolStripMenuItem";
             this.consultarToolStripMenuItem.Size = new System.Drawing.Size(70, 20);
             this.consultarToolStripMenuItem.Text = "Consultar";
+            // 
+            // resultadosToolStripMenuItem
+            // 
+            this.resultadosToolStripMenuItem.Name = "resultadosToolStripMenuItem";
+            this.resultadosToolStripMenuItem.Size = new System.Drawing.Size(152, 22);
+            this.resultadosToolStripMenuItem.Text = "Resultados";
+            this.resultadosToolStripMenuItem.Click += new System.EventHandler(this.resultadosToolStripMenuItem_Click);
             // 
             // Main
             // 
@@ -156,6 +166,7 @@
         private System.Windows.Forms.ToolStripMenuItem usuarioToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem darseDeBajaToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem consultarToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem resultadosToolStripMenuItem;
     }
 }
 

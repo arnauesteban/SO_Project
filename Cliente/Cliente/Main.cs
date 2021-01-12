@@ -223,7 +223,30 @@ namespace Cliente
 
         public void Accion9(string mensaje)
         {
-            
+            string[] separado = mensaje.Split('/');
+
+            if (separado[0] == "-2")
+            {
+                MessageBox.Show("Ha sucedido un error. Vuélvalo a intentar");
+                this.Close();
+            }
+            else if (separado[0] == "-1")
+            {
+                MessageBox.Show("No se han realizado partidas con ese jugador.");
+            }
+
+            else if (separado[0] == "0")
+            {
+                int i = 0;
+                string ganadores = null;
+
+                while (i < Convert.ToInt32(separado[1]))
+                {
+                    ganadores += separado[i] + ",";
+                    i++;
+                }
+                MessageBox.Show(ganadores);
+            }
         }
 
         public void Accion10(string mensaje)
@@ -394,6 +417,12 @@ namespace Cliente
         private void darseDeBajaToolStripMenuItem_Click(object sender, EventArgs e)
         {
             darse_de_baja form = new darse_de_baja(server);
+            form.ShowDialog();
+        }
+
+        private void resultadosToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            consulta_resultados form = new consulta_resultados(server);
             form.ShowDialog();
         }
     }

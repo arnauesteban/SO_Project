@@ -851,7 +851,57 @@ void *AtenderCliente (void *socket){
 		//RESERVADO PARA CONSULTA A LA BASE DE DATOS 1
 		//El servidor recibe ...
 		else if (codigo == 9) {
+			p = strtok(NULL, "/");
+			char name[20];
+			strcpy(name, p);
 			
+			//Pedimos a la base de datos que nos proporcione resultados del usuario
+			char consulta[200];
+			strcpy(consulta, "SELECT PARTIDA.GANADOR FROM(PARTIDA, JUGADOR, PARTICIPACION) WHERE PARTIDA.ID = PARTICIPACION.ID_P AND PARTICIPACION.ID_J = JUGADOR.ID AND JUGADOR.NOMBRE = '");
+			strcat(consulta, name);
+			strcat(consulta, "'");
+			int err = mysql_query (conn, consulta);
+			if (err!=0) {
+				printf ("Error al consultar la clave en la base %u %s\n", mysql_errno(conn), mysql_error(conn));
+				char respuesta[100];
+				strcpy(respuesta, "9$-2"); //Se envia respuesta problemtica,devolvemos -2
+				write(sock_conn, respuesta, strlen(respuesta));
+			}
+			else {
+				MYSQL_RES *resultado;
+				MYSQL_ROW row;
+				resultado = mysql_store_result (conn);
+				row = mysql_fetch_row (resultado);
+				
+				//Si la clave introducida por el usuario y la proporcionada por la base de datos no coinciden se envia un mensaje aclaratorio
+				//NO se borra la cuenta
+				if(row == NULL) {
+					printf("No ha jugado con ese jugador.\n");
+					char respuesta[100];
+					strcpy(respuesta, "9$-1");//No ha jugado con ese jugador, devolvemos -1
+					write(sock_conn, respuesta, strlen(respuesta));
+				}
+				//Si la clave es correcta se procede a eliminar el usuario
+				else {
+					char respuesta[400];
+					char ganadores[300];
+					
+					int i=0;
+					strcpy(respuesta, "9$0/");
+					
+					while (row != NULL){
+						char var[400];
+						strcpy(var, row);
+						sprintf(ganadores, "/%s",var);
+						i++;
+						row = mysql_fetch_row (resultado);
+					}
+				
+					sprintf(respuesta, "%s%d%s", respuesta,i, ganadores);
+					write(sock_conn, respuesta, strlen(respuesta));
+					printf("%s", respuesta);
+				}
+			}
 		}
 		//RESERVADO PARA CONSULTA A LA BASE DE DATOS 2
 		//El servidor recibe ...
