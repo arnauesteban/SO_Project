@@ -1047,11 +1047,13 @@ void *AtenderCliente (void *socket){
 				//Se planta
 				lista_partidas.partida[l].lista_jugadores.usuario[k].estado = 'F';
 			}
-			else if (codigo == 3) {
+			else if (accion == 3) {
 				//Dobla la apuesta y pide una ultima carta
 				sumarPuntos(l, k, lista_partidas.partida[l].baraja.repartidas);
 				char mensaje[100];
-				sprintf(mensaje, "13$%d/%d/3/%d/%d-%d", ID_partida, k, lista_partidas.partida[l].lista_jugadores.usuario[k].puntos,
+				
+				//Se envia 13$ID_partida/numJugador/3/puntos/carta
+				sprintf(mensaje, "14$%d/%d/3/%d/%d-%d", ID_partida, k, lista_partidas.partida[l].lista_jugadores.usuario[k].puntos,
 						lista_partidas.partida[l].baraja.numero[lista_partidas.partida[l].baraja.repartidas], 
 						lista_partidas.partida[l].baraja.palo[lista_partidas.partida[l].baraja.repartidas]);
 				lista_partidas.partida[l].baraja.repartidas++;

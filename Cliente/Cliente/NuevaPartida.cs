@@ -1014,13 +1014,12 @@ namespace Cliente
                 if (jugador1NombreLbl.Text == this.usuario)
                 {
                     jugador1JugadoLbl.Text = (2 * Convert.ToInt32(jugador1JugadoLbl)).ToString();
-                    jugador1PuntosLbl.Text = separado[1];
-                    if (jugador1Carta3Lbl.Text != "Carta 3")
-                        jugador1Carta3Lbl.Text = separado[2];
-                    else if (jugador1Carta4Lbl.Text != "Carta 4")
-                        jugador1Carta4Lbl.Text = separado[2]; 
-                    if (Convert.ToInt32(jugador1PuntosLbl.Text) > 20)
-                    {
+                    jugador1PuntosLbl.Text = separado[2];
+                    if (jugador1Carta3Lbl.Text == "Carta 3")
+                        jugador1Carta3Lbl.Text = separado[3];
+                    else if (jugador1Carta4Lbl.Text == "Carta 4")
+                        jugador1Carta4Lbl.Text = separado[3]; 
+
                         rendirseBtn.Enabled = false;
                         rendirseBtn.Visible = false;
                         pedirBtn.Enabled = false;
@@ -1032,18 +1031,18 @@ namespace Cliente
                         apostarBtn.Text = "Apostar";
                         apostarNum.Enabled = false;
                         apostarNum.Visible = false;
-                    }
+
+                    
                 }
                 else if (jugador2NombreLbl.Text == this.usuario)
                 {
                     jugador2JugadoLbl.Text = (2 * Convert.ToInt32(jugador2JugadoLbl)).ToString();
-                    jugador2PuntosLbl.Text = separado[1];
-                    if (jugador2Carta3Lbl.Text != "Carta 3")
-                        jugador2Carta3Lbl.Text = separado[2];
-                    else if (jugador2Carta4Lbl.Text != "Carta 4")
-                        jugador2Carta4Lbl.Text = separado[2];
-                    if (Convert.ToInt32(jugador2PuntosLbl.Text) > 20)
-                    {
+                    jugador2PuntosLbl.Text = separado[2];
+                    if (jugador2Carta3Lbl.Text == "Carta 3")
+                        jugador2Carta3Lbl.Text = separado[3];
+                    else if (jugador2Carta4Lbl.Text == "Carta 4")
+                        jugador2Carta4Lbl.Text = separado[3];
+
                         rendirseBtn.Enabled = false;
                         rendirseBtn.Visible = false;
                         pedirBtn.Enabled = false;
@@ -1055,18 +1054,17 @@ namespace Cliente
                         apostarBtn.Text = "Apostar";
                         apostarNum.Enabled = false;
                         apostarNum.Visible = false;
-                    }
+                 
                 }
                 else if (jugador3NombreLbl.Text == this.usuario)
                 {
                     jugador3JugadoLbl.Text = (2 * Convert.ToInt32(jugador3JugadoLbl)).ToString();
-                    jugador3PuntosLbl.Text = separado[1];
-                    if (jugador3Carta3Lbl.Text != "Carta 3")
-                        jugador3Carta3Lbl.Text = separado[2];
-                    else if (jugador3Carta4Lbl.Text != "Carta 4")
-                        jugador3Carta4Lbl.Text = separado[2];
-                    if (Convert.ToInt32(jugador3PuntosLbl.Text) > 20)
-                    {
+                    jugador3PuntosLbl.Text = separado[2];
+                    if (jugador3Carta3Lbl.Text == "Carta 3")
+                        jugador3Carta3Lbl.Text = separado[3];
+                    else if (jugador3Carta4Lbl.Text == "Carta 4")
+                        jugador3Carta4Lbl.Text = separado[3];
+
                         rendirseBtn.Enabled = false;
                         rendirseBtn.Visible = false;
                         pedirBtn.Enabled = false;
@@ -1078,18 +1076,17 @@ namespace Cliente
                         apostarBtn.Text = "Apostar";
                         apostarNum.Enabled = false;
                         apostarNum.Visible = false;
-                    }
+
                 }
                 else if (jugador4NombreLbl.Text == this.usuario)
                 {
                     jugador4JugadoLbl.Text = (2 * Convert.ToInt32(jugador4JugadoLbl)).ToString();
-                    jugador4PuntosLbl.Text = separado[1];
-                    if (jugador4Carta3Lbl.Text != "Carta 3")
-                        jugador4Carta3Lbl.Text = separado[2];
-                    else if (jugador4Carta4Lbl.Text != "Carta 4")
-                        jugador4Carta4Lbl.Text = separado[2];
-                    if (Convert.ToInt32(jugador4PuntosLbl.Text) > 20)
-                    {
+                    jugador4PuntosLbl.Text = separado[2];
+                    if (jugador4Carta3Lbl.Text == "Carta 3")
+                        jugador4Carta3Lbl.Text = separado[3];
+                    else if (jugador4Carta4Lbl.Text == "Carta 4")
+                        jugador4Carta4Lbl.Text = separado[3];
+
                         rendirseBtn.Enabled = false;
                         rendirseBtn.Visible = false;
                         pedirBtn.Enabled = false;
@@ -1101,18 +1098,17 @@ namespace Cliente
                         apostarBtn.Text = "Apostar";
                         apostarNum.Enabled = false;
                         apostarNum.Visible = false;
-                    }
+
                 }
                 else if (jugador5NombreLbl.Text == this.usuario)
                 {
                     jugador5JugadoLbl.Text = (2 * Convert.ToInt32(jugador5JugadoLbl)).ToString();
-                    jugador5PuntosLbl.Text = separado[1];
-                    if (jugador5Carta3Lbl.Text != "Carta 3")
-                        jugador5Carta3Lbl.Text = separado[2];
-                    else if (jugador5Carta4Lbl.Text != "Carta 4")
-                        jugador5Carta4Lbl.Text = separado[2];
-                    if (Convert.ToInt32(jugador5PuntosLbl.Text) > 20)
-                    {
+                    jugador5PuntosLbl.Text = separado[2];
+                    if (jugador5Carta3Lbl.Text == "Carta 3")
+                        jugador5Carta3Lbl.Text = separado[3];
+                    else if (jugador5Carta4Lbl.Text == "Carta 4")
+                        jugador5Carta4Lbl.Text = separado[3];
+
                         rendirseBtn.Enabled = false;
                         rendirseBtn.Visible = false;
                         pedirBtn.Enabled = false;
@@ -1124,18 +1120,16 @@ namespace Cliente
                         apostarBtn.Text = "Apostar";
                         apostarNum.Enabled = false;
                         apostarNum.Visible = false;
-                    }
                 }
                 else if (jugador6NombreLbl.Text == this.usuario)
                 {
                     jugador6JugadoLbl.Text = (2 * Convert.ToInt32(jugador6JugadoLbl)).ToString();
-                    jugador6PuntosLbl.Text = separado[1];
-                    if (jugador6Carta3Lbl.Text != "Carta 3")
-                        jugador6Carta3Lbl.Text = separado[2];
-                    else if (jugador6Carta4Lbl.Text != "Carta 4")
-                        jugador6Carta4Lbl.Text = separado[2];
-                    if (Convert.ToInt32(jugador6PuntosLbl.Text) > 20)
-                    {
+                    jugador6PuntosLbl.Text = separado[2];
+                    if (jugador6Carta3Lbl.Text == "Carta 3")
+                        jugador6Carta3Lbl.Text = separado[3];
+                    else if (jugador6Carta4Lbl.Text == "Carta 4")
+                        jugador6Carta4Lbl.Text = separado[3];
+
                         rendirseBtn.Enabled = false;
                         rendirseBtn.Visible = false;
                         pedirBtn.Enabled = false;
@@ -1147,18 +1141,16 @@ namespace Cliente
                         apostarBtn.Text = "Apostar";
                         apostarNum.Enabled = false;
                         apostarNum.Visible = false;
-                    }
                 }
                 else if (jugador7NombreLbl.Text == this.usuario)
                 {
                     jugador7JugadoLbl.Text = (2 * Convert.ToInt32(jugador7JugadoLbl)).ToString();
-                    jugador7PuntosLbl.Text = separado[1];
-                    if (jugador7Carta3Lbl.Text != "Carta 3")
-                        jugador7Carta3Lbl.Text = separado[2];
-                    else if (jugador7Carta4Lbl.Text != "Carta 4")
-                        jugador7Carta4Lbl.Text = separado[2];
-                    if (Convert.ToInt32(jugador7PuntosLbl.Text) > 20)
-                    {
+                    jugador7PuntosLbl.Text = separado[2];
+                    if (jugador7Carta3Lbl.Text == "Carta 3")
+                        jugador7Carta3Lbl.Text = separado[3];
+                    else if (jugador7Carta4Lbl.Text == "Carta 4")
+                        jugador7Carta4Lbl.Text = separado[3];
+
                         rendirseBtn.Enabled = false;
                         rendirseBtn.Visible = false;
                         pedirBtn.Enabled = false;
@@ -1170,18 +1162,17 @@ namespace Cliente
                         apostarBtn.Text = "Apostar";
                         apostarNum.Enabled = false;
                         apostarNum.Visible = false;
-                    }
+
                 }
                 else if (jugador8NombreLbl.Text == this.usuario)
                 {
                     jugador8JugadoLbl.Text = (2 * Convert.ToInt32(jugador8JugadoLbl)).ToString();
-                    jugador8PuntosLbl.Text = separado[1];
-                    if (jugador8Carta3Lbl.Text != "Carta 3")
-                        jugador8Carta3Lbl.Text = separado[2];
-                    else if (jugador8Carta4Lbl.Text != "Carta 4")
-                        jugador8Carta4Lbl.Text = separado[2];
-                    if (Convert.ToInt32(jugador8PuntosLbl.Text) > 20)
-                    {
+                    jugador8PuntosLbl.Text = separado[2];
+                    if (jugador8Carta3Lbl.Text == "Carta 3")
+                        jugador8Carta3Lbl.Text = separado[3];
+                    else if (jugador8Carta4Lbl.Text == "Carta 4")
+                        jugador8Carta4Lbl.Text = separado[3];
+
                         rendirseBtn.Enabled = false;
                         rendirseBtn.Visible = false;
                         pedirBtn.Enabled = false;
@@ -1193,7 +1184,6 @@ namespace Cliente
                         apostarBtn.Text = "Apostar";
                         apostarNum.Enabled = false;
                         apostarNum.Visible = false;
-                    }
                 }
             }
         }
@@ -1308,17 +1298,7 @@ namespace Cliente
                 //El jugador decide doblar la apuesta y pedir una ultima carta
                 string mensaje = "14/" + this.ID + "/3";
                 server.Enviar(mensaje);
-                rendirseBtn.Enabled = false;
-                rendirseBtn.Visible = false;
-                pedirBtn.Enabled = false;
-                pedirBtn.Visible = false;
-                plantarseBtn.Enabled = false;
-                plantarseBtn.Visible = false;
-                apostarBtn.Enabled = false;
-                apostarBtn.Visible = false;
-                apostarBtn.Text = "Apostar";
-                apostarNum.Enabled = false;
-                apostarNum.Visible = false;
+
             }
         }
     }
