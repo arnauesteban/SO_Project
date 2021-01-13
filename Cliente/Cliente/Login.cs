@@ -185,9 +185,13 @@ namespace Cliente
                         case 12:
                             //Recepción y reenvío de un mensaje con información de la partida (jugadores, fichas...)
                         case 13:
-                            //Recepción y reenvío de un mensaje con cartas que puede ver el jugador
+                            //Recepción y reenvío de un mensaje con la configuracion inicial de la partida y las cartas de la mano de la primera ronda
                         case 14:
                             //Recepción y reenvío de un mensaje con la acción que algun jugador ha realizado en la partida
+                        case 15:
+                            //Recepcion y reenvío de un mensaje con todos los datos de un jugador al final de una ronda
+                        case 16:
+                            //Recepcion y reenvio de un mensaje con las dos cartas iniciales del jugador en una nueva ronda
                             main.TomaRespuesta(codigo, mensaje);
                             break;
                     }

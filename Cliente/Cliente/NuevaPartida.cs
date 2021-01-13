@@ -18,6 +18,7 @@ namespace Cliente
         int ID;
         string usuario;
         int lineasChat;
+        bool banca;
 
         public delegate void DelegadoRespuesta(string mensaje);
 
@@ -169,6 +170,16 @@ namespace Cliente
                     delegado = new DelegadoRespuesta(Accion14);
                     this.Invoke(delegado, new object[] { mensaje });
                     break;
+
+                case 15:
+                    delegado = new DelegadoRespuesta(Accion15);
+                    this.Invoke(delegado, new object[] { mensaje });
+                    break;
+
+                case 16:
+                    delegado = new DelegadoRespuesta(Accion16);
+                    this.Invoke(delegado, new object[] { mensaje });
+                    break;
             }
         }
 
@@ -196,9 +207,321 @@ namespace Cliente
 
         public void Accion7(string mensaje)
         {
-            //Función que es llamada cuando se recibe un mensaje para que este jugador pase a ser el host de la partida. 
-            //Permite usar los objetos del formulario reservados al host
-            empezarBtn.Enabled = true;
+            //Función que es llamada cuando se recibe un mensaje con una advertencia de que un jugador se ha ido de la partida
+            //Actualiza los label del formulario de acuerdo con la nueva distribucion de jugadores que hay actualmente
+            int n = Convert.ToInt32(mensaje);
+            if (n == 0)
+            {
+                jugador1NombreLbl.Text = jugador2NombreLbl.Text;
+                jugador1JugadoLbl.Text = jugador2JugadoLbl.Text;
+                jugador1Carta1Lbl.Text = jugador2Carta1Lbl.Text;
+                jugador1Carta2Lbl.Text = jugador2Carta2Lbl.Text;
+                jugador1Carta3Lbl.Text = jugador2Carta3Lbl.Text;
+                jugador1Carta4Lbl.Text = jugador2Carta4Lbl.Text;
+                jugador1FichasLbl.Text = jugador2FichasLbl.Text;
+                jugador1PuntosLbl.Text = jugador2PuntosLbl.Text;
+                jugador2NombreLbl.Text = jugador3NombreLbl.Text;
+                jugador2JugadoLbl.Text = jugador3JugadoLbl.Text;
+                jugador2Carta1Lbl.Text = jugador3Carta1Lbl.Text;
+                jugador2Carta2Lbl.Text = jugador3Carta2Lbl.Text;
+                jugador2Carta3Lbl.Text = jugador3Carta3Lbl.Text;
+                jugador2Carta4Lbl.Text = jugador3Carta4Lbl.Text;
+                jugador2FichasLbl.Text = jugador3FichasLbl.Text;
+                jugador2PuntosLbl.Text = jugador3PuntosLbl.Text;
+                jugador3NombreLbl.Text = jugador4NombreLbl.Text;
+                jugador3JugadoLbl.Text = jugador4JugadoLbl.Text;
+                jugador3Carta1Lbl.Text = jugador4Carta1Lbl.Text;
+                jugador3Carta2Lbl.Text = jugador4Carta2Lbl.Text;
+                jugador3Carta3Lbl.Text = jugador4Carta3Lbl.Text;
+                jugador3Carta4Lbl.Text = jugador4Carta4Lbl.Text;
+                jugador3FichasLbl.Text = jugador4FichasLbl.Text;
+                jugador3PuntosLbl.Text = jugador4PuntosLbl.Text;
+                jugador4NombreLbl.Text = jugador5NombreLbl.Text;
+                jugador4JugadoLbl.Text = jugador5JugadoLbl.Text;
+                jugador4Carta1Lbl.Text = jugador5Carta1Lbl.Text;
+                jugador4Carta2Lbl.Text = jugador5Carta2Lbl.Text;
+                jugador4Carta3Lbl.Text = jugador5Carta3Lbl.Text;
+                jugador4Carta4Lbl.Text = jugador5Carta4Lbl.Text;
+                jugador4FichasLbl.Text = jugador5FichasLbl.Text;
+                jugador4PuntosLbl.Text = jugador5PuntosLbl.Text;
+                jugador5NombreLbl.Text = jugador6NombreLbl.Text;
+                jugador5JugadoLbl.Text = jugador6JugadoLbl.Text;
+                jugador5Carta1Lbl.Text = jugador6Carta1Lbl.Text;
+                jugador5Carta2Lbl.Text = jugador6Carta2Lbl.Text;
+                jugador5Carta3Lbl.Text = jugador6Carta3Lbl.Text;
+                jugador5Carta4Lbl.Text = jugador6Carta4Lbl.Text;
+                jugador5FichasLbl.Text = jugador6FichasLbl.Text;
+                jugador5PuntosLbl.Text = jugador6PuntosLbl.Text;
+                jugador6NombreLbl.Text = jugador7NombreLbl.Text;
+                jugador6JugadoLbl.Text = jugador7JugadoLbl.Text;
+                jugador6Carta1Lbl.Text = jugador7Carta1Lbl.Text;
+                jugador6Carta2Lbl.Text = jugador7Carta2Lbl.Text;
+                jugador6Carta3Lbl.Text = jugador7Carta3Lbl.Text;
+                jugador6Carta4Lbl.Text = jugador7Carta4Lbl.Text;
+                jugador6FichasLbl.Text = jugador7FichasLbl.Text;
+                jugador6PuntosLbl.Text = jugador7PuntosLbl.Text;
+                jugador7NombreLbl.Text = jugador8NombreLbl.Text;
+                jugador7JugadoLbl.Text = jugador8JugadoLbl.Text;
+                jugador7Carta1Lbl.Text = jugador8Carta1Lbl.Text;
+                jugador7Carta2Lbl.Text = jugador8Carta2Lbl.Text;
+                jugador7Carta3Lbl.Text = jugador8Carta3Lbl.Text;
+                jugador7Carta4Lbl.Text = jugador8Carta4Lbl.Text;
+                jugador7FichasLbl.Text = jugador8FichasLbl.Text;
+                jugador7PuntosLbl.Text = jugador8PuntosLbl.Text;
+                jugador8NombreLbl.Text = "";
+                jugador8JugadoLbl.Text = "";
+                jugador8Carta1Lbl.Text = "";
+                jugador8Carta2Lbl.Text = "";
+                jugador8Carta3Lbl.Text = "";
+                jugador8Carta4Lbl.Text = "";
+                jugador8FichasLbl.Text = "";
+                jugador8PuntosLbl.Text = "";
+            }
+            else if (n == 1)
+            {
+                jugador2NombreLbl.Text = jugador3NombreLbl.Text;
+                jugador2JugadoLbl.Text = jugador3JugadoLbl.Text;
+                jugador2Carta1Lbl.Text = jugador3Carta1Lbl.Text;
+                jugador2Carta2Lbl.Text = jugador3Carta2Lbl.Text;
+                jugador2Carta3Lbl.Text = jugador3Carta3Lbl.Text;
+                jugador2Carta4Lbl.Text = jugador3Carta4Lbl.Text;
+                jugador2FichasLbl.Text = jugador3FichasLbl.Text;
+                jugador2PuntosLbl.Text = jugador3PuntosLbl.Text;
+                jugador3NombreLbl.Text = jugador4NombreLbl.Text;
+                jugador3JugadoLbl.Text = jugador4JugadoLbl.Text;
+                jugador3Carta1Lbl.Text = jugador4Carta1Lbl.Text;
+                jugador3Carta2Lbl.Text = jugador4Carta2Lbl.Text;
+                jugador3Carta3Lbl.Text = jugador4Carta3Lbl.Text;
+                jugador3Carta4Lbl.Text = jugador4Carta4Lbl.Text;
+                jugador3FichasLbl.Text = jugador4FichasLbl.Text;
+                jugador3PuntosLbl.Text = jugador4PuntosLbl.Text;
+                jugador4NombreLbl.Text = jugador5NombreLbl.Text;
+                jugador4JugadoLbl.Text = jugador5JugadoLbl.Text;
+                jugador4Carta1Lbl.Text = jugador5Carta1Lbl.Text;
+                jugador4Carta2Lbl.Text = jugador5Carta2Lbl.Text;
+                jugador4Carta3Lbl.Text = jugador5Carta3Lbl.Text;
+                jugador4Carta4Lbl.Text = jugador5Carta4Lbl.Text;
+                jugador4FichasLbl.Text = jugador5FichasLbl.Text;
+                jugador4PuntosLbl.Text = jugador5PuntosLbl.Text;
+                jugador5NombreLbl.Text = jugador6NombreLbl.Text;
+                jugador5JugadoLbl.Text = jugador6JugadoLbl.Text;
+                jugador5Carta1Lbl.Text = jugador6Carta1Lbl.Text;
+                jugador5Carta2Lbl.Text = jugador6Carta2Lbl.Text;
+                jugador5Carta3Lbl.Text = jugador6Carta3Lbl.Text;
+                jugador5Carta4Lbl.Text = jugador6Carta4Lbl.Text;
+                jugador5FichasLbl.Text = jugador6FichasLbl.Text;
+                jugador5PuntosLbl.Text = jugador6PuntosLbl.Text;
+                jugador6NombreLbl.Text = jugador7NombreLbl.Text;
+                jugador6JugadoLbl.Text = jugador7JugadoLbl.Text;
+                jugador6Carta1Lbl.Text = jugador7Carta1Lbl.Text;
+                jugador6Carta2Lbl.Text = jugador7Carta2Lbl.Text;
+                jugador6Carta3Lbl.Text = jugador7Carta3Lbl.Text;
+                jugador6Carta4Lbl.Text = jugador7Carta4Lbl.Text;
+                jugador6FichasLbl.Text = jugador7FichasLbl.Text;
+                jugador6PuntosLbl.Text = jugador7PuntosLbl.Text;
+                jugador7NombreLbl.Text = jugador8NombreLbl.Text;
+                jugador7JugadoLbl.Text = jugador8JugadoLbl.Text;
+                jugador7Carta1Lbl.Text = jugador8Carta1Lbl.Text;
+                jugador7Carta2Lbl.Text = jugador8Carta2Lbl.Text;
+                jugador7Carta3Lbl.Text = jugador8Carta3Lbl.Text;
+                jugador7Carta4Lbl.Text = jugador8Carta4Lbl.Text;
+                jugador7FichasLbl.Text = jugador8FichasLbl.Text;
+                jugador7PuntosLbl.Text = jugador8PuntosLbl.Text;
+                jugador8NombreLbl.Text = "";
+                jugador8JugadoLbl.Text = "";
+                jugador8Carta1Lbl.Text = "";
+                jugador8Carta2Lbl.Text = "";
+                jugador8Carta3Lbl.Text = "";
+                jugador8Carta4Lbl.Text = "";
+                jugador8FichasLbl.Text = "";
+                jugador8PuntosLbl.Text = "";
+            }
+            else if (n == 2)
+            {
+                jugador3NombreLbl.Text = jugador4NombreLbl.Text;
+                jugador3JugadoLbl.Text = jugador4JugadoLbl.Text;
+                jugador3Carta1Lbl.Text = jugador4Carta1Lbl.Text;
+                jugador3Carta2Lbl.Text = jugador4Carta2Lbl.Text;
+                jugador3Carta3Lbl.Text = jugador4Carta3Lbl.Text;
+                jugador3Carta4Lbl.Text = jugador4Carta4Lbl.Text;
+                jugador3FichasLbl.Text = jugador4FichasLbl.Text;
+                jugador3PuntosLbl.Text = jugador4PuntosLbl.Text;
+                jugador4NombreLbl.Text = jugador5NombreLbl.Text;
+                jugador4JugadoLbl.Text = jugador5JugadoLbl.Text;
+                jugador4Carta1Lbl.Text = jugador5Carta1Lbl.Text;
+                jugador4Carta2Lbl.Text = jugador5Carta2Lbl.Text;
+                jugador4Carta3Lbl.Text = jugador5Carta3Lbl.Text;
+                jugador4Carta4Lbl.Text = jugador5Carta4Lbl.Text;
+                jugador4FichasLbl.Text = jugador5FichasLbl.Text;
+                jugador4PuntosLbl.Text = jugador5PuntosLbl.Text;
+                jugador5NombreLbl.Text = jugador6NombreLbl.Text;
+                jugador5JugadoLbl.Text = jugador6JugadoLbl.Text;
+                jugador5Carta1Lbl.Text = jugador6Carta1Lbl.Text;
+                jugador5Carta2Lbl.Text = jugador6Carta2Lbl.Text;
+                jugador5Carta3Lbl.Text = jugador6Carta3Lbl.Text;
+                jugador5Carta4Lbl.Text = jugador6Carta4Lbl.Text;
+                jugador5FichasLbl.Text = jugador6FichasLbl.Text;
+                jugador5PuntosLbl.Text = jugador6PuntosLbl.Text;
+                jugador6NombreLbl.Text = jugador7NombreLbl.Text;
+                jugador6JugadoLbl.Text = jugador7JugadoLbl.Text;
+                jugador6Carta1Lbl.Text = jugador7Carta1Lbl.Text;
+                jugador6Carta2Lbl.Text = jugador7Carta2Lbl.Text;
+                jugador6Carta3Lbl.Text = jugador7Carta3Lbl.Text;
+                jugador6Carta4Lbl.Text = jugador7Carta4Lbl.Text;
+                jugador6FichasLbl.Text = jugador7FichasLbl.Text;
+                jugador6PuntosLbl.Text = jugador7PuntosLbl.Text;
+                jugador7NombreLbl.Text = jugador8NombreLbl.Text;
+                jugador7JugadoLbl.Text = jugador8JugadoLbl.Text;
+                jugador7Carta1Lbl.Text = jugador8Carta1Lbl.Text;
+                jugador7Carta2Lbl.Text = jugador8Carta2Lbl.Text;
+                jugador7Carta3Lbl.Text = jugador8Carta3Lbl.Text;
+                jugador7Carta4Lbl.Text = jugador8Carta4Lbl.Text;
+                jugador7FichasLbl.Text = jugador8FichasLbl.Text;
+                jugador7PuntosLbl.Text = jugador8PuntosLbl.Text;
+                jugador8NombreLbl.Text = "";
+                jugador8JugadoLbl.Text = "";
+                jugador8Carta1Lbl.Text = "";
+                jugador8Carta2Lbl.Text = "";
+                jugador8Carta3Lbl.Text = "";
+                jugador8Carta4Lbl.Text = "";
+                jugador8FichasLbl.Text = "";
+                jugador8PuntosLbl.Text = "";
+            }
+            else if (n == 3)
+            {
+                jugador4NombreLbl.Text = jugador5NombreLbl.Text;
+                jugador4JugadoLbl.Text = jugador5JugadoLbl.Text;
+                jugador4Carta1Lbl.Text = jugador5Carta1Lbl.Text;
+                jugador4Carta2Lbl.Text = jugador5Carta2Lbl.Text;
+                jugador4Carta3Lbl.Text = jugador5Carta3Lbl.Text;
+                jugador4Carta4Lbl.Text = jugador5Carta4Lbl.Text;
+                jugador4FichasLbl.Text = jugador5FichasLbl.Text;
+                jugador4PuntosLbl.Text = jugador5PuntosLbl.Text;
+                jugador5NombreLbl.Text = jugador6NombreLbl.Text;
+                jugador5JugadoLbl.Text = jugador6JugadoLbl.Text;
+                jugador5Carta1Lbl.Text = jugador6Carta1Lbl.Text;
+                jugador5Carta2Lbl.Text = jugador6Carta2Lbl.Text;
+                jugador5Carta3Lbl.Text = jugador6Carta3Lbl.Text;
+                jugador5Carta4Lbl.Text = jugador6Carta4Lbl.Text;
+                jugador5FichasLbl.Text = jugador6FichasLbl.Text;
+                jugador5PuntosLbl.Text = jugador6PuntosLbl.Text;
+                jugador6NombreLbl.Text = jugador7NombreLbl.Text;
+                jugador6JugadoLbl.Text = jugador7JugadoLbl.Text;
+                jugador6Carta1Lbl.Text = jugador7Carta1Lbl.Text;
+                jugador6Carta2Lbl.Text = jugador7Carta2Lbl.Text;
+                jugador6Carta3Lbl.Text = jugador7Carta3Lbl.Text;
+                jugador6Carta4Lbl.Text = jugador7Carta4Lbl.Text;
+                jugador6FichasLbl.Text = jugador7FichasLbl.Text;
+                jugador6PuntosLbl.Text = jugador7PuntosLbl.Text;
+                jugador7NombreLbl.Text = jugador8NombreLbl.Text;
+                jugador7JugadoLbl.Text = jugador8JugadoLbl.Text;
+                jugador7Carta1Lbl.Text = jugador8Carta1Lbl.Text;
+                jugador7Carta2Lbl.Text = jugador8Carta2Lbl.Text;
+                jugador7Carta3Lbl.Text = jugador8Carta3Lbl.Text;
+                jugador7Carta4Lbl.Text = jugador8Carta4Lbl.Text;
+                jugador7FichasLbl.Text = jugador8FichasLbl.Text;
+                jugador7PuntosLbl.Text = jugador8PuntosLbl.Text;
+                jugador8NombreLbl.Text = "";
+                jugador8JugadoLbl.Text = "";
+                jugador8Carta1Lbl.Text = "";
+                jugador8Carta2Lbl.Text = "";
+                jugador8Carta3Lbl.Text = "";
+                jugador8Carta4Lbl.Text = "";
+                jugador8FichasLbl.Text = "";
+                jugador8PuntosLbl.Text = "";
+            }
+            else if (n == 4)
+            {
+                jugador5NombreLbl.Text = jugador6NombreLbl.Text;
+                jugador5JugadoLbl.Text = jugador6JugadoLbl.Text;
+                jugador5Carta1Lbl.Text = jugador6Carta1Lbl.Text;
+                jugador5Carta2Lbl.Text = jugador6Carta2Lbl.Text;
+                jugador5Carta3Lbl.Text = jugador6Carta3Lbl.Text;
+                jugador5Carta4Lbl.Text = jugador6Carta4Lbl.Text;
+                jugador5FichasLbl.Text = jugador6FichasLbl.Text;
+                jugador5PuntosLbl.Text = jugador6PuntosLbl.Text;
+                jugador6NombreLbl.Text = jugador7NombreLbl.Text;
+                jugador6JugadoLbl.Text = jugador7JugadoLbl.Text;
+                jugador6Carta1Lbl.Text = jugador7Carta1Lbl.Text;
+                jugador6Carta2Lbl.Text = jugador7Carta2Lbl.Text;
+                jugador6Carta3Lbl.Text = jugador7Carta3Lbl.Text;
+                jugador6Carta4Lbl.Text = jugador7Carta4Lbl.Text;
+                jugador6FichasLbl.Text = jugador7FichasLbl.Text;
+                jugador6PuntosLbl.Text = jugador7PuntosLbl.Text;
+                jugador7NombreLbl.Text = jugador8NombreLbl.Text;
+                jugador7JugadoLbl.Text = jugador8JugadoLbl.Text;
+                jugador7Carta1Lbl.Text = jugador8Carta1Lbl.Text;
+                jugador7Carta2Lbl.Text = jugador8Carta2Lbl.Text;
+                jugador7Carta3Lbl.Text = jugador8Carta3Lbl.Text;
+                jugador7Carta4Lbl.Text = jugador8Carta4Lbl.Text;
+                jugador7FichasLbl.Text = jugador8FichasLbl.Text;
+                jugador7PuntosLbl.Text = jugador8PuntosLbl.Text;
+                jugador8NombreLbl.Text = "";
+                jugador8JugadoLbl.Text = "";
+                jugador8Carta1Lbl.Text = "";
+                jugador8Carta2Lbl.Text = "";
+                jugador8Carta3Lbl.Text = "";
+                jugador8Carta4Lbl.Text = "";
+                jugador8FichasLbl.Text = "";
+                jugador8PuntosLbl.Text = "";
+            }
+            else if (n == 5)
+            {
+                jugador6NombreLbl.Text = jugador7NombreLbl.Text;
+                jugador6JugadoLbl.Text = jugador7JugadoLbl.Text;
+                jugador6Carta1Lbl.Text = jugador7Carta1Lbl.Text;
+                jugador6Carta2Lbl.Text = jugador7Carta2Lbl.Text;
+                jugador6Carta3Lbl.Text = jugador7Carta3Lbl.Text;
+                jugador6Carta4Lbl.Text = jugador7Carta4Lbl.Text;
+                jugador6FichasLbl.Text = jugador7FichasLbl.Text;
+                jugador6PuntosLbl.Text = jugador7PuntosLbl.Text;
+                jugador7NombreLbl.Text = jugador8NombreLbl.Text;
+                jugador7JugadoLbl.Text = jugador8JugadoLbl.Text;
+                jugador7Carta1Lbl.Text = jugador8Carta1Lbl.Text;
+                jugador7Carta2Lbl.Text = jugador8Carta2Lbl.Text;
+                jugador7Carta3Lbl.Text = jugador8Carta3Lbl.Text;
+                jugador7Carta4Lbl.Text = jugador8Carta4Lbl.Text;
+                jugador7FichasLbl.Text = jugador8FichasLbl.Text;
+                jugador7PuntosLbl.Text = jugador8PuntosLbl.Text;
+                jugador8NombreLbl.Text = "";
+                jugador8JugadoLbl.Text = "";
+                jugador8Carta1Lbl.Text = "";
+                jugador8Carta2Lbl.Text = "";
+                jugador8Carta3Lbl.Text = "";
+                jugador8Carta4Lbl.Text = "";
+                jugador8FichasLbl.Text = "";
+                jugador8PuntosLbl.Text = "";
+            }
+            else if (n == 6)
+            {
+                jugador7NombreLbl.Text = jugador8NombreLbl.Text;
+                jugador7JugadoLbl.Text = jugador8JugadoLbl.Text;
+                jugador7Carta1Lbl.Text = jugador8Carta1Lbl.Text;
+                jugador7Carta2Lbl.Text = jugador8Carta2Lbl.Text;
+                jugador7Carta3Lbl.Text = jugador8Carta3Lbl.Text;
+                jugador7Carta4Lbl.Text = jugador8Carta4Lbl.Text;
+                jugador7FichasLbl.Text = jugador8FichasLbl.Text;
+                jugador7PuntosLbl.Text = jugador8PuntosLbl.Text;
+                jugador8NombreLbl.Text = "";
+                jugador8JugadoLbl.Text = "";
+                jugador8Carta1Lbl.Text = "";
+                jugador8Carta2Lbl.Text = "";
+                jugador8Carta3Lbl.Text = "";
+                jugador8Carta4Lbl.Text = "";
+                jugador8FichasLbl.Text = "";
+                jugador8PuntosLbl.Text = "";
+            }
+            else if (n == 7)
+            {
+                jugador8NombreLbl.Text = "";
+                jugador8JugadoLbl.Text = "";
+                jugador8Carta1Lbl.Text = "";
+                jugador8Carta2Lbl.Text = "";
+                jugador8Carta3Lbl.Text = "";
+                jugador8Carta4Lbl.Text = "";
+                jugador8FichasLbl.Text = "";
+                jugador8PuntosLbl.Text = "";
+            }
         }
 
         public void Accion12(string mensaje)
@@ -207,6 +530,10 @@ namespace Cliente
             //Guarda los nuevos valores y los muestra al usuario
             string[] separado = mensaje.Split('/');
             int n = Convert.ToInt32(separado[0]);
+            if (separado[1] == this.usuario)
+                this.banca = true;
+            else
+                this.banca = false;
             jugador1NombreLbl.Text = separado[1];
             jugador1JugadoLbl.Text = "0";
             jugador1Carta1Lbl.Text = "Carta 1";
@@ -479,7 +806,7 @@ namespace Cliente
 
         public void Accion13(string mensaje)
         {
-            //Función que es llamada cada vez que se recibe un mensaje para mostrar cartas
+            //Función que es llamada cada vez que se recibe un mensaje conforme comienza una partida
             //Quita los objetos de los parámetros iniciales y muestra las cartas que lleguen
             string[] separado = mensaje.Split('/');
             empezarBtn.Visible = false;
@@ -506,14 +833,31 @@ namespace Cliente
                 {
                     rendirseBtn.Enabled = false;
                     rendirseBtn.Visible = false;
-                    pedirBtn.Enabled = false;
-                    pedirBtn.Visible = false;
-                    plantarseBtn.Enabled = false;
-                    plantarseBtn.Visible = false;
-                    apostarBtn.Enabled = true;
-                    apostarBtn.Visible = true;
-                    apostarNum.Enabled = true;
-                    apostarNum.Visible = true;
+                    
+                    if (!banca)
+                    {
+                        apostarBtn.Enabled = true;
+                        apostarBtn.Visible = true;
+                        apostarBtn.Text = "Apostar";
+                        apostarNum.Enabled = true;
+                        apostarNum.Visible = true;
+                        pedirBtn.Enabled = false;
+                        pedirBtn.Visible = false;
+                        plantarseBtn.Enabled = false;
+                        plantarseBtn.Visible = false;
+                    }
+                    else
+                    {
+                        apostarBtn.Enabled = false;
+                        apostarBtn.Visible = false;
+                        apostarBtn.Text = "Apostar";
+                        apostarNum.Enabled = false;
+                        apostarNum.Visible = false;
+                        pedirBtn.Enabled = true;
+                        pedirBtn.Visible = true;
+                        plantarseBtn.Enabled = true;
+                        plantarseBtn.Visible = true;
+                    }
                 }
                 jugador1Carta1Lbl.Text = separado[1];
                 jugador1Carta2Lbl.Text = separado[2];
@@ -540,14 +884,31 @@ namespace Cliente
                 {
                     rendirseBtn.Enabled = false;
                     rendirseBtn.Visible = false;
-                    pedirBtn.Enabled = false;
-                    pedirBtn.Visible = false;
-                    plantarseBtn.Enabled = false;
-                    plantarseBtn.Visible = false;
-                    apostarBtn.Enabled = true;
-                    apostarBtn.Visible = true;
-                    apostarNum.Enabled = true;
-                    apostarNum.Visible = true;
+
+                    if (!banca)
+                    {
+                        apostarBtn.Enabled = true;
+                        apostarBtn.Visible = true;
+                        apostarBtn.Text = "Apostar";
+                        apostarNum.Enabled = true;
+                        apostarNum.Visible = true;
+                        pedirBtn.Enabled = false;
+                        pedirBtn.Visible = false;
+                        plantarseBtn.Enabled = false;
+                        plantarseBtn.Visible = false;
+                    }
+                    else
+                    {
+                        apostarBtn.Enabled = false;
+                        apostarBtn.Visible = false;
+                        apostarBtn.Text = "Apostar";
+                        apostarNum.Enabled = false;
+                        apostarNum.Visible = false;
+                        pedirBtn.Enabled = true;
+                        pedirBtn.Visible = true;
+                        plantarseBtn.Enabled = true;
+                        plantarseBtn.Visible = true;
+                    }
                 }
                 jugador2Carta1Lbl.Text = separado[1];
                 jugador2Carta2Lbl.Text = separado[2];
@@ -574,14 +935,31 @@ namespace Cliente
                 {
                     rendirseBtn.Enabled = false;
                     rendirseBtn.Visible = false;
-                    pedirBtn.Enabled = false;
-                    pedirBtn.Visible = false;
-                    plantarseBtn.Enabled = false;
-                    plantarseBtn.Visible = false;
-                    apostarBtn.Enabled = true;
-                    apostarBtn.Visible = true;
-                    apostarNum.Enabled = true;
-                    apostarNum.Visible = true;
+
+                    if (!banca)
+                    {
+                        apostarBtn.Enabled = true;
+                        apostarBtn.Visible = true;
+                        apostarBtn.Text = "Apostar";
+                        apostarNum.Enabled = true;
+                        apostarNum.Visible = true;
+                        pedirBtn.Enabled = false;
+                        pedirBtn.Visible = false;
+                        plantarseBtn.Enabled = false;
+                        plantarseBtn.Visible = false;
+                    }
+                    else
+                    {
+                        apostarBtn.Enabled = false;
+                        apostarBtn.Visible = false;
+                        apostarBtn.Text = "Apostar";
+                        apostarNum.Enabled = false;
+                        apostarNum.Visible = false;
+                        pedirBtn.Enabled = true;
+                        pedirBtn.Visible = true;
+                        plantarseBtn.Enabled = true;
+                        plantarseBtn.Visible = true;
+                    }
                 }
                 jugador3Carta1Lbl.Text = separado[1];
                 jugador3Carta2Lbl.Text = separado[2]; 
@@ -608,14 +986,31 @@ namespace Cliente
                 {
                     rendirseBtn.Enabled = false;
                     rendirseBtn.Visible = false;
-                    pedirBtn.Enabled = false;
-                    pedirBtn.Visible = false;
-                    plantarseBtn.Enabled = false;
-                    plantarseBtn.Visible = false;
-                    apostarBtn.Enabled = true;
-                    apostarBtn.Visible = true;
-                    apostarNum.Enabled = true;
-                    apostarNum.Visible = true;
+
+                    if (!banca)
+                    {
+                        apostarBtn.Enabled = true;
+                        apostarBtn.Visible = true;
+                        apostarBtn.Text = "Apostar";
+                        apostarNum.Enabled = true;
+                        apostarNum.Visible = true;
+                        pedirBtn.Enabled = false;
+                        pedirBtn.Visible = false;
+                        plantarseBtn.Enabled = false;
+                        plantarseBtn.Visible = false;
+                    }
+                    else
+                    {
+                        apostarBtn.Enabled = false;
+                        apostarBtn.Visible = false;
+                        apostarBtn.Text = "Apostar";
+                        apostarNum.Enabled = false;
+                        apostarNum.Visible = false;
+                        pedirBtn.Enabled = true;
+                        pedirBtn.Visible = true;
+                        plantarseBtn.Enabled = true;
+                        plantarseBtn.Visible = true;
+                    }
                 }
                 jugador4Carta1Lbl.Text = separado[1];
                 jugador4Carta2Lbl.Text = separado[2];
@@ -642,14 +1037,31 @@ namespace Cliente
                 {
                     rendirseBtn.Enabled = false;
                     rendirseBtn.Visible = false;
-                    pedirBtn.Enabled = false;
-                    pedirBtn.Visible = false;
-                    plantarseBtn.Enabled = false;
-                    plantarseBtn.Visible = false;
-                    apostarBtn.Enabled = true;
-                    apostarBtn.Visible = true;
-                    apostarNum.Enabled = true;
-                    apostarNum.Visible = true;
+
+                    if (!banca)
+                    {
+                        apostarBtn.Enabled = true;
+                        apostarBtn.Visible = true;
+                        apostarBtn.Text = "Apostar";
+                        apostarNum.Enabled = true;
+                        apostarNum.Visible = true;
+                        pedirBtn.Enabled = false;
+                        pedirBtn.Visible = false;
+                        plantarseBtn.Enabled = false;
+                        plantarseBtn.Visible = false;
+                    }
+                    else
+                    {
+                        apostarBtn.Enabled = false;
+                        apostarBtn.Visible = false;
+                        apostarBtn.Text = "Apostar";
+                        apostarNum.Enabled = false;
+                        apostarNum.Visible = false;
+                        pedirBtn.Enabled = true;
+                        pedirBtn.Visible = true;
+                        plantarseBtn.Enabled = true;
+                        plantarseBtn.Visible = true;
+                    }
                 }
                 jugador5Carta1Lbl.Text = separado[1];
                 jugador5Carta2Lbl.Text = separado[2];
@@ -676,14 +1088,31 @@ namespace Cliente
                 {
                     rendirseBtn.Enabled = false;
                     rendirseBtn.Visible = false;
-                    pedirBtn.Enabled = false;
-                    pedirBtn.Visible = false;
-                    plantarseBtn.Enabled = false;
-                    plantarseBtn.Visible = false;
-                    apostarBtn.Enabled = true;
-                    apostarBtn.Visible = true;
-                    apostarNum.Enabled = true;
-                    apostarNum.Visible = true;
+
+                    if (!banca)
+                    {
+                        apostarBtn.Enabled = true;
+                        apostarBtn.Visible = true;
+                        apostarBtn.Text = "Apostar";
+                        apostarNum.Enabled = true;
+                        apostarNum.Visible = true;
+                        pedirBtn.Enabled = false;
+                        pedirBtn.Visible = false;
+                        plantarseBtn.Enabled = false;
+                        plantarseBtn.Visible = false;
+                    }
+                    else
+                    {
+                        apostarBtn.Enabled = false;
+                        apostarBtn.Visible = false;
+                        apostarBtn.Text = "Apostar";
+                        apostarNum.Enabled = false;
+                        apostarNum.Visible = false;
+                        pedirBtn.Enabled = true;
+                        pedirBtn.Visible = true;
+                        plantarseBtn.Enabled = true;
+                        plantarseBtn.Visible = true;
+                    }
                 }
                 jugador6Carta1Lbl.Text = separado[1];
                 jugador6Carta2Lbl.Text = separado[2];
@@ -710,14 +1139,31 @@ namespace Cliente
                 {
                     rendirseBtn.Enabled = false;
                     rendirseBtn.Visible = false;
-                    pedirBtn.Enabled = false;
-                    pedirBtn.Visible = false;
-                    plantarseBtn.Enabled = false;
-                    plantarseBtn.Visible = false;
-                    apostarBtn.Enabled = true;
-                    apostarBtn.Visible = true;
-                    apostarNum.Enabled = true;
-                    apostarNum.Visible = true;
+
+                    if (!banca)
+                    {
+                        apostarBtn.Enabled = true;
+                        apostarBtn.Visible = true;
+                        apostarBtn.Text = "Apostar";
+                        apostarNum.Enabled = true;
+                        apostarNum.Visible = true;
+                        pedirBtn.Enabled = false;
+                        pedirBtn.Visible = false;
+                        plantarseBtn.Enabled = false;
+                        plantarseBtn.Visible = false;
+                    }
+                    else
+                    {
+                        apostarBtn.Enabled = false;
+                        apostarBtn.Visible = false;
+                        apostarBtn.Text = "Apostar";
+                        apostarNum.Enabled = false;
+                        apostarNum.Visible = false;
+                        pedirBtn.Enabled = true;
+                        pedirBtn.Visible = true;
+                        plantarseBtn.Enabled = true;
+                        plantarseBtn.Visible = true;
+                    }
                 }
                 jugador7Carta1Lbl.Text = separado[1];
                 jugador7Carta2Lbl.Text = separado[2];
@@ -744,14 +1190,31 @@ namespace Cliente
                 {
                     rendirseBtn.Enabled = false;
                     rendirseBtn.Visible = false;
-                    pedirBtn.Enabled = false;
-                    pedirBtn.Visible = false;
-                    plantarseBtn.Enabled = false;
-                    plantarseBtn.Visible = false;
-                    apostarBtn.Enabled = true;
-                    apostarBtn.Visible = true;
-                    apostarNum.Enabled = true;
-                    apostarNum.Visible = true;
+
+                    if (!banca)
+                    {
+                        apostarBtn.Enabled = true;
+                        apostarBtn.Visible = true;
+                        apostarBtn.Text = "Apostar";
+                        apostarNum.Enabled = true;
+                        apostarNum.Visible = true;
+                        pedirBtn.Enabled = false;
+                        pedirBtn.Visible = false;
+                        plantarseBtn.Enabled = false;
+                        plantarseBtn.Visible = false;
+                    }
+                    else
+                    {
+                        apostarBtn.Enabled = false;
+                        apostarBtn.Visible = false;
+                        apostarBtn.Text = "Apostar";
+                        apostarNum.Enabled = false;
+                        apostarNum.Visible = false;
+                        pedirBtn.Enabled = true;
+                        pedirBtn.Visible = true;
+                        plantarseBtn.Enabled = true;
+                        plantarseBtn.Visible = true;
+                    }
                 }
                 jugador8Carta1Lbl.Text = separado[1];
                 jugador8Carta2Lbl.Text = separado[2];
@@ -1188,6 +1651,236 @@ namespace Cliente
             }
         }
 
+        public void Accion15(string mensaje)
+        {
+            string[] separado = mensaje.Split('/');
+            int n = Convert.ToInt32(separado[0]);
+            int fichas = Convert.ToInt32(separado[1]);
+            int puntos = Convert.ToInt32(separado[2]);
+            int numCartas = Convert.ToInt32(separado[3]);
+            if (n == 0)
+            {
+                jugador1FichasLbl.Text = fichas.ToString();
+                jugador1PuntosLbl.Text = puntos.ToString();
+                if (numCartas == 1)
+                {
+                    jugador1Carta1Lbl.Text = separado[4];
+                }
+                else if (numCartas == 2)
+                {
+                    jugador1Carta1Lbl.Text = separado[4];
+                    jugador1Carta2Lbl.Text = separado[5];
+                }
+                else if (numCartas == 3)
+                {
+                    jugador1Carta1Lbl.Text = separado[4];
+                    jugador1Carta2Lbl.Text = separado[5];
+                    jugador1Carta3Lbl.Text = separado[6];
+                }
+                else if (numCartas == 4)
+                {
+                    jugador1Carta1Lbl.Text = separado[4];
+                    jugador1Carta2Lbl.Text = separado[5];
+                    jugador1Carta3Lbl.Text = separado[6];
+                    jugador1Carta4Lbl.Text = separado[7];
+                }
+            }
+            else if (n == 1)
+            {
+                jugador2FichasLbl.Text = fichas.ToString();
+                jugador2PuntosLbl.Text = puntos.ToString();
+                if (numCartas == 1)
+                {
+                    jugador2Carta1Lbl.Text = separado[4];
+                }
+                else if (numCartas == 2)
+                {
+                    jugador2Carta1Lbl.Text = separado[4];
+                    jugador2Carta2Lbl.Text = separado[5];
+                }
+                else if (numCartas == 3)
+                {
+                    jugador2Carta1Lbl.Text = separado[4];
+                    jugador2Carta2Lbl.Text = separado[5];
+                    jugador2Carta3Lbl.Text = separado[6];
+                }
+                else if (numCartas == 4)
+                {
+                    jugador2Carta1Lbl.Text = separado[4];
+                    jugador2Carta2Lbl.Text = separado[5];
+                    jugador2Carta3Lbl.Text = separado[6];
+                    jugador2Carta4Lbl.Text = separado[7];
+                }
+            }
+            else if (n == 2)
+            {
+                jugador3FichasLbl.Text = fichas.ToString();
+                jugador3PuntosLbl.Text = puntos.ToString();
+                if (numCartas == 1)
+                {
+                    jugador3Carta1Lbl.Text = separado[4];
+                }
+                else if (numCartas == 2)
+                {
+                    jugador3Carta1Lbl.Text = separado[4];
+                    jugador3Carta2Lbl.Text = separado[5];
+                }
+                else if (numCartas == 3)
+                {
+                    jugador3Carta1Lbl.Text = separado[4];
+                    jugador3Carta2Lbl.Text = separado[5];
+                    jugador3Carta3Lbl.Text = separado[6];
+                }
+                else if (numCartas == 4)
+                {
+                    jugador3Carta1Lbl.Text = separado[4];
+                    jugador3Carta2Lbl.Text = separado[5];
+                    jugador3Carta3Lbl.Text = separado[6];
+                    jugador3Carta4Lbl.Text = separado[7];
+                }
+            }
+            else if (n == 3)
+            {
+                jugador4FichasLbl.Text = fichas.ToString();
+                jugador4PuntosLbl.Text = puntos.ToString();
+                if (numCartas == 1)
+                {
+                    jugador4Carta1Lbl.Text = separado[4];
+                }
+                else if (numCartas == 2)
+                {
+                    jugador4Carta1Lbl.Text = separado[4];
+                    jugador4Carta2Lbl.Text = separado[5];
+                }
+                else if (numCartas == 3)
+                {
+                    jugador4Carta1Lbl.Text = separado[4];
+                    jugador4Carta2Lbl.Text = separado[5];
+                    jugador4Carta3Lbl.Text = separado[6];
+                }
+                else if (numCartas == 4)
+                {
+                    jugador4Carta1Lbl.Text = separado[4];
+                    jugador4Carta2Lbl.Text = separado[5];
+                    jugador4Carta3Lbl.Text = separado[6];
+                    jugador4Carta4Lbl.Text = separado[7];
+                }
+            }
+            else if (n == 4)
+            {
+                jugador5FichasLbl.Text = fichas.ToString();
+                jugador5PuntosLbl.Text = puntos.ToString();
+                if (numCartas == 1)
+                {
+                    jugador5Carta1Lbl.Text = separado[4];
+                }
+                else if (numCartas == 2)
+                {
+                    jugador5Carta1Lbl.Text = separado[4];
+                    jugador5Carta2Lbl.Text = separado[5];
+                }
+                else if (numCartas == 3)
+                {
+                    jugador5Carta1Lbl.Text = separado[4];
+                    jugador5Carta2Lbl.Text = separado[5];
+                    jugador5Carta3Lbl.Text = separado[6];
+                }
+                else if (numCartas == 4)
+                {
+                    jugador5Carta1Lbl.Text = separado[4];
+                    jugador5Carta2Lbl.Text = separado[5];
+                    jugador5Carta3Lbl.Text = separado[6];
+                    jugador5Carta4Lbl.Text = separado[7];
+                }
+            }
+            else if (n == 5)
+            {
+                jugador6FichasLbl.Text = fichas.ToString();
+                jugador6PuntosLbl.Text = puntos.ToString();
+                if (numCartas == 1)
+                {
+                    jugador6Carta1Lbl.Text = separado[4];
+                }
+                else if (numCartas == 2)
+                {
+                    jugador6Carta1Lbl.Text = separado[4];
+                    jugador6Carta2Lbl.Text = separado[5];
+                }
+                else if (numCartas == 3)
+                {
+                    jugador6Carta1Lbl.Text = separado[4];
+                    jugador6Carta2Lbl.Text = separado[5];
+                    jugador6Carta3Lbl.Text = separado[6];
+                }
+                else if (numCartas == 4)
+                {
+                    jugador6Carta1Lbl.Text = separado[4];
+                    jugador6Carta2Lbl.Text = separado[5];
+                    jugador6Carta3Lbl.Text = separado[6];
+                    jugador6Carta4Lbl.Text = separado[7];
+                }
+            }
+            else if (n == 6)
+            {
+                jugador7FichasLbl.Text = fichas.ToString();
+                jugador7PuntosLbl.Text = puntos.ToString();
+                if (numCartas == 1)
+                {
+                    jugador7Carta1Lbl.Text = separado[4];
+                }
+                else if (numCartas == 2)
+                {
+                    jugador7Carta1Lbl.Text = separado[4];
+                    jugador7Carta2Lbl.Text = separado[5];
+                }
+                else if (numCartas == 3)
+                {
+                    jugador7Carta1Lbl.Text = separado[4];
+                    jugador7Carta2Lbl.Text = separado[5];
+                    jugador7Carta3Lbl.Text = separado[6];
+                }
+                else if (numCartas == 4)
+                {
+                    jugador7Carta1Lbl.Text = separado[4];
+                    jugador7Carta2Lbl.Text = separado[5];
+                    jugador7Carta3Lbl.Text = separado[6];
+                    jugador7Carta4Lbl.Text = separado[7];
+                }
+            }
+            else if (n == 7)
+            {
+                jugador8FichasLbl.Text = fichas.ToString();
+                jugador8PuntosLbl.Text = puntos.ToString();
+                if (numCartas == 1)
+                {
+                    jugador8Carta1Lbl.Text = separado[4];
+                }
+                else if (numCartas == 2)
+                {
+                    jugador8Carta1Lbl.Text = separado[4];
+                    jugador8Carta2Lbl.Text = separado[5];
+                }
+                else if (numCartas == 3)
+                {
+                    jugador8Carta1Lbl.Text = separado[4];
+                    jugador8Carta2Lbl.Text = separado[5];
+                    jugador8Carta3Lbl.Text = separado[6];
+                }
+                else if (numCartas == 4)
+                {
+                    jugador8Carta1Lbl.Text = separado[4];
+                    jugador8Carta2Lbl.Text = separado[5];
+                    jugador8Carta3Lbl.Text = separado[6];
+                    jugador8Carta4Lbl.Text = separado[7];
+                }
+            }
+        }
+
+        public void Accion16(string mensaje)
+        {
+
+        }
+
         private void enviar_Btn_Click(object sender, EventArgs e)
         {
             //Evento llamado cuando el usuario pulsa el botón "Enviar". Envía el mensaje que ha escrito en el textBox al servidor.
@@ -1247,12 +1940,6 @@ namespace Cliente
             //Se envia la decisión al servidor y bloqueamos los objetos relacionados con acciones en la ronda
             string mensaje = "14/" + this.ID + "/1";
             server.Enviar(mensaje);
-            
-            /*rendirseBtn.Enabled = false;
-            pedirBtn.Enabled = false;
-            plantarseBtn.Enabled = false;
-            apostarBtn.Enabled = false;
-            apostarNum.Enabled = false;*/
         }
 
         private void plantarseBtn_Click(object sender, EventArgs e)

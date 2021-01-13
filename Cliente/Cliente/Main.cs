@@ -103,6 +103,16 @@ namespace Cliente
                     delegado = new DelegadoRespuesta(Accion14);
                     this.Invoke(delegado, new object[] { mensaje });
                     break;
+
+                case 15:
+                    delegado = new DelegadoRespuesta(Accion15);
+                    this.Invoke(delegado, new object[] { mensaje });
+                    break;
+
+                case 16:
+                    delegado = new DelegadoRespuesta(Accion16);
+                    this.Invoke(delegado, new object[] { mensaje });
+                    break;
             } 
         }
 
@@ -204,7 +214,7 @@ namespace Cliente
             string[] separado = mensaje.Split('/');
             for (int j = 0; j < cont_forms; j++)
                 if (lista_forms_partidas[j].getID() == Convert.ToInt32(separado[0]))
-                    lista_forms_partidas[j].TomaRespuesta(7, "");
+                    lista_forms_partidas[j].TomaRespuesta(7, separado[1]);
         }
 
         public void Accion8(string mensaje)
@@ -311,6 +321,33 @@ namespace Cliente
                     else if (separado[2] == "3")
                         lista_forms_partidas[j].TomaRespuesta(14, separado[1] + "/" + separado[2] + "/" + separado[3] + "/" + separado[4]);
                 }
+        }
+
+        public void Accion15(string mensaje)
+        {
+            string[] separado = mensaje.Split('/');
+            for (int j = 0; j < cont_forms; j++)
+                if (lista_forms_partidas[j].getID() == Convert.ToInt32(separado[0]))
+                {
+                    if(separado[4] == "0")
+                        lista_forms_partidas[j].TomaRespuesta(15, separado[1] + "/" + separado[2] + "/" + separado[3] + "/" + separado[4]);
+                    else if (separado[4] == "1")
+                        lista_forms_partidas[j].TomaRespuesta(15, separado[1] + "/" + separado[2] + "/" + separado[3] + "/" + separado[4] + "/" + separado[5]);
+                    else if (separado[4] == "2")
+                        lista_forms_partidas[j].TomaRespuesta(15, separado[1] + "/" + separado[2] + "/" + separado[3] + "/" + separado[4] + "/" + separado[5] + "/" + separado[6]);
+                    else if (separado[4] == "3")
+                        lista_forms_partidas[j].TomaRespuesta(15, separado[1] + "/" + separado[2] + "/" + separado[3] + "/" + separado[4] + "/" + separado[5] + "/" + separado[6] + "/" + separado[7]);
+                    else if (separado[4] == "4")
+                        lista_forms_partidas[j].TomaRespuesta(15, separado[1] + "/" + separado[2] + "/" + separado[3] + "/" + separado[4] + "/" + separado[5] + "/" + separado[6] + "/" + separado[7] + "/" + separado[8]);
+                }
+        }
+
+        public void Accion16(string mensaje)
+        {
+            string[] separado = mensaje.Split('/');
+            for (int j = 0; j < cont_forms; j++)
+                if (lista_forms_partidas[j].getID() == Convert.ToInt32(separado[0]))
+                    lista_forms_partidas[j].TomaRespuesta(16, separado[1] + "/" + separado[2] + "/" + separado[3]);
         }
 
         private void Form1_Load(object sender, EventArgs e)
