@@ -237,10 +237,10 @@ namespace Cliente
 
             else if (separado[0] == "0")
             {
-                int i = 0;
+                int i = 2;
                 string ganadores = null;
 
-                while (i < Convert.ToInt32(separado[1]))
+                while (i - 2 < Convert.ToInt32(separado[1]))
                 {
                     ganadores += separado[i] + ",";
                     i++;

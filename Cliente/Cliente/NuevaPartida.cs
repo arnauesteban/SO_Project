@@ -791,42 +791,42 @@ namespace Cliente
             {
                 if (n == 0)
                 {
-                    jugador1FichasLbl.Text = ((Convert.ToInt32(jugador1FichasLbl)) - ((Convert.ToInt32(jugador1JugadoLbl) / 2))).ToString();
+                    jugador1FichasLbl.Text = ((Convert.ToInt32(jugador1FichasLbl.Text)) - ((Convert.ToInt32(jugador1JugadoLbl.Text) / 2))).ToString();
                     jugador1JugadoLbl.Text = "0";
                 }
                 else if (n == 1)
                 {
-                    jugador2FichasLbl.Text = ((Convert.ToInt32(jugador2FichasLbl)) - ((Convert.ToInt32(jugador2JugadoLbl) / 2))).ToString();
+                    jugador2FichasLbl.Text = ((Convert.ToInt32(jugador2FichasLbl.Text)) - ((Convert.ToInt32(jugador2JugadoLbl.Text) / 2))).ToString();
                     jugador2JugadoLbl.Text = "0";
                 }
                 else if (n == 2)
                 {
-                    jugador3FichasLbl.Text = ((Convert.ToInt32(jugador3FichasLbl)) - ((Convert.ToInt32(jugador3JugadoLbl) / 2))).ToString();
+                    jugador3FichasLbl.Text = ((Convert.ToInt32(jugador3FichasLbl.Text)) - ((Convert.ToInt32(jugador3JugadoLbl.Text) / 2))).ToString();
                     jugador3JugadoLbl.Text = "0";
                 }
                 else if (n == 3)
                 {
-                    jugador4FichasLbl.Text = ((Convert.ToInt32(jugador4FichasLbl)) - ((Convert.ToInt32(jugador4JugadoLbl) / 2))).ToString();
+                    jugador4FichasLbl.Text = ((Convert.ToInt32(jugador4FichasLbl.Text)) - ((Convert.ToInt32(jugador4JugadoLbl.Text) / 2))).ToString();
                     jugador4JugadoLbl.Text = "0";
                 }
                 else if (n == 4)
                 {
-                    jugador5FichasLbl.Text = ((Convert.ToInt32(jugador5FichasLbl)) - ((Convert.ToInt32(jugador5JugadoLbl) / 2))).ToString();
+                    jugador5FichasLbl.Text = ((Convert.ToInt32(jugador5FichasLbl.Text)) - ((Convert.ToInt32(jugador5JugadoLbl.Text) / 2))).ToString();
                     jugador5JugadoLbl.Text = "0";
                 }
                 else if (n == 5)
                 {
-                    jugador6FichasLbl.Text = ((Convert.ToInt32(jugador6FichasLbl)) - ((Convert.ToInt32(jugador6JugadoLbl) / 2))).ToString();
+                    jugador6FichasLbl.Text = ((Convert.ToInt32(jugador6FichasLbl.Text)) - ((Convert.ToInt32(jugador6JugadoLbl.Text) / 2))).ToString();
                     jugador6JugadoLbl.Text = "0";
                 }
                 else if (n == 6)
                 {
-                    jugador7FichasLbl.Text = ((Convert.ToInt32(jugador7FichasLbl)) - ((Convert.ToInt32(jugador7JugadoLbl) / 2))).ToString();
+                    jugador7FichasLbl.Text = ((Convert.ToInt32(jugador7FichasLbl.Text)) - ((Convert.ToInt32(jugador7JugadoLbl.Text) / 2))).ToString();
                     jugador7JugadoLbl.Text = "0";
                 }
                 else if (n == 7)
                 {
-                    jugador8FichasLbl.Text = ((Convert.ToInt32(jugador8FichasLbl)) - ((Convert.ToInt32(jugador8JugadoLbl) / 2))).ToString();
+                    jugador8FichasLbl.Text = ((Convert.ToInt32(jugador8FichasLbl.Text)) - ((Convert.ToInt32(jugador8JugadoLbl.Text) / 2))).ToString();
                     jugador8JugadoLbl.Text = "0";
                 }
             }
@@ -1013,7 +1013,7 @@ namespace Cliente
             {
                 if (jugador1NombreLbl.Text == this.usuario)
                 {
-                    jugador1JugadoLbl.Text = (2 * Convert.ToInt32(jugador1JugadoLbl)).ToString();
+                    jugador1JugadoLbl.Text = (2 * Convert.ToInt32(jugador1JugadoLbl.Text)).ToString();
                     jugador1PuntosLbl.Text = separado[2];
                     if (jugador1Carta3Lbl.Text == "Carta 3")
                         jugador1Carta3Lbl.Text = separado[3];
@@ -1036,7 +1036,7 @@ namespace Cliente
                 }
                 else if (jugador2NombreLbl.Text == this.usuario)
                 {
-                    jugador2JugadoLbl.Text = (2 * Convert.ToInt32(jugador2JugadoLbl)).ToString();
+                    jugador2JugadoLbl.Text = (2 * Convert.ToInt32(jugador2JugadoLbl.Text)).ToString();
                     jugador2PuntosLbl.Text = separado[2];
                     if (jugador2Carta3Lbl.Text == "Carta 3")
                         jugador2Carta3Lbl.Text = separado[3];
@@ -1058,7 +1058,7 @@ namespace Cliente
                 }
                 else if (jugador3NombreLbl.Text == this.usuario)
                 {
-                    jugador3JugadoLbl.Text = (2 * Convert.ToInt32(jugador3JugadoLbl)).ToString();
+                    jugador3JugadoLbl.Text = (2 * Convert.ToInt32(jugador3JugadoLbl.Text)).ToString();
                     jugador3PuntosLbl.Text = separado[2];
                     if (jugador3Carta3Lbl.Text == "Carta 3")
                         jugador3Carta3Lbl.Text = separado[3];
@@ -1080,7 +1080,7 @@ namespace Cliente
                 }
                 else if (jugador4NombreLbl.Text == this.usuario)
                 {
-                    jugador4JugadoLbl.Text = (2 * Convert.ToInt32(jugador4JugadoLbl)).ToString();
+                    jugador4JugadoLbl.Text = (2 * Convert.ToInt32(jugador4JugadoLbl.Text)).ToString();
                     jugador4PuntosLbl.Text = separado[2];
                     if (jugador4Carta3Lbl.Text == "Carta 3")
                         jugador4Carta3Lbl.Text = separado[3];
@@ -1102,7 +1102,7 @@ namespace Cliente
                 }
                 else if (jugador5NombreLbl.Text == this.usuario)
                 {
-                    jugador5JugadoLbl.Text = (2 * Convert.ToInt32(jugador5JugadoLbl)).ToString();
+                    jugador5JugadoLbl.Text = (2 * Convert.ToInt32(jugador5JugadoLbl.Text)).ToString();
                     jugador5PuntosLbl.Text = separado[2];
                     if (jugador5Carta3Lbl.Text == "Carta 3")
                         jugador5Carta3Lbl.Text = separado[3];
@@ -1123,7 +1123,7 @@ namespace Cliente
                 }
                 else if (jugador6NombreLbl.Text == this.usuario)
                 {
-                    jugador6JugadoLbl.Text = (2 * Convert.ToInt32(jugador6JugadoLbl)).ToString();
+                    jugador6JugadoLbl.Text = (2 * Convert.ToInt32(jugador6JugadoLbl.Text)).ToString();
                     jugador6PuntosLbl.Text = separado[2];
                     if (jugador6Carta3Lbl.Text == "Carta 3")
                         jugador6Carta3Lbl.Text = separado[3];
@@ -1144,7 +1144,7 @@ namespace Cliente
                 }
                 else if (jugador7NombreLbl.Text == this.usuario)
                 {
-                    jugador7JugadoLbl.Text = (2 * Convert.ToInt32(jugador7JugadoLbl)).ToString();
+                    jugador7JugadoLbl.Text = (2 * Convert.ToInt32(jugador7JugadoLbl.Text)).ToString();
                     jugador7PuntosLbl.Text = separado[2];
                     if (jugador7Carta3Lbl.Text == "Carta 3")
                         jugador7Carta3Lbl.Text = separado[3];
@@ -1166,7 +1166,7 @@ namespace Cliente
                 }
                 else if (jugador8NombreLbl.Text == this.usuario)
                 {
-                    jugador8JugadoLbl.Text = (2 * Convert.ToInt32(jugador8JugadoLbl)).ToString();
+                    jugador8JugadoLbl.Text = (2 * Convert.ToInt32(jugador8JugadoLbl.Text)).ToString();
                     jugador8PuntosLbl.Text = separado[2];
                     if (jugador8Carta3Lbl.Text == "Carta 3")
                         jugador8Carta3Lbl.Text = separado[3];

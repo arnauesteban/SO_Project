@@ -886,19 +886,24 @@ void *AtenderCliente (void *socket){
 				else {
 					char respuesta[400];
 					char ganadores[300];
+					strcpy(ganadores, "");
 					
 					int i=0;
 					strcpy(respuesta, "9$0/");
 					
 					while (row != NULL){
-						char var[400];
+						char var[20];
+						strcpy(var, "");
 						strcpy(var, row[0]);
-						sprintf(ganadores, "/%s",var);
+						sprintf(ganadores, "%s%s/", ganadores, var);
 						i++;
 						row = mysql_fetch_row (resultado);
 					}
-				
-					sprintf(respuesta, "%s%d%s", respuesta,i, ganadores);
+					
+					//eliminamos el ultimo caracter '/'
+					ganadores[strlen(ganadores)-1] = '\0';
+					
+					sprintf(respuesta, "%s%d/%s", respuesta, i, ganadores);
 					write(sock_conn, respuesta, strlen(respuesta));
 					printf("%s", respuesta);
 				}
