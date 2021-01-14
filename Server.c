@@ -10,7 +10,6 @@
 #include <pthread.h>
 #include <time.h>
 
-
 //Estructura usuario
 typedef struct {
 	char nombre[20];
@@ -50,6 +49,8 @@ typedef struct {
 	int ID;
 	TListaJugadores lista_jugadores;
 	TBaraja baraja;
+	int horaInicio;
+	int minutoInicio;
 } TPartida;
 
 typedef struct {
@@ -409,34 +410,45 @@ int getIndexPartida(int ID_partida) {
 }
 
 void pedirCarta(int l, int j, int carta) {
+	//Funcion a la que se llama cuando se debe dar una carta a un cliente
+	//La carta es un as
 	if(lista_partidas.partida[l].baraja.numero[carta] == 1) {
+		//Si la suma de los puntos que ya tiene y los del as es menor o igual a 21, se suma 11 a los puntos
 		if(lista_partidas.partida[l].baraja.numero[carta] 
 				+ lista_partidas.partida[l].lista_jugadores.usuario[j].puntos <= 21) 
 		{
 			lista_partidas.partida[l].lista_jugadores.usuario[j].as++;
 			lista_partidas.partida[l].lista_jugadores.usuario[j].puntos += 11;
 		}
+		//En caso de pasarse el as vale 1
 		else
 		   lista_partidas.partida[l].lista_jugadores.usuario[j].puntos += 1;
 	}
+	//La carta es un 10 o una figura (J, Q, K)
 	else if(lista_partidas.partida[l].baraja.numero[carta] > 10) {
+		//Si se pasa de puntos y tiene un as de valor 11, el as pasa a tener valor 1
 		if(lista_partidas.partida[l].lista_jugadores.usuario[j].puntos 
 				+ lista_partidas.partida[l].baraja.numero[carta] > 21 
 				&& lista_partidas.partida[l].lista_jugadores.usuario[j].as > 0) {
 			lista_partidas.partida[l].lista_jugadores.usuario[j].as--;
 		}
+		//En caso contrario se suman los puntos
 		else
 		   lista_partidas.partida[l].lista_jugadores.usuario[j].puntos += 10;
 	}
+	//La carta es un numero
 	else {
+		//Si se pasa de puntos y tiene un as de valor 11, el as pasa a tener valor 1
 		if(lista_partidas.partida[l].lista_jugadores.usuario[j].puntos 
 				+ lista_partidas.partida[l].baraja.numero[carta] > 21 
 				&& lista_partidas.partida[l].lista_jugadores.usuario[j].as > 0) {
 			lista_partidas.partida[l].lista_jugadores.usuario[j].as--;
 			lista_partidas.partida[l].lista_jugadores.usuario[j].puntos -= 10;
 		}
+		//En caso contrario se suman los puntos
 		lista_partidas.partida[l].lista_jugadores.usuario[j].puntos += lista_partidas.partida[l].baraja.numero[carta];
 	}
+	//Si se tiene mas de 20 puntos se da el turno del jugador por terminado
 	if(lista_partidas.partida[l].lista_jugadores.usuario[j].puntos > 20)
 		lista_partidas.partida[l].lista_jugadores.usuario[j].estado = 'F';
 	sprintf(lista_partidas.partida[l].lista_jugadores.usuario[j].mano, "%s%d-%d/", lista_partidas.partida[l].lista_jugadores.usuario[j].mano, 
@@ -444,11 +456,14 @@ void pedirCarta(int l, int j, int carta) {
 	lista_partidas.partida[l].lista_jugadores.usuario[j].numCartas++;
 }
 
-void terminarRonda(int l, int ID_partida) {
+void terminarRonda(int l, int ID_partida, MYSQL *conn) {
+	//Funcion a la que se llama cuando todos los jugadores terminan su turno
 	sleep(1);
 	char mensaje[200];
 	strcpy(mensaje, "Todos los jugadores han terminado su turno.");
 	EnviarMensajeChat(mensaje, ID_partida);
+	
+	//Enviamos un mensaje con el resultado de la banca
 	sleep(1);
 	char mensaje0[200];
 	if(lista_partidas.partida[l].lista_jugadores.usuario[0].puntos > 21) {
@@ -459,9 +474,11 @@ void terminarRonda(int l, int ID_partida) {
 		sprintf(mensaje0, "La banca tiene %d puntos.", lista_partidas.partida[l].lista_jugadores.usuario[0].puntos);
 		EnviarMensajeChat(mensaje0, ID_partida);
 	}
-	sleep(1);
 	
+	//Bucle para enviar los resultados del resto de jugadores
+	sleep(1);
 	for(int i = 1; i < lista_partidas.partida[l].lista_jugadores.num; i++) {
+		//Si se ha rendido, no se envian las cartas
 		if(lista_partidas.partida[l].lista_jugadores.usuario[i].jugado == 0) {
 			char mensaje2[200];
 			sprintf(mensaje2, "15$%d/%d/%d/0/0", ID_partida, i, lista_partidas.partida[l].lista_jugadores.usuario[i].fichas);
@@ -469,6 +486,7 @@ void terminarRonda(int l, int ID_partida) {
 				write(lista_partidas.partida[l].lista_jugadores.usuario[q].sock, mensaje2, strlen(mensaje2));
 			printf("se ha enviado %s\n", mensaje2);
 		}
+		//Si ambos se han pasado de puntos, se envia mensaje y el jugador recupera su apuesta
 		else if(lista_partidas.partida[l].lista_jugadores.usuario[i].puntos > 21 && lista_partidas.partida[l].lista_jugadores.usuario[0].puntos > 21) {
 			char mensaje1[200];
 			sprintf(mensaje1, "%s tambien se ha pasado de puntos. Recpuera su apuesta.", lista_partidas.partida[l].lista_jugadores.usuario[i].nombre);
@@ -484,6 +502,7 @@ void terminarRonda(int l, int ID_partida) {
 				write(lista_partidas.partida[l].lista_jugadores.usuario[q].sock, mensaje2, strlen(mensaje2));
 			printf("se ha enviado %s\n", mensaje2);
 		}
+		//Si el jugador se ha pasado de puntos, se envia mensaje y pierde la apuesta
 		else if(lista_partidas.partida[l].lista_jugadores.usuario[i].puntos > 21) {
 			char mensaje1[200];
 			sprintf(mensaje1, "%s se ha pasado de puntos. Pierde su apuesta.", lista_partidas.partida[l].lista_jugadores.usuario[i].nombre);
@@ -502,6 +521,7 @@ void terminarRonda(int l, int ID_partida) {
 				write(lista_partidas.partida[l].lista_jugadores.usuario[q].sock, mensaje2, strlen(mensaje2));
 			printf("se ha enviado %s\n", mensaje2);
 		}
+		//Si la banca se ha pasado de puntos, se envia mensaje y el jugador recibe el doble de lo apostado
 		else if(lista_partidas.partida[l].lista_jugadores.usuario[0].puntos > 21) {
 			char mensaje1[200];
 			sprintf(mensaje1, "%s tiene %d puntos. Recupera el doble de lo apostado.", 
@@ -521,6 +541,7 @@ void terminarRonda(int l, int ID_partida) {
 				write(lista_partidas.partida[l].lista_jugadores.usuario[q].sock, mensaje2, strlen(mensaje2));
 			printf("se ha enviado %s\n", mensaje2);
 		}
+		//Si han empatado a puntos, se envia mensaje y el jugador recupera su apuesta
 		else if(lista_partidas.partida[l].lista_jugadores.usuario[i].puntos == lista_partidas.partida[l].lista_jugadores.usuario[0].puntos) {
 			char mensaje1[200];
 			sprintf(mensaje1, "%s tiene %d puntos. Ha empatado con la banca. Recupera su apuesta.", 
@@ -538,6 +559,7 @@ void terminarRonda(int l, int ID_partida) {
 				write(lista_partidas.partida[l].lista_jugadores.usuario[q].sock, mensaje2, strlen(mensaje2));
 			printf("se ha enviado %s\n", mensaje2);
 		}
+		//Si el jugador tiene menos puntos que la banca se envia mensaje y pierde lo apostado
 		else if(lista_partidas.partida[l].lista_jugadores.usuario[i].puntos < lista_partidas.partida[l].lista_jugadores.usuario[0].puntos) {
 			char mensaje1[200];
 			sprintf(mensaje1, "%s tiene %d puntos. Tiene menos puntos que la banca. Pierde lo apostado.", 
@@ -557,6 +579,7 @@ void terminarRonda(int l, int ID_partida) {
 				write(lista_partidas.partida[l].lista_jugadores.usuario[q].sock, mensaje2, strlen(mensaje2));
 			printf("se ha enviado %s\n", mensaje2);
 		}
+		//Si el jugador tiene mas puntos que la banca, se envia mensaje y recupera el doble de lo apostado
 		else if(lista_partidas.partida[l].lista_jugadores.usuario[i].puntos > lista_partidas.partida[l].lista_jugadores.usuario[0].puntos) {
 			char mensaje1[200];
 			sprintf(mensaje1, "%s tiene %d puntos. Tiene mas puntos que la banca. Recupera el doble de lo apostado.", 
@@ -579,6 +602,7 @@ void terminarRonda(int l, int ID_partida) {
 		sleep(1);
 	}
 	
+	//Se envia los resultados de la banca
 	sprintf(mensaje0, "15$%d/0/%d/%d/%d/%s", ID_partida, lista_partidas.partida[l].lista_jugadores.usuario[0].fichas,  
 			lista_partidas.partida[l].lista_jugadores.usuario[0].puntos, lista_partidas.partida[l].lista_jugadores.usuario[0].numCartas, 
 			lista_partidas.partida[l].lista_jugadores.usuario[0].mano);
@@ -587,8 +611,14 @@ void terminarRonda(int l, int ID_partida) {
 	printf("se ha enviado %s\n", mensaje0);
 	sleep(1);
 	
+	//Si la banca se ha quedado sin dinero se acaba la partida
 	if(lista_partidas.partida[l].lista_jugadores.usuario[0].fichas <= 0) {
-		terminarPartida(ID_partida);
+		int n = 1;
+		int fichas = lista_partidas.partida[l].lista_jugadores.usuario[1].fichas;
+		for(int e = 2; e < lista_partidas.partida[l].lista_jugadores.num; e++)
+			if(lista_partidas.partida[l].lista_jugadores.usuario[e].fichas + fichas)
+				n = e;
+		terminarPartida(ID_partida, lista_partidas.partida[l].lista_jugadores.usuario[n].nombre, conn);
 	}
 	else {
 	    int j = 1;
@@ -599,19 +629,72 @@ void terminarRonda(int l, int ID_partida) {
 			else
 				j++;
 		}
+		//Si solo queda la banca con fichas se acaba la partida
 		if(!encontrado)
-			terminarPartida(ID_partida);
+			terminarPartida(ID_partida, lista_partidas.partida[l].lista_jugadores.usuario[0].nombre, conn);
 	}
 }
 
-void terminarPartida(int ID_partida) {
+void terminarPartida(int ID_partida, char ganador[20], MYSQL *conn) {
+	//Funcion a la que se llama cuando la partida termina
+	int l = getIndexPartida(ID_partida);
+	
 	sleep(1);
 	char mensaje[200];
 	strcpy(mensaje, "Termina la partida.");
 	EnviarMensajeChat(mensaje, ID_partida);
+	
+	struct tm * fecha_hora;
+	time_t segundos;
+	segundos = time(NULL); // obtiene los segundos desde 1-1-1970 /
+	fecha_hora=localtime(&segundos); // convierte los 'segundos' en la hora local 
+
+	int horas = fecha_hora->tm_hour - lista_partidas.partida[l].horaInicio;
+	int minutos = fecha_hora->tm_min - lista_partidas.partida[l].minutoInicio;
+	while(horas > 0) {
+		minutos += 60;
+		horas--;
+	}
+	
+	char consulta[200];
+	sprintf(consulta, "INSERT INTO PARTIDA VALUES(%d, '%s', %d, '%d-%d-%d %d:%d');", ID_partida, ganador, minutos, 
+			fecha_hora->tm_year+1900, fecha_hora->tm_mon+1, fecha_hora->tm_mday, fecha_hora->tm_hour, fecha_hora->tm_min);
+	int err = mysql_query(conn, consulta);
+	if (err!=0) {
+		printf ("Error al introducir datos la base %u %s\n", 
+				mysql_errno(conn), mysql_error(conn));
+	}
+	for(int i = 0; i < lista_partidas.partida[l].lista_jugadores.num; i++) {
+		strcpy(consulta, "SELECT JUGADOR.ID FROM JUGADOR WHERE JUGADOR.NOMBRE='");
+		strcat(consulta, lista_partidas.partida[l].lista_jugadores.usuario[i].nombre);
+		strcat(consulta, "'");
+		err=mysql_query (conn, consulta);
+		if (err!=0) {
+			printf ("Error al consultar datos de la base %u %s\n", mysql_errno(conn), mysql_error(conn));
+		}
+		MYSQL_RES *resultado;
+		MYSQL_ROW row;
+		
+		resultado = mysql_store_result (conn);
+		row = mysql_fetch_row (resultado);
+		
+		sprintf(consulta, "INSERT INTO PARTICIPACION VALUES(%d, %d);", ID_partida, atoi(row[0]));
+		err = mysql_query(conn, consulta);
+		if (err!=0) {
+			printf ("Error al introducir datos la base %u %s\n", 
+					mysql_errno(conn), mysql_error(conn));
+		}
+		
+		char mensaje0[100];
+		sprintf(mensaje0, "16$%d", ID_partida);
+		for(int q = 0; q < lista_partidas.partida[l].lista_jugadores.num; q++)
+			write(lista_partidas.partida[l].lista_jugadores.usuario[q].sock, mensaje0, strlen(mensaje0));
+		printf("se ha enviado %s\n", mensaje0);
+	}
 }
 
 void siguienteRonda(int ID_partida, int l) {
+	//Funcion a la que se llama cuando se debe comenzar una nueva ronda
 	char mensaje[100];
 	strcpy(mensaje, "Comienza la siguiente ronda.");
 	EnviarMensajeChat(mensaje, ID_partida);
@@ -997,7 +1080,7 @@ void *AtenderCliente (void *socket){
 				write(lista_partidas.partida[j].lista_jugadores.usuario[q].sock, mensaje0, strlen(mensaje0));
 			printf("se ha enviado %s\n", mensaje0);
 		}
-		//El usuario quiere darse de baja de la base de datos
+		//Quiere darse de baja de la base de datos
 		//El servidor recibe 8/clave
 		else if (codigo == 8) {
 			p = strtok(NULL, "/");
@@ -1052,7 +1135,7 @@ void *AtenderCliente (void *socket){
 			}
 		}
 		//RESERVADO PARA CONSULTA A LA BASE DE DATOS 1
-		//El servidor recibe ...
+		//El servidor recibe 9/nombre
 		else if (codigo == 9) {
 			p = strtok(NULL, "/");
 			char name[20];
@@ -1065,7 +1148,7 @@ void *AtenderCliente (void *socket){
 			strcat(consulta, "'");
 			int err = mysql_query (conn, consulta);
 			if (err!=0) {
-				printf ("Error al consultar la clave en la base %u %s\n", mysql_errno(conn), mysql_error(conn));
+				printf ("Error al consultar en la base %u %s\n", mysql_errno(conn), mysql_error(conn));
 				char respuesta[100];
 				strcpy(respuesta, "9$-2"); //Se envia respuesta problemtica,devolvemos -2
 				write(sock_conn, respuesta, strlen(respuesta));
@@ -1076,15 +1159,14 @@ void *AtenderCliente (void *socket){
 				resultado = mysql_store_result (conn);
 				row = mysql_fetch_row (resultado);
 				
-				//Si la clave introducida por el usuario y la proporcionada por la base de datos no coinciden se envia un mensaje aclaratorio
-				//NO se borra la cuenta
+				//Si el jugador no ha jugado con el introducido se envia respuesta
 				if(row == NULL) {
 					printf("No ha jugado con ese jugador.\n");
 					char respuesta[100];
 					strcpy(respuesta, "9$-1");//No ha jugado con ese jugador, devolvemos -1
 					write(sock_conn, respuesta, strlen(respuesta));
 				}
-				//Si la clave es correcta se procede a eliminar el usuario
+				//Si tienen partidas en comun, se envian respuestas
 				else {
 					char respuesta[400];
 					char ganadores[300];
@@ -1156,6 +1238,14 @@ void *AtenderCliente (void *socket){
 			
 			pthread_mutex_lock(&mutex);
 			
+			struct tm * fecha_hora;
+			time_t segundos;
+			segundos = time(NULL); // obtiene los segundos desde 1-1-1970 /
+			fecha_hora=localtime(&segundos); // convierte los 'segundos' en la hora local 
+			//Y para sacar la informacion:
+			lista_partidas.partida[l].horaInicio = fecha_hora->tm_hour; //hora
+			lista_partidas.partida[l].minutoInicio = fecha_hora->tm_min; //minutos
+			
 			//Configuramos los parametros iniciales de cada jugador
 			for(int k = 0; k < lista_partidas.partida[l].lista_jugadores.num; k++) {
 				lista_partidas.partida[l].lista_jugadores.usuario[k].fichas = 100;
@@ -1192,7 +1282,7 @@ void *AtenderCliente (void *socket){
 			pthread_mutex_unlock(&mutex);
 		}
 		//Quiere hacer alguna accion en la partida
-		//El servidor recibe 14/id_partida/accion  Accion = 0/N cuando al principio apuesta N fichas, -1 cuando se retira, 1 cuando pide carta, 2 cuando se planta, 3 cuando dobla
+		//El servidor recibe 14/id_partida/accion   donde accion = 0/N cuando al principio apuesta N fichas, -1 cuando se retira, 1 cuando pide carta, 2 cuando se planta, 3 cuando dobla
 		else if (codigo == 14) {
 			p = strtok(NULL, "/");
 			int ID_partida = atoi(p);
@@ -1274,7 +1364,7 @@ void *AtenderCliente (void *socket){
 				pedirCarta(l, k, lista_partidas.partida[l].baraja.repartidas);
 				char mensaje[100];
 				
-				//Se envia 13$ID_partida/numJugador/3/puntos/carta
+				//Se envia 14$ID_partida/numJugador/3/puntos/carta
 				sprintf(mensaje, "14$%d/%d/3/%d/%d-%d", ID_partida, k, lista_partidas.partida[l].lista_jugadores.usuario[k].puntos,
 						lista_partidas.partida[l].baraja.numero[lista_partidas.partida[l].baraja.repartidas], 
 						lista_partidas.partida[l].baraja.palo[lista_partidas.partida[l].baraja.repartidas]);
@@ -1297,8 +1387,9 @@ void *AtenderCliente (void *socket){
 				else
 					m++;
 			}
+			//Si todos los jugadores han terminado su turno se termina la ronda
 			if(encontrado == 0)
-				terminarRonda(l, ID_partida);
+				terminarRonda(l, ID_partida, conn);
 		}
 		//Quiere comenzar la siguiente ronda
 		//El servidor recibe 15/ID_partida
@@ -1317,12 +1408,14 @@ void *AtenderCliente (void *socket){
 				else
 					i++;
 			}
-			lista_partidas.partida[l].lista_jugadores.usuario[i].estado = 'W';
 			
+			//Ponemos al jugador en espera y enviamos mensaje al chat
+			lista_partidas.partida[l].lista_jugadores.usuario[i].estado = 'W';
 			char mensaje[100];
 			sprintf(mensaje, "%s quiere comenzar la siguiente ronda.", lista_partidas.partida[l].lista_jugadores.usuario[i].nombre);
 			EnviarMensajeChat(mensaje, ID_partida);
 			
+			//Si todos los jugadores estan en espera, se pasa a la siguiente ronda
 			encontrado = 0;
 			i = 0;
 			while(!encontrado && i < lista_partidas.partida[l].lista_jugadores.num) {
