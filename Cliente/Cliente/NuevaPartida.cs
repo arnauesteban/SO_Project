@@ -19,6 +19,7 @@ namespace Cliente
         string usuario;
         int lineasChat;
         bool banca;
+        int numJugadores;
 
         public delegate void DelegadoRespuesta(string mensaje);
 
@@ -29,6 +30,7 @@ namespace Cliente
             CheckForIllegalCrossThreadCalls = false;
             this.server = server;
             this.usuario = usuario;
+            this.numJugadores = 1;
             usuarioLbl.Text = this.usuario;
             chatLbl.Text = "¡Bienvenido a una nueva partida de poker! Espera a que tus contrincantes acepten tu invitación o pulsa el botón del centro de la mesa.";
             lineasChat = 4;
@@ -110,6 +112,7 @@ namespace Cliente
             this.server = server;
             this.usuario = usuario;
             this.ID = ID;
+            this.numJugadores = 1;
             usuarioLbl.Text = this.usuario;
             empezarBtn.Enabled = false;
             this.Text = "Partida " + this.ID;
@@ -133,6 +136,82 @@ namespace Cliente
         {
             //Método que devuelve el identificador de partida.
             return this.ID;
+        }
+
+        public void resetLabels()
+        {
+            if (numJugadores > 0)
+            {
+                jugador1Carta1Lbl.Text = "Carta 1";
+                jugador1Carta2Lbl.Text = "Carta 2";
+                jugador1Carta3Lbl.Text = "Carta 3";
+                jugador1Carta4Lbl.Text = "Carta 4";
+                jugador1JugadoLbl.Text = "0";
+                jugador1PuntosLbl.Text = "0";
+            }
+            if (numJugadores > 1)
+            {
+                jugador2Carta1Lbl.Text = "Carta 1";
+                jugador2Carta2Lbl.Text = "Carta 2";
+                jugador2Carta3Lbl.Text = "Carta 3";
+                jugador2Carta4Lbl.Text = "Carta 4";
+                jugador2JugadoLbl.Text = "0";
+                jugador2PuntosLbl.Text = "0";
+            }
+            if (numJugadores > 2)
+            {
+                jugador3Carta1Lbl.Text = "Carta 1";
+                jugador3Carta2Lbl.Text = "Carta 2";
+                jugador3Carta3Lbl.Text = "Carta 3";
+                jugador3Carta4Lbl.Text = "Carta 4";
+                jugador3JugadoLbl.Text = "0";
+                jugador3PuntosLbl.Text = "0";
+            }
+            if (numJugadores > 3)
+            {
+                jugador4Carta1Lbl.Text = "Carta 1";
+                jugador4Carta2Lbl.Text = "Carta 2";
+                jugador4Carta3Lbl.Text = "Carta 3";
+                jugador4Carta4Lbl.Text = "Carta 4";
+                jugador4JugadoLbl.Text = "0";
+                jugador4PuntosLbl.Text = "0";
+            }
+            if (numJugadores > 4)
+            {
+                jugador5Carta1Lbl.Text = "Carta 1";
+                jugador5Carta2Lbl.Text = "Carta 2";
+                jugador5Carta3Lbl.Text = "Carta 3";
+                jugador5Carta4Lbl.Text = "Carta 4";
+                jugador5JugadoLbl.Text = "0";
+                jugador5PuntosLbl.Text = "0";
+            }
+            if (numJugadores > 5)
+            {
+                jugador6Carta1Lbl.Text = "Carta 1";
+                jugador6Carta2Lbl.Text = "Carta 2";
+                jugador6Carta3Lbl.Text = "Carta 3";
+                jugador6Carta4Lbl.Text = "Carta 4";
+                jugador6JugadoLbl.Text = "0";
+                jugador6PuntosLbl.Text = "0";
+            }
+            if (numJugadores > 6)
+            {
+                jugador7Carta1Lbl.Text = "Carta 1";
+                jugador7Carta2Lbl.Text = "Carta 2";
+                jugador7Carta3Lbl.Text = "Carta 3";
+                jugador7Carta4Lbl.Text = "Carta 4";
+                jugador7JugadoLbl.Text = "0";
+                jugador7PuntosLbl.Text = "0";
+            }
+            if (numJugadores > 7)
+            {
+                jugador8Carta1Lbl.Text = "Carta 1";
+                jugador8Carta2Lbl.Text = "Carta 2";
+                jugador8Carta3Lbl.Text = "Carta 3";
+                jugador8Carta4Lbl.Text = "Carta 4";
+                jugador8JugadoLbl.Text = "0";
+                jugador8PuntosLbl.Text = "0";
+            }
         }
 
         public void TomaRespuesta(int codigo, string mensaje)
@@ -530,6 +609,7 @@ namespace Cliente
             //Guarda los nuevos valores y los muestra al usuario
             string[] separado = mensaje.Split('/');
             int n = Convert.ToInt32(separado[0]);
+            this.numJugadores = n;
             if (separado[1] == this.usuario)
                 this.banca = true;
             else
@@ -806,10 +886,12 @@ namespace Cliente
 
         public void Accion13(string mensaje)
         {
-            //Función que es llamada cada vez que se recibe un mensaje conforme comienza una partida
+            //Función que es llamada cada vez que se recibe un mensaje conforme comienza una ronda
             //Quita los objetos de los parámetros iniciales y muestra las cartas que lleguen
             string[] separado = mensaje.Split('/');
             empezarBtn.Visible = false;
+
+            resetLabels();
 
             //Comienza una nueva ronda y llegan las dos primeras cartas
             if (jugador1NombreLbl.Text == this.usuario)
@@ -962,7 +1044,7 @@ namespace Cliente
                     }
                 }
                 jugador3Carta1Lbl.Text = separado[1];
-                jugador3Carta2Lbl.Text = separado[2]; 
+                jugador3Carta2Lbl.Text = separado[2];
                 apostarNum.Maximum = Convert.ToInt32(jugador3FichasLbl.Text);
             }
             else if (jugador4NombreLbl.Text == this.usuario)
@@ -1662,6 +1744,7 @@ namespace Cliente
             {
                 jugador1FichasLbl.Text = fichas.ToString();
                 jugador1PuntosLbl.Text = puntos.ToString();
+                jugador1JugadoLbl.Text = "0";
                 if (numCartas == 1)
                 {
                     jugador1Carta1Lbl.Text = separado[4];
@@ -1684,11 +1767,15 @@ namespace Cliente
                     jugador1Carta3Lbl.Text = separado[6];
                     jugador1Carta4Lbl.Text = separado[7];
                 }
+                empezarBtn.Text = "Siguiente";
+                empezarBtn.Visible = true;
+                empezarBtn.Enabled = true;
             }
             else if (n == 1)
             {
                 jugador2FichasLbl.Text = fichas.ToString();
                 jugador2PuntosLbl.Text = puntos.ToString();
+                jugador1JugadoLbl.Text = "0";
                 if (numCartas == 1)
                 {
                     jugador2Carta1Lbl.Text = separado[4];
@@ -1716,6 +1803,7 @@ namespace Cliente
             {
                 jugador3FichasLbl.Text = fichas.ToString();
                 jugador3PuntosLbl.Text = puntos.ToString();
+                jugador1JugadoLbl.Text = "0";
                 if (numCartas == 1)
                 {
                     jugador3Carta1Lbl.Text = separado[4];
@@ -1743,6 +1831,7 @@ namespace Cliente
             {
                 jugador4FichasLbl.Text = fichas.ToString();
                 jugador4PuntosLbl.Text = puntos.ToString();
+                jugador1JugadoLbl.Text = "0";
                 if (numCartas == 1)
                 {
                     jugador4Carta1Lbl.Text = separado[4];
@@ -1770,6 +1859,7 @@ namespace Cliente
             {
                 jugador5FichasLbl.Text = fichas.ToString();
                 jugador5PuntosLbl.Text = puntos.ToString();
+                jugador1JugadoLbl.Text = "0";
                 if (numCartas == 1)
                 {
                     jugador5Carta1Lbl.Text = separado[4];
@@ -1797,6 +1887,7 @@ namespace Cliente
             {
                 jugador6FichasLbl.Text = fichas.ToString();
                 jugador6PuntosLbl.Text = puntos.ToString();
+                jugador1JugadoLbl.Text = "0";
                 if (numCartas == 1)
                 {
                     jugador6Carta1Lbl.Text = separado[4];
@@ -1824,6 +1915,7 @@ namespace Cliente
             {
                 jugador7FichasLbl.Text = fichas.ToString();
                 jugador7PuntosLbl.Text = puntos.ToString();
+                jugador1JugadoLbl.Text = "0";
                 if (numCartas == 1)
                 {
                     jugador7Carta1Lbl.Text = separado[4];
@@ -1851,6 +1943,7 @@ namespace Cliente
             {
                 jugador8FichasLbl.Text = fichas.ToString();
                 jugador8PuntosLbl.Text = puntos.ToString();
+                jugador1JugadoLbl.Text = "0";
                 if (numCartas == 1)
                 {
                     jugador8Carta1Lbl.Text = separado[4];
@@ -1878,7 +1971,7 @@ namespace Cliente
 
         public void Accion16(string mensaje)
         {
-
+            
         }
 
         private void enviar_Btn_Click(object sender, EventArgs e)
@@ -1894,8 +1987,16 @@ namespace Cliente
             //Evento llamado cuando el host quiere comenzar a jugar la partida.
             empezarBtn.Enabled = false;
             empezarBtn.Visible = false;
-            string mensaje = "13/" + this.ID;
-            server.Enviar(mensaje);
+            if (empezarBtn.Text == "Empezar")
+            {
+                string mensaje = "13/" + this.ID;
+                server.Enviar(mensaje);
+            }
+            else
+            {
+                string mensaje = "15/" + this.ID;
+                server.Enviar(mensaje);
+            }
         }
 
         private void NuevaPartida_FormClosing(object sender, FormClosingEventArgs e)

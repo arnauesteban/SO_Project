@@ -437,7 +437,7 @@ void pedirCarta(int l, int j, int carta) {
 		}
 		lista_partidas.partida[l].lista_jugadores.usuario[j].puntos += lista_partidas.partida[l].baraja.numero[carta];
 	}
-	if(lista_partidas.partida[l].lista_jugadores.usuario[j].puntos > 21)
+	if(lista_partidas.partida[l].lista_jugadores.usuario[j].puntos > 20)
 		lista_partidas.partida[l].lista_jugadores.usuario[j].estado = 'F';
 	sprintf(lista_partidas.partida[l].lista_jugadores.usuario[j].mano, "%s%d-%d/", lista_partidas.partida[l].lista_jugadores.usuario[j].mano, 
 			lista_partidas.partida[l].baraja.numero[carta], lista_partidas.partida[l].baraja.palo[carta]);
@@ -445,9 +445,11 @@ void pedirCarta(int l, int j, int carta) {
 }
 
 void terminarRonda(int l, int ID_partida) {
+	sleep(1);
 	char mensaje[200];
 	strcpy(mensaje, "Todos los jugadores han terminado su turno.");
 	EnviarMensajeChat(mensaje, ID_partida);
+	sleep(1);
 	char mensaje0[200];
 	if(lista_partidas.partida[l].lista_jugadores.usuario[0].puntos > 21) {
 		strcpy(mensaje0, "La banca se ha pasado de puntos.");
@@ -457,6 +459,7 @@ void terminarRonda(int l, int ID_partida) {
 		sprintf(mensaje0, "La banca tiene %d puntos.", lista_partidas.partida[l].lista_jugadores.usuario[0].puntos);
 		EnviarMensajeChat(mensaje0, ID_partida);
 	}
+	sleep(1);
 	
 	for(int i = 1; i < lista_partidas.partida[l].lista_jugadores.num; i++) {
 		if(lista_partidas.partida[l].lista_jugadores.usuario[i].jugado == 0) {
@@ -472,7 +475,7 @@ void terminarRonda(int l, int ID_partida) {
 			EnviarMensajeChat(mensaje1, ID_partida);
 			
 			lista_partidas.partida[l].lista_jugadores.usuario[i].jugado = 0;
-			
+			sleep(1);
 			char mensaje2[200];
 			sprintf(mensaje2, "15$%d/%d/%d/%d/%d/%s", ID_partida, i, lista_partidas.partida[l].lista_jugadores.usuario[i].fichas,  
 					lista_partidas.partida[l].lista_jugadores.usuario[i].puntos, lista_partidas.partida[l].lista_jugadores.usuario[i].numCartas, 
@@ -490,6 +493,7 @@ void terminarRonda(int l, int ID_partida) {
 			lista_partidas.partida[l].lista_jugadores.usuario[0].fichas += lista_partidas.partida[l].lista_jugadores.usuario[i].jugado;
 			lista_partidas.partida[l].lista_jugadores.usuario[i].jugado = 0;
 			
+			sleep(1);
 			char mensaje2[200];
 			sprintf(mensaje2, "15$%d/%d/%d/%d/%d/%s", ID_partida, i, lista_partidas.partida[l].lista_jugadores.usuario[i].fichas,  
 					lista_partidas.partida[l].lista_jugadores.usuario[i].puntos, lista_partidas.partida[l].lista_jugadores.usuario[i].numCartas, 
@@ -508,6 +512,7 @@ void terminarRonda(int l, int ID_partida) {
 			lista_partidas.partida[l].lista_jugadores.usuario[0].fichas -= lista_partidas.partida[l].lista_jugadores.usuario[i].jugado;
 			lista_partidas.partida[l].lista_jugadores.usuario[i].jugado = 0;
 			
+			sleep(1);
 			char mensaje2[200];
 			sprintf(mensaje2, "15$%d/%d/%d/%d/%d/%s", ID_partida, i, lista_partidas.partida[l].lista_jugadores.usuario[i].fichas,  
 					lista_partidas.partida[l].lista_jugadores.usuario[i].puntos, lista_partidas.partida[l].lista_jugadores.usuario[i].numCartas, 
@@ -524,6 +529,7 @@ void terminarRonda(int l, int ID_partida) {
 			
 			lista_partidas.partida[l].lista_jugadores.usuario[i].jugado = 0;
 			
+			sleep(1);
 			char mensaje2[200];
 			sprintf(mensaje2, "15$%d/%d/%d/%d/%d/%s", ID_partida, i, lista_partidas.partida[l].lista_jugadores.usuario[i].fichas,  
 					lista_partidas.partida[l].lista_jugadores.usuario[i].puntos, lista_partidas.partida[l].lista_jugadores.usuario[i].numCartas, 
@@ -542,6 +548,7 @@ void terminarRonda(int l, int ID_partida) {
 			lista_partidas.partida[l].lista_jugadores.usuario[0].fichas += lista_partidas.partida[l].lista_jugadores.usuario[i].jugado;
 			lista_partidas.partida[l].lista_jugadores.usuario[i].jugado = 0;
 			
+			sleep(1);
 			char mensaje2[200];
 			sprintf(mensaje2, "15$%d/%d/%d/%d/%d/%s", ID_partida, i, lista_partidas.partida[l].lista_jugadores.usuario[i].fichas,  
 					lista_partidas.partida[l].lista_jugadores.usuario[i].puntos, lista_partidas.partida[l].lista_jugadores.usuario[i].numCartas, 
@@ -560,6 +567,7 @@ void terminarRonda(int l, int ID_partida) {
 			lista_partidas.partida[l].lista_jugadores.usuario[0].fichas -= lista_partidas.partida[l].lista_jugadores.usuario[i].jugado;
 			lista_partidas.partida[l].lista_jugadores.usuario[i].jugado = 0;
 			
+			sleep(1);
 			char mensaje2[200];
 			sprintf(mensaje2, "15$%d/%d/%d/%d/%d/%s", ID_partida, i, lista_partidas.partida[l].lista_jugadores.usuario[i].fichas,  
 					lista_partidas.partida[l].lista_jugadores.usuario[i].puntos, lista_partidas.partida[l].lista_jugadores.usuario[i].numCartas, 
@@ -568,6 +576,7 @@ void terminarRonda(int l, int ID_partida) {
 				write(lista_partidas.partida[l].lista_jugadores.usuario[q].sock, mensaje2, strlen(mensaje2));
 			printf("se ha enviado %s\n", mensaje2);
 		}
+		sleep(1);
 	}
 	
 	sprintf(mensaje0, "15$%d/0/%d/%d/%d/%s", ID_partida, lista_partidas.partida[l].lista_jugadores.usuario[0].fichas,  
@@ -576,9 +585,10 @@ void terminarRonda(int l, int ID_partida) {
 	for(int q = 0; q < lista_partidas.partida[l].lista_jugadores.num; q++)
 		write(lista_partidas.partida[l].lista_jugadores.usuario[q].sock, mensaje0, strlen(mensaje0));
 	printf("se ha enviado %s\n", mensaje0);
+	sleep(1);
 	
 	if(lista_partidas.partida[l].lista_jugadores.usuario[0].fichas <= 0) {
-		terminarPartida();
+		terminarPartida(ID_partida);
 	}
 	else {
 	    int j = 1;
@@ -590,20 +600,22 @@ void terminarRonda(int l, int ID_partida) {
 				j++;
 		}
 		if(!encontrado)
-			terminarPartida();
+			terminarPartida(ID_partida);
 	}
-	
-	siguienteRonda(ID_partida, l);
 }
 
-void terminarPartida() {
-	
+void terminarPartida(int ID_partida) {
+	sleep(1);
+	char mensaje[200];
+	strcpy(mensaje, "Termina la partida.");
+	EnviarMensajeChat(mensaje, ID_partida);
 }
 
 void siguienteRonda(int ID_partida, int l) {
 	char mensaje[100];
 	strcpy(mensaje, "Comienza la siguiente ronda.");
 	EnviarMensajeChat(mensaje, ID_partida);
+	sleep(1);
 	
 	pthread_mutex_lock(&mutex);
 	
@@ -612,9 +624,13 @@ void siguienteRonda(int ID_partida, int l) {
 		lista_partidas.partida[l].lista_jugadores.usuario[k].jugado = 0;
 		lista_partidas.partida[l].lista_jugadores.usuario[k].puntos = 0;
 		lista_partidas.partida[l].lista_jugadores.usuario[k].as = 0;
-		lista_partidas.partida[l].lista_jugadores.usuario[k].estado = 'W';
 		strcpy(lista_partidas.partida[l].lista_jugadores.usuario[k].mano, "");
 		lista_partidas.partida[l].lista_jugadores.usuario[k].numCartas = 0;
+		if(lista_partidas.partida[l].lista_jugadores.usuario[k].fichas > 0)
+			lista_partidas.partida[l].lista_jugadores.usuario[k].estado = 'W';
+		else
+			lista_partidas.partida[l].lista_jugadores.usuario[k].estado = 'O';
+		
 	}
 	
 	//Barajamos las cartas
@@ -625,18 +641,19 @@ void siguienteRonda(int ID_partida, int l) {
 	int j = 0;
 	strcpy(mensaje, "");
 	while(j < lista_partidas.partida[l].lista_jugadores.num) {
-		pedirCarta(l, j, lista_partidas.partida[l].baraja.repartidas);
-		lista_partidas.partida[l].baraja.repartidas++;
-		pedirCarta(l, j, lista_partidas.partida[l].baraja.repartidas);
-		lista_partidas.partida[l].baraja.repartidas++;
-		sprintf(mensaje, "16$%d/%d/%d-%d/%d-%d", ID_partida, lista_partidas.partida[l].lista_jugadores.usuario[j].puntos,
-				lista_partidas.partida[l].baraja.numero[lista_partidas.partida[l].baraja.repartidas - 2], 
-				lista_partidas.partida[l].baraja.palo[lista_partidas.partida[l].baraja.repartidas - 2],
-				lista_partidas.partida[l].baraja.numero[lista_partidas.partida[l].baraja.repartidas - 1], 
-				lista_partidas.partida[l].baraja.palo[lista_partidas.partida[l].baraja.repartidas - 1]);
-		write (lista_partidas.partida[l].lista_jugadores.usuario[j].sock, mensaje, strlen(mensaje));
-		printf("Se ha enviado %s\n", mensaje);
-		
+		if(lista_partidas.partida[l].lista_jugadores.usuario[j].estado == 'W') {
+			pedirCarta(l, j, lista_partidas.partida[l].baraja.repartidas);
+			lista_partidas.partida[l].baraja.repartidas++;
+			pedirCarta(l, j, lista_partidas.partida[l].baraja.repartidas);
+			lista_partidas.partida[l].baraja.repartidas++;
+			sprintf(mensaje, "13$%d/%d/%d-%d/%d-%d", ID_partida, lista_partidas.partida[l].lista_jugadores.usuario[j].puntos,
+					lista_partidas.partida[l].baraja.numero[lista_partidas.partida[l].baraja.repartidas - 2], 
+					lista_partidas.partida[l].baraja.palo[lista_partidas.partida[l].baraja.repartidas - 2],
+					lista_partidas.partida[l].baraja.numero[lista_partidas.partida[l].baraja.repartidas - 1], 
+					lista_partidas.partida[l].baraja.palo[lista_partidas.partida[l].baraja.repartidas - 1]);
+			write (lista_partidas.partida[l].lista_jugadores.usuario[j].sock, mensaje, strlen(mensaje));
+			printf("Se ha enviado %s\n", mensaje);
+		}
 		j++;
 	}
 	pthread_mutex_unlock(&mutex);
@@ -1283,6 +1300,40 @@ void *AtenderCliente (void *socket){
 			if(encontrado == 0)
 				terminarRonda(l, ID_partida);
 		}
+		//Quiere comenzar la siguiente ronda
+		//El servidor recibe 15/ID_partida
+		else if (codigo == 15) {
+			p = strtok(NULL, "/");
+			int ID_partida = atoi(p);
+			
+			//Buscamos la partida en la lista
+			int l = getIndexPartida(ID_partida);
+			
+			int i = 0;
+			int encontrado = 0;
+			while(!encontrado && i < lista_partidas.partida[l].lista_jugadores.num) {
+				if(lista_partidas.partida[l].lista_jugadores.usuario[i].sock == sock_conn)
+					encontrado = 1;
+				else
+					i++;
+			}
+			lista_partidas.partida[l].lista_jugadores.usuario[i].estado = 'W';
+			
+			char mensaje[100];
+			sprintf(mensaje, "%s quiere comenzar la siguiente ronda.", lista_partidas.partida[l].lista_jugadores.usuario[i].nombre);
+			EnviarMensajeChat(mensaje, ID_partida);
+			
+			encontrado = 0;
+			i = 0;
+			while(!encontrado && i < lista_partidas.partida[l].lista_jugadores.num) {
+				if(lista_partidas.partida[l].lista_jugadores.usuario[i].estado == 'F')
+					encontrado = 1;
+				else
+					i++;
+			}
+			if(!encontrado)
+				siguienteRonda(ID_partida, l);
+		}
 	}
 	// Se acabo el servicio para este cliente
 	close(sock_conn);
@@ -1310,7 +1361,7 @@ int main(int argc, char *argv[]){
 	serv_adr.sin_addr.s_addr = htonl(INADDR_ANY);
 	
 	//Escucharemos en el puerto indicado entre parenteis
-	serv_adr.sin_port = htons(50072);
+	serv_adr.sin_port = htons(50082);
 	if (bind(sock_listen, (struct sockaddr *) &serv_adr, sizeof(serv_adr)) < 0)
 		printf ("Error al bind\n");
 	if (listen(sock_listen, 2) < 0)
