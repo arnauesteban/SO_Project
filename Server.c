@@ -456,6 +456,64 @@ void pedirCarta(int l, int j, int carta) {
 	lista_partidas.partida[l].lista_jugadores.usuario[j].numCartas++;
 }
 
+void terminarPartida(int ID_partida, char ganador[20], MYSQL *conn) {
+	//Funcion a la que se llama cuando la partida termina
+	int l = getIndexPartida(ID_partida);
+	
+	sleep(1);
+	char mensaje[200];
+	strcpy(mensaje, "Termina la partida.");
+	EnviarMensajeChat(mensaje, ID_partida);
+	
+	struct tm * fecha_hora;
+	time_t segundos;
+	segundos = time(NULL); // obtiene los segundos desde 1-1-1970 /
+	fecha_hora=localtime(&segundos); // convierte los 'segundos' en la hora local 
+	
+	int horas = fecha_hora->tm_hour - lista_partidas.partida[l].horaInicio;
+	int minutos = fecha_hora->tm_min - lista_partidas.partida[l].minutoInicio;
+	while(horas > 0) {
+		minutos += 60;
+		horas--;
+	}
+	
+	char consulta[200];
+	sprintf(consulta, "INSERT INTO PARTIDA VALUES(%d, '%s', %d, '%d-%d-%d %d:%d');", ID_partida, ganador, minutos, 
+			fecha_hora->tm_year+1900, fecha_hora->tm_mon+1, fecha_hora->tm_mday, fecha_hora->tm_hour, fecha_hora->tm_min);
+	int err = mysql_query(conn, consulta);
+	if (err!=0) {
+		printf ("Error al introducir datos la base %u %s\n", 
+				mysql_errno(conn), mysql_error(conn));
+	}
+	for(int i = 0; i < lista_partidas.partida[l].lista_jugadores.num; i++) {
+		strcpy(consulta, "SELECT JUGADOR.ID FROM JUGADOR WHERE JUGADOR.NOMBRE='");
+		strcat(consulta, lista_partidas.partida[l].lista_jugadores.usuario[i].nombre);
+		strcat(consulta, "'");
+		err=mysql_query (conn, consulta);
+		if (err!=0) {
+			printf ("Error al consultar datos de la base %u %s\n", mysql_errno(conn), mysql_error(conn));
+		}
+		MYSQL_RES *resultado;
+		MYSQL_ROW row;
+		
+		resultado = mysql_store_result (conn);
+		row = mysql_fetch_row (resultado);
+		
+		sprintf(consulta, "INSERT INTO PARTICIPACION VALUES(%d, %d);", ID_partida, atoi(row[0]));
+		err = mysql_query(conn, consulta);
+		if (err!=0) {
+			printf ("Error al introducir datos la base %u %s\n", 
+					mysql_errno(conn), mysql_error(conn));
+		}
+		
+		char mensaje0[100];
+		sprintf(mensaje0, "16$%d", ID_partida);
+		for(int q = 0; q < lista_partidas.partida[l].lista_jugadores.num; q++)
+			write(lista_partidas.partida[l].lista_jugadores.usuario[q].sock, mensaje0, strlen(mensaje0));
+		printf("se ha enviado %s\n", mensaje0);
+	}
+}
+
 void terminarRonda(int l, int ID_partida, MYSQL *conn) {
 	//Funcion a la que se llama cuando todos los jugadores terminan su turno
 	sleep(1);
@@ -635,63 +693,7 @@ void terminarRonda(int l, int ID_partida, MYSQL *conn) {
 	}
 }
 
-void terminarPartida(int ID_partida, char ganador[20], MYSQL *conn) {
-	//Funcion a la que se llama cuando la partida termina
-	int l = getIndexPartida(ID_partida);
-	
-	sleep(1);
-	char mensaje[200];
-	strcpy(mensaje, "Termina la partida.");
-	EnviarMensajeChat(mensaje, ID_partida);
-	
-	struct tm * fecha_hora;
-	time_t segundos;
-	segundos = time(NULL); // obtiene los segundos desde 1-1-1970 /
-	fecha_hora=localtime(&segundos); // convierte los 'segundos' en la hora local 
 
-	int horas = fecha_hora->tm_hour - lista_partidas.partida[l].horaInicio;
-	int minutos = fecha_hora->tm_min - lista_partidas.partida[l].minutoInicio;
-	while(horas > 0) {
-		minutos += 60;
-		horas--;
-	}
-	
-	char consulta[200];
-	sprintf(consulta, "INSERT INTO PARTIDA VALUES(%d, '%s', %d, '%d-%d-%d %d:%d');", ID_partida, ganador, minutos, 
-			fecha_hora->tm_year+1900, fecha_hora->tm_mon+1, fecha_hora->tm_mday, fecha_hora->tm_hour, fecha_hora->tm_min);
-	int err = mysql_query(conn, consulta);
-	if (err!=0) {
-		printf ("Error al introducir datos la base %u %s\n", 
-				mysql_errno(conn), mysql_error(conn));
-	}
-	for(int i = 0; i < lista_partidas.partida[l].lista_jugadores.num; i++) {
-		strcpy(consulta, "SELECT JUGADOR.ID FROM JUGADOR WHERE JUGADOR.NOMBRE='");
-		strcat(consulta, lista_partidas.partida[l].lista_jugadores.usuario[i].nombre);
-		strcat(consulta, "'");
-		err=mysql_query (conn, consulta);
-		if (err!=0) {
-			printf ("Error al consultar datos de la base %u %s\n", mysql_errno(conn), mysql_error(conn));
-		}
-		MYSQL_RES *resultado;
-		MYSQL_ROW row;
-		
-		resultado = mysql_store_result (conn);
-		row = mysql_fetch_row (resultado);
-		
-		sprintf(consulta, "INSERT INTO PARTICIPACION VALUES(%d, %d);", ID_partida, atoi(row[0]));
-		err = mysql_query(conn, consulta);
-		if (err!=0) {
-			printf ("Error al introducir datos la base %u %s\n", 
-					mysql_errno(conn), mysql_error(conn));
-		}
-		
-		char mensaje0[100];
-		sprintf(mensaje0, "16$%d", ID_partida);
-		for(int q = 0; q < lista_partidas.partida[l].lista_jugadores.num; q++)
-			write(lista_partidas.partida[l].lista_jugadores.usuario[q].sock, mensaje0, strlen(mensaje0));
-		printf("se ha enviado %s\n", mensaje0);
-	}
-}
 
 void siguienteRonda(int ID_partida, int l) {
 	//Funcion a la que se llama cuando se debe comenzar una nueva ronda
@@ -1236,6 +1238,16 @@ void *AtenderCliente (void *socket){
 			//Buscamos la partida en la lista
 			int l = getIndexPartida(ID_partida);
 			
+			//Buscamos al jugador en la lista de jugadores de la partida, para guardar en n su identificador
+			int n = 0;
+			int encontrado = 0;
+			while (!encontrado && n < lista_partidas.partida[l].lista_jugadores.num) {
+				if(lista_partidas.partida[l].lista_jugadores.usuario[n].sock == sock_conn)
+					encontrado = 1;
+				else
+					n++;
+			}
+			
 			pthread_mutex_lock(&mutex);
 			
 			struct tm * fecha_hora;
@@ -1269,11 +1281,14 @@ void *AtenderCliente (void *socket){
 				lista_partidas.partida[l].baraja.repartidas++;
 				pedirCarta(l, j, lista_partidas.partida[l].baraja.repartidas);
 				lista_partidas.partida[l].baraja.repartidas++;
-				sprintf(mensaje, "13$%d/%d/%d-%d/%d-%d", ID_partida, lista_partidas.partida[l].lista_jugadores.usuario[j].puntos,
+				
+				//Enviamos la notificacion 13$ID_partida/puntos/numero1-palo1/numero2-palo2/numJugador
+				sprintf(mensaje, "13$%d/%d/%d-%d/%d-%d/%d", ID_partida, lista_partidas.partida[l].lista_jugadores.usuario[j].puntos,
 						lista_partidas.partida[l].baraja.numero[lista_partidas.partida[l].baraja.repartidas - 2], 
 						lista_partidas.partida[l].baraja.palo[lista_partidas.partida[l].baraja.repartidas - 2],
 						lista_partidas.partida[l].baraja.numero[lista_partidas.partida[l].baraja.repartidas - 1], 
-						lista_partidas.partida[l].baraja.palo[lista_partidas.partida[l].baraja.repartidas - 1]);
+						lista_partidas.partida[l].baraja.palo[lista_partidas.partida[l].baraja.repartidas - 1],
+						n);
 				write (lista_partidas.partida[l].lista_jugadores.usuario[j].sock, mensaje, strlen(mensaje));
 				printf("Se ha enviado %s\n", mensaje);
 				
@@ -1454,7 +1469,7 @@ int main(int argc, char *argv[]){
 	serv_adr.sin_addr.s_addr = htonl(INADDR_ANY);
 	
 	//Escucharemos en el puerto indicado entre parenteis
-	serv_adr.sin_port = htons(50082);
+	serv_adr.sin_port = htons(50083);
 	if (bind(sock_listen, (struct sockaddr *) &serv_adr, sizeof(serv_adr)) < 0)
 		printf ("Error al bind\n");
 	if (listen(sock_listen, 2) < 0)
