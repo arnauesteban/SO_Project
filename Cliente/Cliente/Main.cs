@@ -299,7 +299,7 @@ namespace Cliente
             string[] separado = mensaje.Split('/');
             for (int j = 0; j < cont_forms; j++)
                 if (lista_forms_partidas[j].getID() == Convert.ToInt32(separado[0]))
-                    lista_forms_partidas[j].TomaRespuesta(13, separado[1] + "/" + separado[2] + "/" + separado[3]);
+                    lista_forms_partidas[j].TomaRespuesta(13, separado[1] + "/" + separado[2] + "/" + separado[3] + "/" + separado[4]);
         }
 
         public void Accion14(string mensaje)
