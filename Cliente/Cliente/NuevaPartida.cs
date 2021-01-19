@@ -23,9 +23,10 @@ namespace Cliente
         bool banca;
         int numJugadores;
 
-        PictureBox[] PictureBoxCartas = new PictureBox[5];
+        //Matriz de los PictureBox [Jugador, PictureBox]
+        PictureBox[,] PictureBoxCartas = new PictureBox[8,6];
 
-        List<string> cartas = new List<string>();
+        int[] numCartasPorJugador = new int[8];
 
         public delegate void DelegadoRespuesta(string mensaje);
 
@@ -83,11 +84,72 @@ namespace Cliente
 
         private void NuevaPartida_Load(object sender, EventArgs e)
         {
-            PictureBoxCartas[0] = pictureBox1;
-            PictureBoxCartas[1] = pictureBox2;
-            PictureBoxCartas[2] = pictureBox3;
-            PictureBoxCartas[3] = pictureBox4;
-            PictureBoxCartas[4] = pictureBox5;
+            //Organizamos todos los PictureBox en la matrix PictureBoxCartas
+            PictureBoxCartas[0, 0] = pictureBox1_MiJugador;
+            PictureBoxCartas[0, 1] = pictureBox2_MiJugador;
+            PictureBoxCartas[0, 2] = pictureBox3_MiJugador;
+            PictureBoxCartas[0, 3] = pictureBox4_MiJugador;
+            PictureBoxCartas[0, 4] = pictureBox5_MiJugador;
+            PictureBoxCartas[0, 5] = pictureBox6_MiJugador;
+
+            PictureBoxCartas[1, 0] = pictureBox1_Jugador2;
+            PictureBoxCartas[1, 1] = pictureBox2_Jugador2;
+            PictureBoxCartas[1, 2] = pictureBox3_Jugador2;
+            PictureBoxCartas[1, 3] = pictureBox4_Jugador2;
+            PictureBoxCartas[1, 4] = pictureBox5_Jugador2;
+            PictureBoxCartas[1, 5] = pictureBox6_Jugador2;
+
+            PictureBoxCartas[2, 0] = pictureBox1_Jugador3;
+            PictureBoxCartas[2, 1] = pictureBox2_Jugador3;
+            PictureBoxCartas[2, 2] = pictureBox3_Jugador3;
+            PictureBoxCartas[2, 3] = pictureBox4_Jugador3;
+            PictureBoxCartas[2, 4] = pictureBox5_Jugador3;
+            PictureBoxCartas[2, 5] = pictureBox6_Jugador3;
+
+            PictureBoxCartas[3, 0] = pictureBox1_Jugador4;
+            PictureBoxCartas[3, 1] = pictureBox2_Jugador4;
+            PictureBoxCartas[3, 2] = pictureBox3_Jugador4;
+            PictureBoxCartas[3, 3] = pictureBox4_Jugador4;
+            PictureBoxCartas[3, 4] = pictureBox5_Jugador4;
+            PictureBoxCartas[3, 5] = pictureBox6_Jugador4;
+
+            PictureBoxCartas[4, 0] = pictureBox1_Jugador5;
+            PictureBoxCartas[4, 1] = pictureBox2_Jugador5;
+            PictureBoxCartas[4, 2] = pictureBox3_Jugador5;
+            PictureBoxCartas[4, 3] = pictureBox4_Jugador5;
+            PictureBoxCartas[4, 4] = pictureBox5_Jugador5;
+            PictureBoxCartas[4, 5] = pictureBox6_Jugador5;
+
+            PictureBoxCartas[5, 0] = pictureBox1_Jugador6;
+            PictureBoxCartas[5, 1] = pictureBox2_Jugador6;
+            PictureBoxCartas[5, 2] = pictureBox3_Jugador6;
+            PictureBoxCartas[5, 3] = pictureBox4_Jugador6;
+            PictureBoxCartas[5, 4] = pictureBox5_Jugador6;
+            PictureBoxCartas[5, 5] = pictureBox6_Jugador6;
+
+            PictureBoxCartas[6, 0] = pictureBox1_Jugador7;
+            PictureBoxCartas[6, 1] = pictureBox2_Jugador7;
+            PictureBoxCartas[6, 2] = pictureBox3_Jugador7;
+            PictureBoxCartas[6, 3] = pictureBox4_Jugador7;
+            PictureBoxCartas[6, 4] = pictureBox5_Jugador7;
+            PictureBoxCartas[6, 5] = pictureBox6_Jugador7;
+
+            PictureBoxCartas[7, 0] = pictureBox1_Jugador8;
+            PictureBoxCartas[7, 1] = pictureBox2_Jugador8;
+            PictureBoxCartas[7, 2] = pictureBox3_Jugador8;
+            PictureBoxCartas[7, 3] = pictureBox4_Jugador8;
+            PictureBoxCartas[7, 4] = pictureBox5_Jugador8;
+            PictureBoxCartas[7, 5] = pictureBox6_Jugador8;
+
+            for (int i = 1; i < 8; i++)
+            {
+                for (int j = 0; j < 6; j++)
+                {
+                    PictureBoxCartas[i, j].Visible = false;
+                    PictureBoxCartas[i, j].ImageLocation = "..\\..\\Img\\cards\\dorso.png";
+                }
+            }
+
         }
 
         public int getID()
@@ -99,10 +161,6 @@ namespace Cliente
         public void resetLabels()
         {
  
-            jugador1Carta1Lbl.Text = "Carta 1";
-            jugador1Carta2Lbl.Text = "Carta 2";
-            jugador1Carta3Lbl.Text = "Carta 3";
-            jugador1Carta4Lbl.Text = "Carta 4";
             jugador1JugadoLbl.Text = "0";
             jugador1PuntosLbl.Text = "0";
             
@@ -249,10 +307,6 @@ namespace Cliente
                 this.banca = false;
 
             jugador1JugadoLbl.Text = "0";
-            jugador1Carta1Lbl.Text = "Carta 1";
-            jugador1Carta2Lbl.Text = "Carta 2";
-            jugador1Carta3Lbl.Text = "Carta 3";
-            jugador1Carta4Lbl.Text = "Carta 4";
             jugador1FichasLbl.Text = "100";
             jugador1PuntosLbl.Text = "0";
         }
@@ -262,7 +316,21 @@ namespace Cliente
             //Función que es llamada cada vez que se recibe un mensaje conforme comienza una ronda
             //Quita los objetos de los parámetros iniciales y muestra las cartas que lleguen
 
-            //Recibimos mensaje :  puntos/numero1-palo1/numero2-palo2
+            //Reseteamos las cartas
+            for (int j = 0; j < numCartasPorJugador[0]; j++)
+            {
+                PictureBoxCartas[0, j].Image = null;
+            }
+            for (int i = 1; i < 8; i++)
+            {
+                for (int j = 0; j < numCartasPorJugador[i]; j++)
+                {
+                    PictureBoxCartas[i, j].Visible = false;
+                }
+                
+            }
+
+            //Recibimos mensaje :  puntos/numero1-palo1/numero2-palo2/numJugador/numero_de_jugadores
             string[] separado = mensaje.Split('/');
             empezarBtn.Visible = false;
 
@@ -319,17 +387,25 @@ namespace Cliente
 
             this.numJugador = Convert.ToInt32(separado[3]);
 
-            cartas.Add(separado[1]);
-            cartas.Add(separado[2]);
+            numCartasPorJugador[0] = 2;
 
             //Asignamos a carta1 y carta2 el nombre de sus imagenes correspondientes
             string carta1, carta2;
             carta1 = AsignarNombreImagenCarta(separado[1]);
             carta2 = AsignarNombreImagenCarta(separado[2]);
 
-            //Insertamos la imagen de cada carta
-            PictureBoxCartas[0].ImageLocation = "..\\..\\Img\\cards\\" + carta1;
-            PictureBoxCartas[1].ImageLocation = "..\\..\\Img\\cards\\" + carta2;
+            //Insertamos la imagen de cada carta de mi jugador
+            PictureBoxCartas[0, 0].ImageLocation = "..\\..\\Img\\cards\\" + carta1;
+            PictureBoxCartas[0, 1].ImageLocation = "..\\..\\Img\\cards\\" + carta2;
+
+            //Insertamos la imagen del dorso de las cartas iniciales del resto de jugadores
+            for (int i = 1; i < numJugadores; i++)
+            {
+                PictureBoxCartas[i, 0].Visible = true;
+                PictureBoxCartas[i, 1].Visible = true;
+                numCartasPorJugador[i] = 2;
+            }
+
 
         }
 
@@ -362,13 +438,71 @@ namespace Cliente
             //1 cuando pide carta
             else if (accion == 1)
             {
-                jugador1PuntosLbl.Text = separado[2];
-                if(jugador1Carta3Lbl.Text == "Carta 3")
-                    jugador1Carta3Lbl.Text = separado[3];
-                else if(jugador1Carta4Lbl.Text == "Carta 4")
-                    jugador1Carta4Lbl.Text = separado[3];
-                if (Convert.ToInt32(jugador1PuntosLbl.Text) > 20)
+                int numJugador_carta_recibida = Convert.ToInt32(separado[0]);
+                //Si la carta que se ha pedido es nuestra
+                if (numJugador_carta_recibida == numJugador)
                 {
+                    jugador1PuntosLbl.Text = separado[2];
+
+                    if (Convert.ToInt32(jugador1PuntosLbl.Text) > 20)
+                    {
+                        rendirseBtn.Enabled = false;
+                        rendirseBtn.Visible = false;
+                        pedirBtn.Enabled = false;
+                        pedirBtn.Visible = false;
+                        plantarseBtn.Enabled = false;
+                        plantarseBtn.Visible = false;
+                        apostarBtn.Enabled = false;
+                        apostarBtn.Visible = false;
+                        apostarBtn.Text = "Apostar";
+                        apostarNum.Enabled = false;
+                        apostarNum.Visible = false;
+                    }
+
+                    //Asignamos a carta el nombre de sus imagenes correspondientes
+                    string carta;
+                    carta = AsignarNombreImagenCarta(separado[3]);
+
+                    //Insertamos la imagen de cada carta
+                    PictureBoxCartas[0, numCartasPorJugador[0]].ImageLocation = "..\\..\\Img\\cards\\" + carta;
+                    numCartasPorJugador[0]++;
+                }
+                //Si la carta no es mia
+                else
+                {
+                    //Si es el croupier
+                    if (numJugador_carta_recibida == 0)
+                    {
+                        PictureBoxCartas[1, numCartasPorJugador[1]].Visible = true;
+                        numCartasPorJugador[1]++;
+                    }
+                    else
+                    {
+                        if (numJugador_carta_recibida == 1 && numJugador != 0)
+                        {
+                            PictureBoxCartas[numJugador, numCartasPorJugador[numJugador]].Visible = true;
+                            numCartasPorJugador[numJugador]++;
+                        }
+                        else
+                        {
+                            PictureBoxCartas[numJugador_carta_recibida, numCartasPorJugador[numJugador_carta_recibida]].Visible = true;
+                            numCartasPorJugador[numJugador_carta_recibida]++;
+                        }
+                    }
+                }
+
+            }
+
+            //3 cuando dobla
+            else if (accion == 3)
+            {
+                int numJugador_carta_recibida = Convert.ToInt32(separado[0]);
+                //Si la carta que se ha pedido es nuestra
+                if (numJugador_carta_recibida == numJugador)
+                {
+                    jugador1JugadoLbl.Text = (2 * Convert.ToInt32(jugador1JugadoLbl.Text)).ToString();
+                    jugador1PuntosLbl.Text = separado[2];
+
                     rendirseBtn.Enabled = false;
                     rendirseBtn.Visible = false;
                     pedirBtn.Enabled = false;
@@ -380,50 +514,38 @@ namespace Cliente
                     apostarBtn.Text = "Apostar";
                     apostarNum.Enabled = false;
                     apostarNum.Visible = false;
+
+                    //Asignamos a carta el nombre de sus imagenes correspondientes
+                    string carta;
+                    carta = AsignarNombreImagenCarta(separado[3]);
+
+                    //Insertamos la imagen de cada carta
+                    PictureBoxCartas[0, numCartasPorJugador[0]].ImageLocation = "..\\..\\Img\\cards\\" + carta;
+                    numCartasPorJugador[0]++;
                 }
-
-                cartas.Add(separado[3]);
-
-                //Asignamos a carta el nombre de sus imagenes correspondientes
-                string carta;
-                carta = AsignarNombreImagenCarta(separado[3]);
-
-                //Insertamos la imagen de cada carta
-                PictureBoxCartas[cartas.Count-1].ImageLocation = "..\\..\\Img\\cards\\" + carta;
-
-            }
-            //3 cuando dobla
-            else if (accion == 3)
-            {
-
-                jugador1JugadoLbl.Text = (2 * Convert.ToInt32(jugador1JugadoLbl.Text)).ToString();
-                jugador1PuntosLbl.Text = separado[2];
-                if (jugador1Carta3Lbl.Text == "Carta 3")
-                    jugador1Carta3Lbl.Text = separado[3];
-                else if (jugador1Carta4Lbl.Text == "Carta 4")
-                    jugador1Carta4Lbl.Text = separado[3]; 
-
-                rendirseBtn.Enabled = false;
-                rendirseBtn.Visible = false;
-                pedirBtn.Enabled = false;
-                pedirBtn.Visible = false;
-                plantarseBtn.Enabled = false;
-                plantarseBtn.Visible = false;
-                apostarBtn.Enabled = false;
-                apostarBtn.Visible = false;
-                apostarBtn.Text = "Apostar";
-                apostarNum.Enabled = false;
-                apostarNum.Visible = false;
-
-                cartas.Add(separado[3]);
-
-                //Asignamos a carta el nombre de sus imagenes correspondientes
-                string carta;
-                carta = AsignarNombreImagenCarta(separado[3]);
-
-                //Insertamos la imagen de cada carta
-                PictureBoxCartas[cartas.Count - 1].ImageLocation = "..\\..\\Img\\cards\\" + carta;
-
+                //Si la carta no es mia
+                else
+                {
+                    //Si es el croupier
+                    if (numJugador_carta_recibida == 0)
+                    {
+                        PictureBoxCartas[1, numCartasPorJugador[1]].Visible = true;
+                        numCartasPorJugador[1]++;
+                    }
+                    else
+                    {
+                        if (numJugador_carta_recibida == 1 && numJugador != 0)
+                        {
+                            PictureBoxCartas[numJugador, numCartasPorJugador[numJugador]].Visible = true;
+                            numCartasPorJugador[numJugador]++;
+                        }
+                        else
+                        {
+                            PictureBoxCartas[numJugador_carta_recibida, numCartasPorJugador[numJugador_carta_recibida]].Visible = true;
+                            numCartasPorJugador[numJugador_carta_recibida]++;
+                        }
+                    }
+                }
             }
         }
 
@@ -434,233 +556,18 @@ namespace Cliente
             int fichas = Convert.ToInt32(separado[1]);
             int puntos = Convert.ToInt32(separado[2]);
             int numCartas = Convert.ToInt32(separado[3]);
-            /*if (n == 0)
+
+            if (n == numJugador)
             {
                 jugador1FichasLbl.Text = fichas.ToString();
                 jugador1PuntosLbl.Text = puntos.ToString();
                 jugador1JugadoLbl.Text = "0";
-                if (numCartas == 1)
-                {
-                    jugador1Carta1Lbl.Text = separado[4];
-                }
-                else if (numCartas == 2)
-                {
-                    jugador1Carta1Lbl.Text = separado[4];
-                    jugador1Carta2Lbl.Text = separado[5];
-                }
-                else if (numCartas == 3)
-                {
-                    jugador1Carta1Lbl.Text = separado[4];
-                    jugador1Carta2Lbl.Text = separado[5];
-                    jugador1Carta3Lbl.Text = separado[6];
-                }
-                else if (numCartas == 4)
-                {
-                    jugador1Carta1Lbl.Text = separado[4];
-                    jugador1Carta2Lbl.Text = separado[5];
-                    jugador1Carta3Lbl.Text = separado[6];
-                    jugador1Carta4Lbl.Text = separado[7];
-                }
-                empezarBtn.Text = "Siguiente";
-                empezarBtn.Visible = true;
-                empezarBtn.Enabled = true;
             }
-            else if (n == 1)
-            {
-                jugador2FichasLbl.Text = fichas.ToString();
-                jugador2PuntosLbl.Text = puntos.ToString();
-                jugador1JugadoLbl.Text = "0";
-                if (numCartas == 1)
-                {
-                    jugador2Carta1Lbl.Text = separado[4];
-                }
-                else if (numCartas == 2)
-                {
-                    jugador2Carta1Lbl.Text = separado[4];
-                    jugador2Carta2Lbl.Text = separado[5];
-                }
-                else if (numCartas == 3)
-                {
-                    jugador2Carta1Lbl.Text = separado[4];
-                    jugador2Carta2Lbl.Text = separado[5];
-                    jugador2Carta3Lbl.Text = separado[6];
-                }
-                else if (numCartas == 4)
-                {
-                    jugador2Carta1Lbl.Text = separado[4];
-                    jugador2Carta2Lbl.Text = separado[5];
-                    jugador2Carta3Lbl.Text = separado[6];
-                    jugador2Carta4Lbl.Text = separado[7];
-                }
-            }
-            else if (n == 2)
-            {
-                jugador3FichasLbl.Text = fichas.ToString();
-                jugador3PuntosLbl.Text = puntos.ToString();
-                jugador1JugadoLbl.Text = "0";
-                if (numCartas == 1)
-                {
-                    jugador3Carta1Lbl.Text = separado[4];
-                }
-                else if (numCartas == 2)
-                {
-                    jugador3Carta1Lbl.Text = separado[4];
-                    jugador3Carta2Lbl.Text = separado[5];
-                }
-                else if (numCartas == 3)
-                {
-                    jugador3Carta1Lbl.Text = separado[4];
-                    jugador3Carta2Lbl.Text = separado[5];
-                    jugador3Carta3Lbl.Text = separado[6];
-                }
-                else if (numCartas == 4)
-                {
-                    jugador3Carta1Lbl.Text = separado[4];
-                    jugador3Carta2Lbl.Text = separado[5];
-                    jugador3Carta3Lbl.Text = separado[6];
-                    jugador3Carta4Lbl.Text = separado[7];
-                }
-            }
-            else if (n == 3)
-            {
-                jugador4FichasLbl.Text = fichas.ToString();
-                jugador4PuntosLbl.Text = puntos.ToString();
-                jugador1JugadoLbl.Text = "0";
-                if (numCartas == 1)
-                {
-                    jugador4Carta1Lbl.Text = separado[4];
-                }
-                else if (numCartas == 2)
-                {
-                    jugador4Carta1Lbl.Text = separado[4];
-                    jugador4Carta2Lbl.Text = separado[5];
-                }
-                else if (numCartas == 3)
-                {
-                    jugador4Carta1Lbl.Text = separado[4];
-                    jugador4Carta2Lbl.Text = separado[5];
-                    jugador4Carta3Lbl.Text = separado[6];
-                }
-                else if (numCartas == 4)
-                {
-                    jugador4Carta1Lbl.Text = separado[4];
-                    jugador4Carta2Lbl.Text = separado[5];
-                    jugador4Carta3Lbl.Text = separado[6];
-                    jugador4Carta4Lbl.Text = separado[7];
-                }
-            }
-            else if (n == 4)
-            {
-                jugador5FichasLbl.Text = fichas.ToString();
-                jugador5PuntosLbl.Text = puntos.ToString();
-                jugador1JugadoLbl.Text = "0";
-                if (numCartas == 1)
-                {
-                    jugador5Carta1Lbl.Text = separado[4];
-                }
-                else if (numCartas == 2)
-                {
-                    jugador5Carta1Lbl.Text = separado[4];
-                    jugador5Carta2Lbl.Text = separado[5];
-                }
-                else if (numCartas == 3)
-                {
-                    jugador5Carta1Lbl.Text = separado[4];
-                    jugador5Carta2Lbl.Text = separado[5];
-                    jugador5Carta3Lbl.Text = separado[6];
-                }
-                else if (numCartas == 4)
-                {
-                    jugador5Carta1Lbl.Text = separado[4];
-                    jugador5Carta2Lbl.Text = separado[5];
-                    jugador5Carta3Lbl.Text = separado[6];
-                    jugador5Carta4Lbl.Text = separado[7];
-                }
-            }
-            else if (n == 5)
-            {
-                jugador6FichasLbl.Text = fichas.ToString();
-                jugador6PuntosLbl.Text = puntos.ToString();
-                jugador1JugadoLbl.Text = "0";
-                if (numCartas == 1)
-                {
-                    jugador6Carta1Lbl.Text = separado[4];
-                }
-                else if (numCartas == 2)
-                {
-                    jugador6Carta1Lbl.Text = separado[4];
-                    jugador6Carta2Lbl.Text = separado[5];
-                }
-                else if (numCartas == 3)
-                {
-                    jugador6Carta1Lbl.Text = separado[4];
-                    jugador6Carta2Lbl.Text = separado[5];
-                    jugador6Carta3Lbl.Text = separado[6];
-                }
-                else if (numCartas == 4)
-                {
-                    jugador6Carta1Lbl.Text = separado[4];
-                    jugador6Carta2Lbl.Text = separado[5];
-                    jugador6Carta3Lbl.Text = separado[6];
-                    jugador6Carta4Lbl.Text = separado[7];
-                }
-            }
-            else if (n == 6)
-            {
-                jugador7FichasLbl.Text = fichas.ToString();
-                jugador7PuntosLbl.Text = puntos.ToString();
-                jugador1JugadoLbl.Text = "0";
-                if (numCartas == 1)
-                {
-                    jugador7Carta1Lbl.Text = separado[4];
-                }
-                else if (numCartas == 2)
-                {
-                    jugador7Carta1Lbl.Text = separado[4];
-                    jugador7Carta2Lbl.Text = separado[5];
-                }
-                else if (numCartas == 3)
-                {
-                    jugador7Carta1Lbl.Text = separado[4];
-                    jugador7Carta2Lbl.Text = separado[5];
-                    jugador7Carta3Lbl.Text = separado[6];
-                }
-                else if (numCartas == 4)
-                {
-                    jugador7Carta1Lbl.Text = separado[4];
-                    jugador7Carta2Lbl.Text = separado[5];
-                    jugador7Carta3Lbl.Text = separado[6];
-                    jugador7Carta4Lbl.Text = separado[7];
-                }
-            }
-            else if (n == 7)
-            {
-                jugador8FichasLbl.Text = fichas.ToString();
-                jugador8PuntosLbl.Text = puntos.ToString();
-                jugador1JugadoLbl.Text = "0";
-                if (numCartas == 1)
-                {
-                    jugador8Carta1Lbl.Text = separado[4];
-                }
-                else if (numCartas == 2)
-                {
-                    jugador8Carta1Lbl.Text = separado[4];
-                    jugador8Carta2Lbl.Text = separado[5];
-                }
-                else if (numCartas == 3)
-                {
-                    jugador8Carta1Lbl.Text = separado[4];
-                    jugador8Carta2Lbl.Text = separado[5];
-                    jugador8Carta3Lbl.Text = separado[6];
-                }
-                else if (numCartas == 4)
-                {
-                    jugador8Carta1Lbl.Text = separado[4];
-                    jugador8Carta2Lbl.Text = separado[5];
-                    jugador8Carta3Lbl.Text = separado[6];
-                    jugador8Carta4Lbl.Text = separado[7];
-                }
-            }*/
+                
+            empezarBtn.Text = "Siguiente";
+            empezarBtn.Visible = true;
+            empezarBtn.Enabled = true;
+            
         }
 
         public void Accion16(string mensaje)

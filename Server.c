@@ -731,11 +731,12 @@ void siguienteRonda(int ID_partida, int l) {
 			lista_partidas.partida[l].baraja.repartidas++;
 			pedirCarta(l, j, lista_partidas.partida[l].baraja.repartidas);
 			lista_partidas.partida[l].baraja.repartidas++;
-			sprintf(mensaje, "13$%d/%d/%d-%d/%d-%d", ID_partida, lista_partidas.partida[l].lista_jugadores.usuario[j].puntos,
+			sprintf(mensaje, "13$%d/%d/%d-%d/%d-%d/%d", ID_partida, lista_partidas.partida[l].lista_jugadores.usuario[j].puntos,
 					lista_partidas.partida[l].baraja.numero[lista_partidas.partida[l].baraja.repartidas - 2], 
 					lista_partidas.partida[l].baraja.palo[lista_partidas.partida[l].baraja.repartidas - 2],
 					lista_partidas.partida[l].baraja.numero[lista_partidas.partida[l].baraja.repartidas - 1], 
-					lista_partidas.partida[l].baraja.palo[lista_partidas.partida[l].baraja.repartidas - 1]);
+					lista_partidas.partida[l].baraja.palo[lista_partidas.partida[l].baraja.repartidas - 1],
+					j);
 			write (lista_partidas.partida[l].lista_jugadores.usuario[j].sock, mensaje, strlen(mensaje));
 			printf("Se ha enviado %s\n", mensaje);
 		}
@@ -1238,16 +1239,6 @@ void *AtenderCliente (void *socket){
 			//Buscamos la partida en la lista
 			int l = getIndexPartida(ID_partida);
 			
-			//Buscamos al jugador en la lista de jugadores de la partida, para guardar en n su identificador
-			int n = 0;
-			int encontrado = 0;
-			while (!encontrado && n < lista_partidas.partida[l].lista_jugadores.num) {
-				if(lista_partidas.partida[l].lista_jugadores.usuario[n].sock == sock_conn)
-					encontrado = 1;
-				else
-					n++;
-			}
-			
 			pthread_mutex_lock(&mutex);
 			
 			struct tm * fecha_hora;
@@ -1288,7 +1279,7 @@ void *AtenderCliente (void *socket){
 						lista_partidas.partida[l].baraja.palo[lista_partidas.partida[l].baraja.repartidas - 2],
 						lista_partidas.partida[l].baraja.numero[lista_partidas.partida[l].baraja.repartidas - 1], 
 						lista_partidas.partida[l].baraja.palo[lista_partidas.partida[l].baraja.repartidas - 1],
-						n);
+						j);
 				write (lista_partidas.partida[l].lista_jugadores.usuario[j].sock, mensaje, strlen(mensaje));
 				printf("Se ha enviado %s\n", mensaje);
 				
@@ -1355,13 +1346,14 @@ void *AtenderCliente (void *socket){
 				//Pide otra carta
 				pedirCarta(l, k, lista_partidas.partida[l].baraja.repartidas);
 				char mensaje[100];
-				//Enviamos 14$ID_partida/numJugador/1/puntos/carta
+				//Enviamos 14$ID_partida/numJugador/1/puntos/carta a todos los jugadores
 				sprintf(mensaje, "14$%d/%d/1/%d/%d-%d", ID_partida, k, lista_partidas.partida[l].lista_jugadores.usuario[k].puntos,
 						lista_partidas.partida[l].baraja.numero[lista_partidas.partida[l].baraja.repartidas], 
 						lista_partidas.partida[l].baraja.palo[lista_partidas.partida[l].baraja.repartidas]);
 				lista_partidas.partida[l].baraja.repartidas++;
-				write (lista_partidas.partida[l].lista_jugadores.usuario[k].sock, mensaje, strlen(mensaje));
-				printf("Se ha enviado %s\n", mensaje);
+				for(int i = 0; i < lista_partidas.partida[l].lista_jugadores.num; i++)
+					write (lista_partidas.partida[l].lista_jugadores.usuario[i].sock, mensaje, strlen(mensaje));
+				printf("Se ha enviado la notificacion %s\n", mensaje);
 				
 				sprintf(mensaje, "%s ha pedido otra carta.", lista_partidas.partida[l].lista_jugadores.usuario[k].nombre);
 				EnviarMensajeChat(mensaje, ID_partida);
@@ -1384,7 +1376,9 @@ void *AtenderCliente (void *socket){
 						lista_partidas.partida[l].baraja.numero[lista_partidas.partida[l].baraja.repartidas], 
 						lista_partidas.partida[l].baraja.palo[lista_partidas.partida[l].baraja.repartidas]);
 				lista_partidas.partida[l].baraja.repartidas++;
-				write (lista_partidas.partida[l].lista_jugadores.usuario[k].sock, mensaje, strlen(mensaje));
+				//Enviamos notificacion
+				for(int i = 0; i < lista_partidas.partida[l].lista_jugadores.num; i++)
+					write (lista_partidas.partida[l].lista_jugadores.usuario[i].sock, mensaje, strlen(mensaje));
 				printf("Se ha enviado %s\n", mensaje);
 				
 				lista_partidas.partida[l].lista_jugadores.usuario[k].jugado = lista_partidas.partida[l].lista_jugadores.usuario[k].jugado * 2;
@@ -1469,7 +1463,7 @@ int main(int argc, char *argv[]){
 	serv_adr.sin_addr.s_addr = htonl(INADDR_ANY);
 	
 	//Escucharemos en el puerto indicado entre parenteis
-	serv_adr.sin_port = htons(50083);
+	serv_adr.sin_port = htons(50082);
 	if (bind(sock_listen, (struct sockaddr *) &serv_adr, sizeof(serv_adr)) < 0)
 		printf ("Error al bind\n");
 	if (listen(sock_listen, 2) < 0)

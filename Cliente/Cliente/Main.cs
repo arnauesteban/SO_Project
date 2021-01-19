@@ -296,6 +296,7 @@ namespace Cliente
 
         public void Accion13(string mensaje)
         {
+
             string[] separado = mensaje.Split('/');
             for (int j = 0; j < cont_forms; j++)
                 if (lista_forms_partidas[j].getID() == Convert.ToInt32(separado[0]))
