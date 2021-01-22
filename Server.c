@@ -10,6 +10,8 @@
 #include <pthread.h>
 #include <time.h>
 
+// #include <my_global.h>
+
 //Estructura usuario
 typedef struct {
 	char nombre[20];
@@ -170,7 +172,7 @@ int Registrarse(char usuario[20], char clave[20], MYSQL *conn) {
 	}
 	
 	// Ahora ya podemos realizar la insercion 
-	sprintf(consulta, "INSERT INTO JUGADOR VALUES (%d,'%s','%s',0, 0);", i + 1, usuario, clave);
+	sprintf(consulta, "INSERT INTO JUGADOR VALUES (%d,'%s','%s',0, 100);", i + 1, usuario, clave);
 	err = mysql_query(conn, consulta);
 	if (err!=0) {
 		printf ("Error al introducir datos la base %u %s\n", 
@@ -343,7 +345,7 @@ int AsignarIdPartida(MYSQL *conn) {
 	if(id_max > id_max_sql)
 		id = id_max + 1;
 	else
-		id = id_max_sql + 1;
+		id = id_max_sql;
 	
 	//Retornamos la Id disponible para asignar a una partida
 	return id;	
@@ -383,7 +385,7 @@ void BarajarCartas(int l) {
 		int j = 0;
 		int encontrado = 0;
 		while (j < i && !encontrado) {
-			if(lista_partidas.partida[l].baraja.numero[j] == testNum && lista_partidas.partida[l].baraja.palo[j] == testNum)
+			if(lista_partidas.partida[l].baraja.numero[j] == testNum && lista_partidas.partida[l].baraja.palo[j] == testPalo)
 				encontrado = 1;
 			else
 				j++;
@@ -414,13 +416,11 @@ void pedirCarta(int l, int j, int carta) {
 	//La carta es un as
 	if(lista_partidas.partida[l].baraja.numero[carta] == 1) {
 		//Si la suma de los puntos que ya tiene y los del as es menor o igual a 21, se suma 11 a los puntos
-		if(lista_partidas.partida[l].baraja.numero[carta] 
-				+ lista_partidas.partida[l].lista_jugadores.usuario[j].puntos <= 21) 
-		{
+		if(11 + lista_partidas.partida[l].lista_jugadores.usuario[j].puntos <= 21) {
 			lista_partidas.partida[l].lista_jugadores.usuario[j].as++;
 			lista_partidas.partida[l].lista_jugadores.usuario[j].puntos += 11;
 		}
-		//En caso de pasarse el as vale 1
+		//En caso de pasarse de puntos el as vale 1
 		else
 		   lista_partidas.partida[l].lista_jugadores.usuario[j].puntos += 1;
 	}
@@ -482,16 +482,21 @@ void terminarPartida(int ID_partida, char ganador[20], MYSQL *conn) {
 			fecha_hora->tm_year+1900, fecha_hora->tm_mon+1, fecha_hora->tm_mday, fecha_hora->tm_hour, fecha_hora->tm_min);
 	int err = mysql_query(conn, consulta);
 	if (err!=0) {
-		printf ("Error al introducir datos la base %u %s\n", 
-				mysql_errno(conn), mysql_error(conn));
+		printf ("Error al introducir datos la base %u %s\n", mysql_errno(conn), mysql_error(conn));
+		strcpy(mensaje, "1$Ha habido un problema al contactar con la base de datos. Por favor, comunica el error a los desarrolladores (codigo de error 12).");
+		for(int q = 0; q < lista_partidas.partida[l].lista_jugadores.num; q++)
+			write(lista_partidas.partida[l].lista_jugadores.usuario[q].sock, mensaje, strlen(mensaje));
 	}
 	for(int i = 0; i < lista_partidas.partida[l].lista_jugadores.num; i++) {
-		strcpy(consulta, "SELECT JUGADOR.ID FROM JUGADOR WHERE JUGADOR.NOMBRE='");
+		strcpy(consulta, "SELECT JUGADOR.ID, JUGADOR.RECORD, JUGADOR.FICHAS FROM JUGADOR WHERE JUGADOR.NOMBRE='");
 		strcat(consulta, lista_partidas.partida[l].lista_jugadores.usuario[i].nombre);
 		strcat(consulta, "'");
 		err=mysql_query (conn, consulta);
 		if (err!=0) {
 			printf ("Error al consultar datos de la base %u %s\n", mysql_errno(conn), mysql_error(conn));
+			strcpy(mensaje, "1$Ha habido un problema al contactar con la base de datos. Por favor, comunica el error a los desarrolladores (codigo de error 13).");
+			for(int q = 0; q < lista_partidas.partida[l].lista_jugadores.num; q++)
+				write(lista_partidas.partida[l].lista_jugadores.usuario[q].sock, mensaje, strlen(mensaje));
 		}
 		MYSQL_RES *resultado;
 		MYSQL_ROW row;
@@ -502,10 +507,49 @@ void terminarPartida(int ID_partida, char ganador[20], MYSQL *conn) {
 		sprintf(consulta, "INSERT INTO PARTICIPACION VALUES(%d, %d);", ID_partida, atoi(row[0]));
 		err = mysql_query(conn, consulta);
 		if (err!=0) {
-			printf ("Error al introducir datos la base %u %s\n", 
-					mysql_errno(conn), mysql_error(conn));
+			printf ("Error al introducir datos la base %u %s\n", mysql_errno(conn), mysql_error(conn));
+			strcpy(mensaje, "1$Ha habido un problema al contactar con la base de datos. Por favor, comunica el error a los desarrolladores (codigo de error 14).");
+			for(int q = 0; q < lista_partidas.partida[l].lista_jugadores.num; q++)
+				write(lista_partidas.partida[l].lista_jugadores.usuario[q].sock, mensaje, strlen(mensaje));
 		}
 		
+		if(atoi(row[1]) <= lista_partidas.partida[l].lista_jugadores.usuario[i].fichas) {
+			sprintf(consulta, "UPDATE JUGADOR SET JUGADOR.RECORD = %d WHERE JUGADOR.ID = %d;",
+					lista_partidas.partida[l].lista_jugadores.usuario[i].fichas, atoi(row[0]));
+			err = mysql_query(conn, consulta);
+			if (err!=0) {
+				printf ("Error al introducir datos la base %u %s\n", mysql_errno(conn), mysql_error(conn));
+				strcpy(mensaje, "1$Ha habido un problema al contactar con la base de datos. Por favor, comunica el error a los desarrolladores (codigo de error 15).");
+				for(int q = 0; q < lista_partidas.partida[l].lista_jugadores.num; q++)
+					write(lista_partidas.partida[l].lista_jugadores.usuario[q].sock, mensaje, strlen(mensaje));
+			}
+		}
+		if(atoi(row[2]) - 100 + lista_partidas.partida[l].lista_jugadores.usuario[i].fichas >= 100) {
+			sprintf(consulta, "UPDATE JUGADOR SET JUGADOR.FICHAS = JUGADOR.FICHAS-100+%d WHERE JUGADOR.ID = %d;",
+					lista_partidas.partida[l].lista_jugadores.usuario[i].fichas, atoi(row[0]));
+			err = mysql_query(conn, consulta);
+			if (err!=0) {
+				printf ("Error al introducir datos la base %u %s\n", mysql_errno(conn), mysql_error(conn));
+				strcpy(mensaje, "1$Ha habido un problema al contactar con la base de datos. Por favor, comunica el error a los desarrolladores (codigo de error 15).");
+				write(lista_partidas.partida[l].lista_jugadores.usuario[i].sock, mensaje, strlen(mensaje));
+			}
+		}
+		else {
+			sprintf(consulta, "UPDATE JUGADOR SET JUGADOR.FICHAS = 100 WHERE JUGADOR.ID = %d;", atoi(row[0]));
+			err = mysql_query(conn, consulta);
+			if (err!=0) {
+				printf ("Error al introducir datos la base %u %s\n", mysql_errno(conn), mysql_error(conn));
+				strcpy(mensaje, "1$Ha habido un problema al contactar con la base de datos. Por favor, comunica el error a los desarrolladores (codigo de error 16).");
+				write(lista_partidas.partida[l].lista_jugadores.usuario[i].sock, mensaje, strlen(mensaje));
+			}
+			else {	
+				strcpy(mensaje, "1$Vaya, ¡Te has quedado sin blanca! No te preocupes, hemos ingresado unas pocas fichas y ahora tienes 100 para jugar mas partidas.");
+				write(lista_partidas.partida[l].lista_jugadores.usuario[i].sock, mensaje, strlen(mensaje));
+				sleep(1);
+			}
+		}
+		
+		sleep(1);
 		char mensaje0[100];
 		sprintf(mensaje0, "16$%d", ID_partida);
 		for(int q = 0; q < lista_partidas.partida[l].lista_jugadores.num; q++)
@@ -682,7 +726,7 @@ void terminarRonda(int l, int ID_partida, MYSQL *conn) {
 	    int j = 1;
 		int encontrado = 0;
 		while(!encontrado && j < lista_partidas.partida[l].lista_jugadores.num) {
-			if(lista_partidas.partida[l].lista_jugadores.usuario[0].fichas > 0)
+			if(lista_partidas.partida[l].lista_jugadores.usuario[j].fichas > 0)
 				encontrado = 1;
 			else
 				j++;
@@ -758,9 +802,11 @@ void *AtenderCliente (void *socket){
 	//Creamos una conexion al servidor MYSQL 
 	conn = mysql_init(NULL);
 	if (conn==NULL) {
-		printf ("Error al crear la conexion: %u %s\n",
-				mysql_errno(conn), mysql_error(conn));
-		exit(1);
+		printf ("Error al crear la conexion: %u %s\n", mysql_errno(conn), mysql_error(conn));
+		char mensaje[200];
+		strcpy(mensaje, "1$Ha habido un problema al contactar con la base de datos. Por favor, comunica el error a los desarrolladores (codigo de error 1).");
+		printf("Se ha enviado %s\n", mensaje);
+		write (sock_conn, mensaje, strlen(mensaje));
 	}
 	//inicializar la conexion, entrando nuestras claves de acceso y el nombre de la base de datos a la que queremos acceder 
 
@@ -769,7 +815,10 @@ void *AtenderCliente (void *socket){
 
 	if (conn==NULL) {
 		printf ("Error al inicializar la conexion: %u %s\n", mysql_errno(conn), mysql_error(conn));
-		exit(1);
+		char mensaje[200];
+		strcpy(mensaje, "1$Ha habido un problema al contactar con la base de datos. Por favor, comunica el error a los desarrolladores (codigo de error 2).");
+		printf("Se ha enviado %s\n", mensaje);
+		write (sock_conn, mensaje, strlen(mensaje));
 	}
 	
 	srand(time(NULL));
@@ -832,17 +881,16 @@ void *AtenderCliente (void *socket){
 			strcpy(clave, p);
 			
 			//Registramos al cliente con los datos que ha enviado y analizamos resultados
-
 			int res = Registrarse(nombre, clave, conn);
-
+			
 			if(res == 0)
 				strcpy (buff2, "1$Se ha registrado correctamente.");
 			else if(res == -1)
-				strcpy (buff2, "1$Error al consultar la base de datos.");
+				strcpy (buff2, "1$Ha habido un problema al contactar con la base de datos. Por favor, comunica el error a los desarrolladores (codigo de error 3).");
 			else if(res == -2)
 				strcpy (buff2, "1$Lo sentimos, ya hay alguien con ese nombre. Introduce un nombre distinto.");
 			else if(res == -3)
-				strcpy (buff2, "1$Error al introducir tus datos en la base.");
+				strcpy (buff2, "1$Ha habido un problema al contactar con la base de datos. Por favor, comunica el error a los desarrolladores (codigo de error 4).");
 			else
 				printf("Error inesperado al registar al usuario.");
 			
@@ -872,7 +920,7 @@ void *AtenderCliente (void *socket){
 			}
 
 			else if(res == -1)
-				strcpy (buff2, "2$Error al consultar la base de datos.");
+			   strcpy(buff2, "1$Ha habido un problema al contactar con la base de datos. Por favor, comunica el error a los desarrolladores (codigo de error 5).");
 			else if(res == -2)
 				strcpy (buff2, "2$Error. Los datos introducidos no coinciden.");
 			else
@@ -933,31 +981,39 @@ void *AtenderCliente (void *socket){
 			
 			//Asignamos una ID a la partida, miramos que no exista en la base de datos ni en la lista de partidas local
 			int id = AsignarIdPartida(conn);
-			lista_partidas.partida[lista_partidas.num].ID = id;
-			
-			lista_partidas.partida[lista_partidas.num].lista_jugadores.num = 1;
-			pthread_mutex_unlock(&mutex);
-			
-			char mensaje[200];
-			
-			//Se envia al invitado: 5$nombre_host/id_partida
-			sprintf(mensaje, "5$%s/%d", nombre_host, lista_partidas.partida[lista_partidas.num].ID);
-			p = strtok(NULL, "/");
-			int num_invitados = atoi(p);
-			p = strtok(NULL, "/");
-			for (int j = 0; j < num_invitados; j++) {
-				char nombre_invitado[20];
-				strcpy(nombre_invitado, p);
+			if(id == -1) {
+				char mensaje[200];
+				strcpy(mensaje, "1$Ha habido un problema al contactar con la base de datos. Por favor, comunica el error a los desarrolladores (codigo de error 6).");
 				printf("Se ha enviado %s\n", mensaje);
-				for(int k = 0; k < lista_conectados.num; k++)
-					if(strcmp(lista_conectados.usuario[k].nombre, nombre_invitado) == 0)
-						write (lista_conectados.usuario[k].sock, mensaje, strlen(mensaje));
-				p = strtok(NULL, "/");
+				write (sock_conn, mensaje, strlen(mensaje));
 			}
-			sprintf(mensaje, "4$%d", lista_partidas.partida[lista_partidas.num].ID);
-			printf("Se ha enviado %s\n", mensaje);
-			write (sock_conn, mensaje, strlen(mensaje));
-			lista_partidas.num++;
+			else {
+				lista_partidas.partida[lista_partidas.num].ID = id;
+				
+				lista_partidas.partida[lista_partidas.num].lista_jugadores.num = 1;
+				pthread_mutex_unlock(&mutex);
+				
+				char mensaje[200];
+				
+				//Se envia al invitado: 5$nombre_host/id_partida
+				sprintf(mensaje, "5$%s/%d", nombre_host, lista_partidas.partida[lista_partidas.num].ID);
+				p = strtok(NULL, "/");
+				int num_invitados = atoi(p);
+				p = strtok(NULL, "/");
+				for (int j = 0; j < num_invitados; j++) {
+					char nombre_invitado[20];
+					strcpy(nombre_invitado, p);
+					printf("Se ha enviado %s\n", mensaje);
+					for(int k = 0; k < lista_conectados.num; k++)
+						if(strcmp(lista_conectados.usuario[k].nombre, nombre_invitado) == 0)
+							write (lista_conectados.usuario[k].sock, mensaje, strlen(mensaje));
+					p = strtok(NULL, "/");
+				}
+				sprintf(mensaje, "4$%d", lista_partidas.partida[lista_partidas.num].ID);
+				printf("Se ha enviado %s\n", mensaje);
+				write (sock_conn, mensaje, strlen(mensaje));
+				lista_partidas.num++;
+			}
 		}
 		
 		//Quiere aceptar o rechazar una invitación recibida
@@ -1098,8 +1154,8 @@ void *AtenderCliente (void *socket){
 			int err = mysql_query (conn, consulta);
 			if (err!=0) {
 				printf ("Error al consultar la clave en la base %u %s\n", mysql_errno(conn), mysql_error(conn));
-				char respuesta[100];
-				strcpy(respuesta, "8$-1");
+				char respuesta[200];
+				strcpy(respuesta, "1$Ha habido un problema al contactar con la base de datos. Por favor, comunica el error a los desarrolladores (codigo de error 7).");
 				write(sock_conn, respuesta, strlen(respuesta));
 			}
 			else {
@@ -1124,8 +1180,8 @@ void *AtenderCliente (void *socket){
 					if (err!=0) {
 						//Si ha habido algun error en la eliminacion se envia mensaje de error al usuario
 						printf ("Error al eliminar de la base %u %s\n", mysql_errno(conn), mysql_error(conn));
-						char respuesta[100];
-						strcpy(respuesta, "8$-1");
+						char respuesta[200];
+						strcpy(respuesta, "1$Ha habido un problema al contactar con la base de datos. Por favor, comunica el error a los desarrolladores (codigo de error 8).");
 						write(sock_conn, respuesta, strlen(respuesta));
 					}
 					else {
@@ -1153,7 +1209,7 @@ void *AtenderCliente (void *socket){
 			if (err!=0) {
 				printf ("Error al consultar en la base %u %s\n", mysql_errno(conn), mysql_error(conn));
 				char respuesta[100];
-				strcpy(respuesta, "9$-2"); //Se envia respuesta problemtica,devolvemos -2
+				strcpy(respuesta, "1$Ha habido un problema al contactar con la base de datos. Por favor, comunica el error a los desarrolladores (codigo de error 9).");
 				write(sock_conn, respuesta, strlen(respuesta));
 			}
 			else {
@@ -1199,12 +1255,12 @@ void *AtenderCliente (void *socket){
 		//RESERVADO PARA CONSULTA A LA BASE DE DATOS 2
 		//El servidor recibe ...
 		else if (codigo == 10) {
-			
+			//RESERVADO CODIGO DE ERROR 10 EN COMUNICACION CON BBDD
 		}
 		//RESERVADO PARA CONSULTA A LA BASE DE DATOS 3
 		//El servidor recibe ...
 		else if (codigo == 11) {
-			
+			//RESERVADO CODIGO DE ERROR 11 DE COMUNICACION CON BBDD
 		}
 		
 		//Quiere recibir los datos de la partida (jugadores, fichas...)

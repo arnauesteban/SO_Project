@@ -348,7 +348,7 @@ namespace Cliente
             string[] separado = mensaje.Split('/');
             for (int j = 0; j < cont_forms; j++)
                 if (lista_forms_partidas[j].getID() == Convert.ToInt32(separado[0]))
-                    lista_forms_partidas[j].TomaRespuesta(16, separado[1] + "/" + separado[2] + "/" + separado[3]);
+                    lista_forms_partidas[j].TomaRespuesta(16, "");
         }
 
         private void Form1_Load(object sender, EventArgs e)

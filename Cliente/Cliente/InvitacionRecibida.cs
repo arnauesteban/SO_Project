@@ -20,7 +20,7 @@ namespace Cliente
 
         private void InvitacionRecibida_Load(object sender, EventArgs e)
         {
-            Label.Text = this.nombre_host + " te ha invitado a una partida de Poker! ¿Aceptar?";
+            Label.Text = "¡" + this.nombre_host + " te ha invitado a una partida de BlackJack! ¿Aceptar?";
         }
 
         private void YesBtn_Click(object sender, EventArgs e)

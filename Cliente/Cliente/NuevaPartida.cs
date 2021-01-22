@@ -8,7 +8,6 @@ using System.Text;
 using System.Windows.Forms;
 using System.Net.Sockets;
 using System.Threading;
-using System.Collections.Generic;
 
 namespace Cliente
 {
@@ -167,9 +166,9 @@ namespace Cliente
 
         }
 
-        //A partir de la carta en formato numero-palo, retornamos el nombre del archivo imagen de esa carta
         private string AsignarNombreImagenCarta(string carta)
         {
+            //A partir de la carta en formato numero-palo, retornamos el nombre del archivo imagen de esa carta
             string numero = carta.Split('-')[0];
             string palo = carta.Split('-')[1];
 
@@ -340,17 +339,34 @@ namespace Cliente
             jugador1PuntosLbl.Text = separado[0];
             if (Convert.ToInt32(jugador1PuntosLbl.Text) > 20)
             {
-                rendirseBtn.Enabled = false;
-                rendirseBtn.Visible = false;
-                pedirBtn.Enabled = false;
-                pedirBtn.Visible = false;
-                plantarseBtn.Enabled = false;
-                plantarseBtn.Visible = false;
-                apostarBtn.Enabled = false;
-                apostarBtn.Visible = false;
-                apostarBtn.Text = "Apostar";
-                apostarNum.Enabled = false;
-                apostarNum.Visible = false;
+                if (banca)
+                {
+                    apostarBtn.Enabled = false;
+                    apostarBtn.Visible = false;
+                    apostarBtn.Text = "Apostar";
+                    apostarNum.Enabled = false;
+                    apostarNum.Visible = false;
+                    rendirseBtn.Enabled = false;
+                    rendirseBtn.Visible = false;
+                    pedirBtn.Enabled = false;
+                    pedirBtn.Visible = false;
+                    plantarseBtn.Enabled = false;
+                    plantarseBtn.Visible = false;
+                }
+                else
+                {
+                    apostarBtn.Enabled = true;
+                    apostarBtn.Visible = true;
+                    apostarBtn.Text = "Apostar";
+                    apostarNum.Enabled = true;
+                    apostarNum.Visible = true;
+                    rendirseBtn.Enabled = false;
+                    rendirseBtn.Visible = false;
+                    pedirBtn.Enabled = false;
+                    pedirBtn.Visible = false;
+                    plantarseBtn.Enabled = false;
+                    plantarseBtn.Visible = false;
+                }
             }
             else
             {
@@ -572,7 +588,8 @@ namespace Cliente
 
         public void Accion16(string mensaje)
         {
-            
+            MessageBox.Show("La partida ha terminado. ¡Bien jugado!");
+            this.Close();
         }
 
         private void enviar_Btn_Click(object sender, EventArgs e)
@@ -681,6 +698,11 @@ namespace Cliente
                 apostarBtn.Text = "Doblar";
                 apostarNum.Enabled = false;
                 apostarNum.Visible = false;
+                if (2 * apostarNum.Value > Convert.ToInt32(jugador1FichasLbl.Text))
+                {
+                    apostarBtn.Visible = false;
+                    apostarBtn.Enabled = false;
+                }
             }
             else
             {

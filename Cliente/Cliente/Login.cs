@@ -141,59 +141,66 @@ namespace Cliente
                 string[] trozos = server.Recibir().Split('$');
                 if (trozos.Length > 1)
                 {
-                    int codigo = Convert.ToInt32(trozos[0]);
-                    string mensaje = trozos[1].Split('\0')[0];
-
-                    switch (codigo)
+                    try
                     {
-                        case 1:
-                            //Respuesta a petición de registro en la base de datos
-                            MessageBox.Show(mensaje);
-                            break;
-                        case 2:
-                            //Respuesta a petición de iniciar sesión
-                            MessageBox.Show(mensaje);
-                            if (mensaje == "Se ha iniciado sesion correctamente.")
-                            {
-                                ThreadStart ts = delegate { this.AbrirMain(); };
-                                thread_main = new Thread(ts);
-                                thread_main.Start();
-                            }
-                            break;
-                        case 3:
-                            //Recepción y reenvío de la lista de conectados actualizada.
-                            if (main != null)
-                                main.TomaRespuesta(codigo, mensaje);
-                            break;
+                        int codigo = Convert.ToInt32(trozos[0]);
+                        string mensaje = trozos[1].Split('\0')[0];
 
-                        case 4:
+                        switch (codigo)
+                        {
+                            case 1:
+                                //Respuesta a petición de registro en la base de datos
+                                MessageBox.Show(mensaje);
+                                break;
+                            case 2:
+                                //Respuesta a petición de iniciar sesión
+                                MessageBox.Show(mensaje);
+                                if (mensaje == "Se ha iniciado sesion correctamente.")
+                                {
+                                    ThreadStart ts = delegate { this.AbrirMain(); };
+                                    thread_main = new Thread(ts);
+                                    thread_main.Start();
+                                }
+                                break;
+                            case 3:
+                                //Recepción y reenvío de la lista de conectados actualizada.
+                                if (main != null)
+                                    main.TomaRespuesta(codigo, mensaje);
+                                break;
+
+                            case 4:
                             //Recepción y reenvío de un mensaje con el identificador que tiene la partida que el usuario acaba de crear
-                        case 5:
+                            case 5:
                             //Recepción y reenvío de una invitación para jugar una partida
-                        case 6:
+                            case 6:
                             //Recepción y reenvío de un mensaje de chat de alguna partida que está jugando el usuario
-                        case 7:
+                            case 7:
                             //Recepción y reenvío de un mensaje que designa a este cliente como host de una partida
-                        case 8:
+                            case 8:
                             //Recepción y reenvío de un mensaje de respuesta a una peticion de baja del juego
-                        case 9:
+                            case 9:
                             //Recepción y reenvío de un mensaje con la respuesta a la petición 1 a la base de datos
-                        case 10:
+                            case 10:
                             //Recepción y reenvío de un mensaje con la respuesta a la petición 2 a la base de datos
-                        case 11:
+                            case 11:
                             //Recepción y reenvío de un mensaje con la respuesta a la petición 3 a la base de datos
-                        case 12:
+                            case 12:
                             //Recepción y reenvío de un mensaje con información de la partida (jugadores, fichas...)
-                        case 13:
-                            //Recepción y reenvío de un mensaje con la configuracion inicial de la partida y las cartas de la mano de la primera ronda
-                        case 14:
+                            case 13:
+                            //Recepción y reenvío de un mensaje con las dos cartas iniciales del jugador en una nueva ronda
+                            case 14:
                             //Recepción y reenvío de un mensaje con la acción que algun jugador ha realizado en la partida
-                        case 15:
+                            case 15:
                             //Recepcion y reenvío de un mensaje con todos los datos de un jugador al final de una ronda
-                        case 16:
-                            //Recepcion y reenvio de un mensaje con las dos cartas iniciales del jugador en una nueva ronda
-                            main.TomaRespuesta(codigo, mensaje);
-                            break;
+                            case 16:
+                            //Recepcion y reenvio de un mensaje para invitarnos a salir de una partida terminada
+                                main.TomaRespuesta(codigo, mensaje);
+                                break;
+                        }
+                    }
+                    catch (FormatException)
+                    {
+                        //Si el formato del mensaje es erróneo, nos limitamos a ignorar el mensaje
                     }
                 }
             }
