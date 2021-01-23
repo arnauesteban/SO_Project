@@ -94,6 +94,34 @@ namespace Cliente
             this.label1 = new System.Windows.Forms.Label();
             this.label2 = new System.Windows.Forms.Label();
             this.label3 = new System.Windows.Forms.Label();
+            this.jugador7PuntosLbl = new System.Windows.Forms.Label();
+            this.jugador6PuntosLbl = new System.Windows.Forms.Label();
+            this.jugador5PuntosLbl = new System.Windows.Forms.Label();
+            this.jugador7JugadoLbl = new System.Windows.Forms.Label();
+            this.jugador7FichasLbl = new System.Windows.Forms.Label();
+            this.jugador7NombreLbl = new System.Windows.Forms.Label();
+            this.jugador6JugadoLbl = new System.Windows.Forms.Label();
+            this.jugador6FichasLbl = new System.Windows.Forms.Label();
+            this.jugador6NombreLbl = new System.Windows.Forms.Label();
+            this.jugador5JugadoLbl = new System.Windows.Forms.Label();
+            this.jugador5FichasLbl = new System.Windows.Forms.Label();
+            this.jugador5NombreLbl = new System.Windows.Forms.Label();
+            this.jugador8PuntosLbl = new System.Windows.Forms.Label();
+            this.jugador8JugadoLbl = new System.Windows.Forms.Label();
+            this.jugador8FichasLbl = new System.Windows.Forms.Label();
+            this.jugador8NombreLbl = new System.Windows.Forms.Label();
+            this.jugador4PuntosLbl = new System.Windows.Forms.Label();
+            this.jugador3PuntosLbl = new System.Windows.Forms.Label();
+            this.jugador2PuntosLbl = new System.Windows.Forms.Label();
+            this.jugador4JugadoLbl = new System.Windows.Forms.Label();
+            this.jugador4FichasLbl = new System.Windows.Forms.Label();
+            this.jugador4NombreLbl = new System.Windows.Forms.Label();
+            this.jugador3JugadoLbl = new System.Windows.Forms.Label();
+            this.jugador3FichasLbl = new System.Windows.Forms.Label();
+            this.jugador3NombreLbl = new System.Windows.Forms.Label();
+            this.jugador2JugadoLbl = new System.Windows.Forms.Label();
+            this.jugador2FichasLbl = new System.Windows.Forms.Label();
+            this.jugador2NombreLbl = new System.Windows.Forms.Label();
             ((System.ComponentModel.ISupportInitialize)(this.apostarNum)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.pictureBox1_MiJugador)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.pictureBox2_MiJugador)).BeginInit();
@@ -826,6 +854,258 @@ namespace Cliente
             this.label3.TabIndex = 132;
             this.label3.Text = "Puntos";
             // 
+            // jugador7PuntosLbl
+            // 
+            this.jugador7PuntosLbl.AutoSize = true;
+            this.jugador7PuntosLbl.Location = new System.Drawing.Point(203, 397);
+            this.jugador7PuntosLbl.Name = "jugador7PuntosLbl";
+            this.jugador7PuntosLbl.Size = new System.Drawing.Size(13, 13);
+            this.jugador7PuntosLbl.TabIndex = 147;
+            this.jugador7PuntosLbl.Text = "0";
+            // 
+            // jugador6PuntosLbl
+            // 
+            this.jugador6PuntosLbl.AutoSize = true;
+            this.jugador6PuntosLbl.Location = new System.Drawing.Point(540, 195);
+            this.jugador6PuntosLbl.Name = "jugador6PuntosLbl";
+            this.jugador6PuntosLbl.Size = new System.Drawing.Size(13, 13);
+            this.jugador6PuntosLbl.TabIndex = 146;
+            this.jugador6PuntosLbl.Text = "0";
+            // 
+            // jugador5PuntosLbl
+            // 
+            this.jugador5PuntosLbl.AutoSize = true;
+            this.jugador5PuntosLbl.Location = new System.Drawing.Point(202, 195);
+            this.jugador5PuntosLbl.Name = "jugador5PuntosLbl";
+            this.jugador5PuntosLbl.Size = new System.Drawing.Size(13, 13);
+            this.jugador5PuntosLbl.TabIndex = 145;
+            this.jugador5PuntosLbl.Text = "0";
+            // 
+            // jugador7JugadoLbl
+            // 
+            this.jugador7JugadoLbl.AutoSize = true;
+            this.jugador7JugadoLbl.Location = new System.Drawing.Point(202, 375);
+            this.jugador7JugadoLbl.Name = "jugador7JugadoLbl";
+            this.jugador7JugadoLbl.Size = new System.Drawing.Size(13, 13);
+            this.jugador7JugadoLbl.TabIndex = 141;
+            this.jugador7JugadoLbl.Text = "0";
+            // 
+            // jugador7FichasLbl
+            // 
+            this.jugador7FichasLbl.AutoSize = true;
+            this.jugador7FichasLbl.Location = new System.Drawing.Point(203, 352);
+            this.jugador7FichasLbl.Name = "jugador7FichasLbl";
+            this.jugador7FichasLbl.Size = new System.Drawing.Size(13, 13);
+            this.jugador7FichasLbl.TabIndex = 140;
+            this.jugador7FichasLbl.Text = "0";
+            // 
+            // jugador7NombreLbl
+            // 
+            this.jugador7NombreLbl.AutoSize = true;
+            this.jugador7NombreLbl.Location = new System.Drawing.Point(202, 329);
+            this.jugador7NombreLbl.Name = "jugador7NombreLbl";
+            this.jugador7NombreLbl.Size = new System.Drawing.Size(54, 13);
+            this.jugador7NombreLbl.TabIndex = 139;
+            this.jugador7NombreLbl.Text = "Jugador 7";
+            // 
+            // jugador6JugadoLbl
+            // 
+            this.jugador6JugadoLbl.AutoSize = true;
+            this.jugador6JugadoLbl.Location = new System.Drawing.Point(540, 173);
+            this.jugador6JugadoLbl.Name = "jugador6JugadoLbl";
+            this.jugador6JugadoLbl.Size = new System.Drawing.Size(13, 13);
+            this.jugador6JugadoLbl.TabIndex = 138;
+            this.jugador6JugadoLbl.Text = "0";
+            // 
+            // jugador6FichasLbl
+            // 
+            this.jugador6FichasLbl.AutoSize = true;
+            this.jugador6FichasLbl.Location = new System.Drawing.Point(541, 150);
+            this.jugador6FichasLbl.Name = "jugador6FichasLbl";
+            this.jugador6FichasLbl.Size = new System.Drawing.Size(13, 13);
+            this.jugador6FichasLbl.TabIndex = 137;
+            this.jugador6FichasLbl.Text = "0";
+            // 
+            // jugador6NombreLbl
+            // 
+            this.jugador6NombreLbl.AutoSize = true;
+            this.jugador6NombreLbl.Location = new System.Drawing.Point(540, 127);
+            this.jugador6NombreLbl.Name = "jugador6NombreLbl";
+            this.jugador6NombreLbl.Size = new System.Drawing.Size(54, 13);
+            this.jugador6NombreLbl.TabIndex = 136;
+            this.jugador6NombreLbl.Text = "Jugador 6";
+            // 
+            // jugador5JugadoLbl
+            // 
+            this.jugador5JugadoLbl.AutoSize = true;
+            this.jugador5JugadoLbl.Location = new System.Drawing.Point(202, 173);
+            this.jugador5JugadoLbl.Name = "jugador5JugadoLbl";
+            this.jugador5JugadoLbl.Size = new System.Drawing.Size(13, 13);
+            this.jugador5JugadoLbl.TabIndex = 135;
+            this.jugador5JugadoLbl.Text = "0";
+            // 
+            // jugador5FichasLbl
+            // 
+            this.jugador5FichasLbl.AutoSize = true;
+            this.jugador5FichasLbl.Location = new System.Drawing.Point(203, 150);
+            this.jugador5FichasLbl.Name = "jugador5FichasLbl";
+            this.jugador5FichasLbl.Size = new System.Drawing.Size(13, 13);
+            this.jugador5FichasLbl.TabIndex = 134;
+            this.jugador5FichasLbl.Text = "0";
+            // 
+            // jugador5NombreLbl
+            // 
+            this.jugador5NombreLbl.AutoSize = true;
+            this.jugador5NombreLbl.Location = new System.Drawing.Point(202, 127);
+            this.jugador5NombreLbl.Name = "jugador5NombreLbl";
+            this.jugador5NombreLbl.Size = new System.Drawing.Size(54, 13);
+            this.jugador5NombreLbl.TabIndex = 133;
+            this.jugador5NombreLbl.Text = "Jugador 5";
+            // 
+            // jugador8PuntosLbl
+            // 
+            this.jugador8PuntosLbl.AutoSize = true;
+            this.jugador8PuntosLbl.Location = new System.Drawing.Point(541, 397);
+            this.jugador8PuntosLbl.Name = "jugador8PuntosLbl";
+            this.jugador8PuntosLbl.Size = new System.Drawing.Size(13, 13);
+            this.jugador8PuntosLbl.TabIndex = 151;
+            this.jugador8PuntosLbl.Text = "0";
+            // 
+            // jugador8JugadoLbl
+            // 
+            this.jugador8JugadoLbl.AutoSize = true;
+            this.jugador8JugadoLbl.Location = new System.Drawing.Point(540, 375);
+            this.jugador8JugadoLbl.Name = "jugador8JugadoLbl";
+            this.jugador8JugadoLbl.Size = new System.Drawing.Size(13, 13);
+            this.jugador8JugadoLbl.TabIndex = 150;
+            this.jugador8JugadoLbl.Text = "0";
+            // 
+            // jugador8FichasLbl
+            // 
+            this.jugador8FichasLbl.AutoSize = true;
+            this.jugador8FichasLbl.Location = new System.Drawing.Point(541, 352);
+            this.jugador8FichasLbl.Name = "jugador8FichasLbl";
+            this.jugador8FichasLbl.Size = new System.Drawing.Size(13, 13);
+            this.jugador8FichasLbl.TabIndex = 149;
+            this.jugador8FichasLbl.Text = "0";
+            // 
+            // jugador8NombreLbl
+            // 
+            this.jugador8NombreLbl.AutoSize = true;
+            this.jugador8NombreLbl.Location = new System.Drawing.Point(540, 329);
+            this.jugador8NombreLbl.Name = "jugador8NombreLbl";
+            this.jugador8NombreLbl.Size = new System.Drawing.Size(54, 13);
+            this.jugador8NombreLbl.TabIndex = 148;
+            this.jugador8NombreLbl.Text = "Jugador 8";
+            // 
+            // jugador4PuntosLbl
+            // 
+            this.jugador4PuntosLbl.AutoSize = true;
+            this.jugador4PuntosLbl.Location = new System.Drawing.Point(540, 297);
+            this.jugador4PuntosLbl.Name = "jugador4PuntosLbl";
+            this.jugador4PuntosLbl.Size = new System.Drawing.Size(13, 13);
+            this.jugador4PuntosLbl.TabIndex = 163;
+            this.jugador4PuntosLbl.Text = "0";
+            // 
+            // jugador3PuntosLbl
+            // 
+            this.jugador3PuntosLbl.AutoSize = true;
+            this.jugador3PuntosLbl.Location = new System.Drawing.Point(203, 297);
+            this.jugador3PuntosLbl.Name = "jugador3PuntosLbl";
+            this.jugador3PuntosLbl.Size = new System.Drawing.Size(13, 13);
+            this.jugador3PuntosLbl.TabIndex = 162;
+            this.jugador3PuntosLbl.Text = "0";
+            // 
+            // jugador2PuntosLbl
+            // 
+            this.jugador2PuntosLbl.AutoSize = true;
+            this.jugador2PuntosLbl.Location = new System.Drawing.Point(373, 180);
+            this.jugador2PuntosLbl.Name = "jugador2PuntosLbl";
+            this.jugador2PuntosLbl.Size = new System.Drawing.Size(13, 13);
+            this.jugador2PuntosLbl.TabIndex = 161;
+            this.jugador2PuntosLbl.Text = "0";
+            // 
+            // jugador4JugadoLbl
+            // 
+            this.jugador4JugadoLbl.AutoSize = true;
+            this.jugador4JugadoLbl.Location = new System.Drawing.Point(540, 274);
+            this.jugador4JugadoLbl.Name = "jugador4JugadoLbl";
+            this.jugador4JugadoLbl.Size = new System.Drawing.Size(13, 13);
+            this.jugador4JugadoLbl.TabIndex = 160;
+            this.jugador4JugadoLbl.Text = "0";
+            // 
+            // jugador4FichasLbl
+            // 
+            this.jugador4FichasLbl.AutoSize = true;
+            this.jugador4FichasLbl.Location = new System.Drawing.Point(541, 251);
+            this.jugador4FichasLbl.Name = "jugador4FichasLbl";
+            this.jugador4FichasLbl.Size = new System.Drawing.Size(13, 13);
+            this.jugador4FichasLbl.TabIndex = 159;
+            this.jugador4FichasLbl.Text = "0";
+            // 
+            // jugador4NombreLbl
+            // 
+            this.jugador4NombreLbl.AutoSize = true;
+            this.jugador4NombreLbl.Location = new System.Drawing.Point(540, 228);
+            this.jugador4NombreLbl.Name = "jugador4NombreLbl";
+            this.jugador4NombreLbl.Size = new System.Drawing.Size(54, 13);
+            this.jugador4NombreLbl.TabIndex = 158;
+            this.jugador4NombreLbl.Text = "Jugador 4";
+            // 
+            // jugador3JugadoLbl
+            // 
+            this.jugador3JugadoLbl.AutoSize = true;
+            this.jugador3JugadoLbl.Location = new System.Drawing.Point(202, 274);
+            this.jugador3JugadoLbl.Name = "jugador3JugadoLbl";
+            this.jugador3JugadoLbl.Size = new System.Drawing.Size(13, 13);
+            this.jugador3JugadoLbl.TabIndex = 157;
+            this.jugador3JugadoLbl.Text = "0";
+            // 
+            // jugador3FichasLbl
+            // 
+            this.jugador3FichasLbl.AutoSize = true;
+            this.jugador3FichasLbl.Location = new System.Drawing.Point(203, 251);
+            this.jugador3FichasLbl.Name = "jugador3FichasLbl";
+            this.jugador3FichasLbl.Size = new System.Drawing.Size(13, 13);
+            this.jugador3FichasLbl.TabIndex = 156;
+            this.jugador3FichasLbl.Text = "0";
+            // 
+            // jugador3NombreLbl
+            // 
+            this.jugador3NombreLbl.AutoSize = true;
+            this.jugador3NombreLbl.Location = new System.Drawing.Point(202, 228);
+            this.jugador3NombreLbl.Name = "jugador3NombreLbl";
+            this.jugador3NombreLbl.Size = new System.Drawing.Size(54, 13);
+            this.jugador3NombreLbl.TabIndex = 155;
+            this.jugador3NombreLbl.Text = "Jugador 3";
+            // 
+            // jugador2JugadoLbl
+            // 
+            this.jugador2JugadoLbl.AutoSize = true;
+            this.jugador2JugadoLbl.Location = new System.Drawing.Point(372, 157);
+            this.jugador2JugadoLbl.Name = "jugador2JugadoLbl";
+            this.jugador2JugadoLbl.Size = new System.Drawing.Size(13, 13);
+            this.jugador2JugadoLbl.TabIndex = 154;
+            this.jugador2JugadoLbl.Text = "0";
+            // 
+            // jugador2FichasLbl
+            // 
+            this.jugador2FichasLbl.AutoSize = true;
+            this.jugador2FichasLbl.Location = new System.Drawing.Point(373, 134);
+            this.jugador2FichasLbl.Name = "jugador2FichasLbl";
+            this.jugador2FichasLbl.Size = new System.Drawing.Size(13, 13);
+            this.jugador2FichasLbl.TabIndex = 153;
+            this.jugador2FichasLbl.Text = "0";
+            // 
+            // jugador2NombreLbl
+            // 
+            this.jugador2NombreLbl.AutoSize = true;
+            this.jugador2NombreLbl.Location = new System.Drawing.Point(372, 111);
+            this.jugador2NombreLbl.Name = "jugador2NombreLbl";
+            this.jugador2NombreLbl.Size = new System.Drawing.Size(54, 13);
+            this.jugador2NombreLbl.TabIndex = 152;
+            this.jugador2NombreLbl.Text = "Jugador 2";
+            // 
             // NuevaPartida
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -833,6 +1113,34 @@ namespace Cliente
             this.BackgroundImage = ((System.Drawing.Image)(resources.GetObject("$this.BackgroundImage")));
             this.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Stretch;
             this.ClientSize = new System.Drawing.Size(999, 574);
+            this.Controls.Add(this.jugador4PuntosLbl);
+            this.Controls.Add(this.jugador3PuntosLbl);
+            this.Controls.Add(this.jugador2PuntosLbl);
+            this.Controls.Add(this.jugador4JugadoLbl);
+            this.Controls.Add(this.jugador4FichasLbl);
+            this.Controls.Add(this.jugador4NombreLbl);
+            this.Controls.Add(this.jugador3JugadoLbl);
+            this.Controls.Add(this.jugador3FichasLbl);
+            this.Controls.Add(this.jugador3NombreLbl);
+            this.Controls.Add(this.jugador2JugadoLbl);
+            this.Controls.Add(this.jugador2FichasLbl);
+            this.Controls.Add(this.jugador2NombreLbl);
+            this.Controls.Add(this.jugador8PuntosLbl);
+            this.Controls.Add(this.jugador8JugadoLbl);
+            this.Controls.Add(this.jugador8FichasLbl);
+            this.Controls.Add(this.jugador8NombreLbl);
+            this.Controls.Add(this.jugador7PuntosLbl);
+            this.Controls.Add(this.jugador6PuntosLbl);
+            this.Controls.Add(this.jugador5PuntosLbl);
+            this.Controls.Add(this.jugador7JugadoLbl);
+            this.Controls.Add(this.jugador7FichasLbl);
+            this.Controls.Add(this.jugador7NombreLbl);
+            this.Controls.Add(this.jugador6JugadoLbl);
+            this.Controls.Add(this.jugador6FichasLbl);
+            this.Controls.Add(this.jugador6NombreLbl);
+            this.Controls.Add(this.jugador5JugadoLbl);
+            this.Controls.Add(this.jugador5FichasLbl);
+            this.Controls.Add(this.jugador5NombreLbl);
             this.Controls.Add(this.label3);
             this.Controls.Add(this.label2);
             this.Controls.Add(this.label1);
@@ -1021,5 +1329,33 @@ namespace Cliente
         private System.Windows.Forms.Label label1;
         private System.Windows.Forms.Label label2;
         private System.Windows.Forms.Label label3;
+        private System.Windows.Forms.Label jugador7PuntosLbl;
+        private System.Windows.Forms.Label jugador6PuntosLbl;
+        private System.Windows.Forms.Label jugador5PuntosLbl;
+        private System.Windows.Forms.Label jugador7JugadoLbl;
+        private System.Windows.Forms.Label jugador7FichasLbl;
+        private System.Windows.Forms.Label jugador7NombreLbl;
+        private System.Windows.Forms.Label jugador6JugadoLbl;
+        private System.Windows.Forms.Label jugador6FichasLbl;
+        private System.Windows.Forms.Label jugador6NombreLbl;
+        private System.Windows.Forms.Label jugador5JugadoLbl;
+        private System.Windows.Forms.Label jugador5FichasLbl;
+        private System.Windows.Forms.Label jugador5NombreLbl;
+        private System.Windows.Forms.Label jugador8PuntosLbl;
+        private System.Windows.Forms.Label jugador8JugadoLbl;
+        private System.Windows.Forms.Label jugador8FichasLbl;
+        private System.Windows.Forms.Label jugador8NombreLbl;
+        private System.Windows.Forms.Label jugador4PuntosLbl;
+        private System.Windows.Forms.Label jugador3PuntosLbl;
+        private System.Windows.Forms.Label jugador2PuntosLbl;
+        private System.Windows.Forms.Label jugador4JugadoLbl;
+        private System.Windows.Forms.Label jugador4FichasLbl;
+        private System.Windows.Forms.Label jugador4NombreLbl;
+        private System.Windows.Forms.Label jugador3JugadoLbl;
+        private System.Windows.Forms.Label jugador3FichasLbl;
+        private System.Windows.Forms.Label jugador3NombreLbl;
+        private System.Windows.Forms.Label jugador2JugadoLbl;
+        private System.Windows.Forms.Label jugador2FichasLbl;
+        private System.Windows.Forms.Label jugador2NombreLbl;
     }
 }

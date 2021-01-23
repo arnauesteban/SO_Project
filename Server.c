@@ -342,7 +342,7 @@ int AsignarIdPartida(MYSQL *conn) {
 			id_max = lista_partidas.partida[i].ID;
 	
 	int id;
-	if(id_max > id_max_sql)
+	if(id_max >= id_max_sql)
 		id = id_max + 1;
 	else
 		id = id_max_sql;

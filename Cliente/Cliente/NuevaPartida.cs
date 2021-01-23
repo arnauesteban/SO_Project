@@ -23,7 +23,8 @@ namespace Cliente
         int numJugadores;
 
         //Matriz de los PictureBox [Jugador, PictureBox]
-        PictureBox[,] PictureBoxCartas = new PictureBox[8,6];
+        PictureBox[,] PictureBoxCartas = new PictureBox[8, 6];
+        Label[,] LabelsJugadores = new Label[8, 4];
 
         int[] numCartasPorJugador = new int[8];
 
@@ -33,14 +34,13 @@ namespace Cliente
         {
             //Constructor del formulario usado cuando el usuario es el host de la partida.
             InitializeComponent();
-            CheckForIllegalCrossThreadCalls = false;
             this.server = server;
             this.usuario = usuario;
             this.numJugadores = 1;
             usuarioLbl.Text = this.usuario;
             chatLbl.Text = "¡Bienvenido a una nueva partida de poker! Espera a que tus contrincantes acepten tu invitación o pulsa el botón del centro de la mesa.";
             lineasChat = 4;
-            
+            this.ID = 0;
             pedirBtn.Enabled = false;
             pedirBtn.Visible = false;
             plantarseBtn.Enabled = false;
@@ -67,8 +67,6 @@ namespace Cliente
             this.Text = "Partida " + this.ID;
             chatLbl.Text = "¡Bienvenido a una nueva partida de poker! Espera a que otros contrincantes acepten la invitación o a que el host pulse el botón del centro de la mesa.";
             lineasChat = 4;
-            string mensaje = "12/" + this.ID;
-            server.Enviar(mensaje);
             pedirBtn.Enabled = false;
             pedirBtn.Visible = false;
             plantarseBtn.Enabled = false;
@@ -83,7 +81,7 @@ namespace Cliente
 
         private void NuevaPartida_Load(object sender, EventArgs e)
         {
-            //Organizamos todos los PictureBox en la matrix PictureBoxCartas
+            //Organizamos todos los PictureBox en la matriz PictureBoxCartas
             PictureBoxCartas[0, 0] = pictureBox1_MiJugador;
             PictureBoxCartas[0, 1] = pictureBox2_MiJugador;
             PictureBoxCartas[0, 2] = pictureBox3_MiJugador;
@@ -149,6 +147,57 @@ namespace Cliente
                 }
             }
 
+            //Organizamos los label de los jugadores en la matriz LabelsJugadores
+            LabelsJugadores[1, 0] = jugador2NombreLbl;
+            LabelsJugadores[1, 1] = jugador2FichasLbl;
+            LabelsJugadores[1, 2] = jugador2JugadoLbl;
+            LabelsJugadores[1, 3] = jugador2PuntosLbl;
+
+            LabelsJugadores[2, 0] = jugador3NombreLbl;
+            LabelsJugadores[2, 1] = jugador3FichasLbl;
+            LabelsJugadores[2, 2] = jugador3JugadoLbl;
+            LabelsJugadores[2, 3] = jugador3PuntosLbl;
+
+            LabelsJugadores[3, 0] = jugador4NombreLbl;
+            LabelsJugadores[3, 1] = jugador4FichasLbl;
+            LabelsJugadores[3, 2] = jugador4JugadoLbl;
+            LabelsJugadores[3, 3] = jugador4PuntosLbl;
+
+            LabelsJugadores[4, 0] = jugador5NombreLbl;
+            LabelsJugadores[4, 1] = jugador5FichasLbl;
+            LabelsJugadores[4, 2] = jugador5JugadoLbl;
+            LabelsJugadores[4, 3] = jugador5PuntosLbl;
+
+            LabelsJugadores[5, 0] = jugador6NombreLbl;
+            LabelsJugadores[5, 1] = jugador6FichasLbl;
+            LabelsJugadores[5, 2] = jugador6JugadoLbl;
+            LabelsJugadores[5, 3] = jugador6PuntosLbl;
+
+            LabelsJugadores[6, 0] = jugador7NombreLbl;
+            LabelsJugadores[6, 1] = jugador7FichasLbl;
+            LabelsJugadores[6, 2] = jugador7JugadoLbl;
+            LabelsJugadores[6, 3] = jugador7PuntosLbl;
+
+            LabelsJugadores[7, 0] = jugador8NombreLbl;
+            LabelsJugadores[7, 1] = jugador8FichasLbl;
+            LabelsJugadores[7, 2] = jugador8JugadoLbl;
+            LabelsJugadores[7, 3] = jugador8PuntosLbl;
+
+            if (ID == 0)
+            {
+                int k = 1;
+                while (k < 8)
+                {
+                    LabelsJugadores[k, 0].Text = "";
+                    LabelsJugadores[k, 1].Text = "";
+                    LabelsJugadores[k, 2].Text = "";
+                    LabelsJugadores[k, 3].Text = "";
+                    k++;
+                }
+            }
+
+            string mensaje = "12/" + this.ID;
+            server.Enviar(mensaje);
         }
 
         public int getID()
@@ -162,7 +211,13 @@ namespace Cliente
  
             jugador1JugadoLbl.Text = "0";
             jugador1PuntosLbl.Text = "0";
-            
+            int i = 1;
+            while (i < numJugadores)
+            {
+                LabelsJugadores[i, 2].Text = "0";
+                LabelsJugadores[i, 3].Text = "0";
+                i++;
+            }
 
         }
 
@@ -308,6 +363,52 @@ namespace Cliente
             jugador1JugadoLbl.Text = "0";
             jugador1FichasLbl.Text = "100";
             jugador1PuntosLbl.Text = "0";
+
+            if (!banca)
+            {
+                int i = 1;
+                int index = 1;
+                while (i < n)
+                {
+                    if (separado[i] != this.usuario)
+                    {
+                        LabelsJugadores[index, 0].Text = separado[i];
+                        LabelsJugadores[index, 1].Text = "100";
+                        LabelsJugadores[index, 2].Text = "0";
+                        LabelsJugadores[index, 3].Text = "0";
+                        index++;
+                    }
+                    i++;
+                }
+                while (i < 8)
+                {
+                    LabelsJugadores[i, 0].Text = "";
+                    LabelsJugadores[i, 1].Text = "";
+                    LabelsJugadores[i, 2].Text = "";
+                    LabelsJugadores[i, 3].Text = "";
+                    i++;
+                }
+            }
+            else
+            {
+                int i = 1;
+                while (i < n)
+                {
+                    LabelsJugadores[i, 0].Text = separado[i + 1];
+                    LabelsJugadores[i, 1].Text = "100";
+                    LabelsJugadores[i, 2].Text = "0";
+                    LabelsJugadores[i, 3].Text = "0";
+                    i++;
+                }
+                while (i < 8)
+                {
+                    LabelsJugadores[i, 0].Text = "";
+                    LabelsJugadores[i, 1].Text = "";
+                    LabelsJugadores[i, 2].Text = "";
+                    LabelsJugadores[i, 3].Text = "";
+                    i++;
+                }
+            }
         }
 
         public void Accion13(string mensaje)
@@ -322,14 +423,22 @@ namespace Cliente
             }
             for (int i = 1; i < 8; i++)
             {
-                for (int j = 0; j < numCartasPorJugador[i]; j++)
+                for (int j = 0; j < 6; j++)
                 {
-                    PictureBoxCartas[i, j].Visible = false;
+                     PictureBoxCartas[i, j].Visible = false;
                 }
                 
             }
+            for (int i = 1; i < 8; i++)
+            {
+                for (int j = 0; j < 6; j++)
+                {
+                    PictureBoxCartas[i, j].Visible = false;
+                    PictureBoxCartas[i, j].ImageLocation = "..\\..\\Img\\cards\\dorso.png";
+                }
+            }
 
-            //Recibimos mensaje :  puntos/numero1-palo1/numero2-palo2/numJugador/numero_de_jugadores
+            //Recibimos mensaje :  puntos/numero1-palo1/numero2-palo2/numJugador
             string[] separado = mensaje.Split('/');
             empezarBtn.Visible = false;
 
@@ -421,8 +530,6 @@ namespace Cliente
                 PictureBoxCartas[i, 1].Visible = true;
                 numCartasPorJugador[i] = 2;
             }
-
-
         }
 
         public void Accion14(string mensaje)
@@ -441,6 +548,14 @@ namespace Cliente
             {
                 if (n == this.numJugador)
                     jugador1JugadoLbl.Text = separado[2];
+                else if (n < this.numJugador)
+                {
+                    LabelsJugadores[n + 1, 2].Text = separado[2];
+                }
+                else
+                {
+                    LabelsJugadores[n, 2].Text = separado[2];
+                }
             }
             //-1 cuando se retira
             else if (accion == -1)
@@ -449,6 +564,16 @@ namespace Cliente
                 {
                     jugador1FichasLbl.Text = ((Convert.ToInt32(jugador1FichasLbl.Text)) - ((Convert.ToInt32(jugador1JugadoLbl.Text) / 2))).ToString();
                     jugador1JugadoLbl.Text = "0";
+                }
+                else if (n < this.numJugador)
+                {
+                    LabelsJugadores[n + 1, 1].Text = ((Convert.ToInt32(LabelsJugadores[n + 1, 1].Text)) - ((Convert.ToInt32(LabelsJugadores[n + 1, 2].Text) / 2))).ToString();
+                    LabelsJugadores[n + 1, 2].Text = "0";
+                }
+                else
+                {
+                    LabelsJugadores[n, 1].Text = ((Convert.ToInt32(LabelsJugadores[n, 1].Text)) - ((Convert.ToInt32(LabelsJugadores[n, 2].Text) / 2))).ToString();
+                    LabelsJugadores[n, 2].Text = "0";
                 }
             }
             //1 cuando pide carta
@@ -553,11 +678,13 @@ namespace Cliente
                         if (numJugador_carta_recibida == 1 && numJugador != 0)
                         {
                             PictureBoxCartas[numJugador, numCartasPorJugador[numJugador]].Visible = true;
+                            LabelsJugadores[numJugador, 2].Text = (2 * Convert.ToInt32(LabelsJugadores[numJugador, 2].Text)).ToString();
                             numCartasPorJugador[numJugador]++;
                         }
                         else
                         {
                             PictureBoxCartas[numJugador_carta_recibida, numCartasPorJugador[numJugador_carta_recibida]].Visible = true;
+                            LabelsJugadores[numJugador_carta_recibida, 2].Text = (2 * Convert.ToInt32(LabelsJugadores[numJugador_carta_recibida, 2].Text)).ToString();
                             numCartasPorJugador[numJugador_carta_recibida]++;
                         }
                     }
@@ -576,13 +703,52 @@ namespace Cliente
             if (n == numJugador)
             {
                 jugador1FichasLbl.Text = fichas.ToString();
-                jugador1PuntosLbl.Text = puntos.ToString();
                 jugador1JugadoLbl.Text = "0";
+                jugador1PuntosLbl.Text = puntos.ToString();
             }
-                
-            empezarBtn.Text = "Siguiente";
-            empezarBtn.Visible = true;
-            empezarBtn.Enabled = true;
+            else if (n < numJugador)
+            {
+                LabelsJugadores[n + 1, 1].Text = fichas.ToString();
+                LabelsJugadores[n + 1, 2].Text = "0";
+                LabelsJugadores[n + 1, 3].Text = puntos.ToString();
+                int i = 0;
+                while (i < numCartas)
+                {
+                    //Asignamos a carta el nombre de sus imagenes correspondientes
+                    string carta;
+                    carta = AsignarNombreImagenCarta(separado[i + 4]);
+
+                    //Insertamos la imagen de cada carta
+                    PictureBoxCartas[n + 1, i].ImageLocation = "..\\..\\Img\\cards\\" + carta;
+                    numCartasPorJugador[n + 1]++;
+                    i++;
+                }
+            }
+            else
+            {
+                LabelsJugadores[n, 1].Text = fichas.ToString();
+                LabelsJugadores[n, 2].Text = "0";
+                LabelsJugadores[n, 3].Text = puntos.ToString();
+                int i = 0;
+                while (i < numCartas)
+                {
+                    //Asignamos a carta el nombre de sus imagenes correspondientes
+                    string carta;
+                    carta = AsignarNombreImagenCarta(separado[i + 4]);
+
+                    //Insertamos la imagen de cada carta
+                    PictureBoxCartas[n, i].ImageLocation = "..\\..\\Img\\cards\\" + carta;
+                    numCartasPorJugador[n]++;
+                    i++;
+                }
+            }
+
+            if (n == 0)
+            {
+                empezarBtn.Text = "Siguiente";
+                empezarBtn.Visible = true;
+                empezarBtn.Enabled = true;
+            }
             
         }
 
@@ -712,7 +878,5 @@ namespace Cliente
 
             }
         }
-
-        
     }
 }

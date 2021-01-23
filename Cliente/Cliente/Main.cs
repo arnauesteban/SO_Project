@@ -340,6 +340,10 @@ namespace Cliente
                         lista_forms_partidas[j].TomaRespuesta(15, separado[1] + "/" + separado[2] + "/" + separado[3] + "/" + separado[4] + "/" + separado[5] + "/" + separado[6] + "/" + separado[7]);
                     else if (separado[4] == "4")
                         lista_forms_partidas[j].TomaRespuesta(15, separado[1] + "/" + separado[2] + "/" + separado[3] + "/" + separado[4] + "/" + separado[5] + "/" + separado[6] + "/" + separado[7] + "/" + separado[8]);
+                    else if (separado[4] == "5")
+                        lista_forms_partidas[j].TomaRespuesta(15, separado[1] + "/" + separado[2] + "/" + separado[3] + "/" + separado[4] + "/" + separado[5] + "/" + separado[6] + "/" + separado[7] + "/" + separado[8] + "/" + separado[9]);
+                    else if (separado[4] == "6")
+                        lista_forms_partidas[j].TomaRespuesta(15, separado[1] + "/" + separado[2] + "/" + separado[3] + "/" + separado[4] + "/" + separado[5] + "/" + separado[6] + "/" + separado[7] + "/" + separado[8] + "/" + separado[9] + "/" + separado[10]);
                 }
         }
 
