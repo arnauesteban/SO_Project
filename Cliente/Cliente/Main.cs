@@ -247,21 +247,29 @@ namespace Cliente
 
             else if (separado[0] == "0")
             {
-                int i = 2;
-                string ganadores = null;
-
-                while (i - 2 < Convert.ToInt32(separado[1]))
-                {
-                    ganadores += separado[i] + ",";
-                    i++;
-                }
-                MessageBox.Show(ganadores);
+                MessageBox.Show("Tenéis " + separado[1] + " partidas en común. Ha ganado " + separado[2] + " partidas y tú has ganado " + separado[3] + " partidas.");
             }
         }
 
         public void Accion10(string mensaje)
         {
-            
+            string[] separado = mensaje.Split('/');
+
+            if (separado[0] == "1")
+            {
+                MessageBox.Show("No hay resultados en la consulta.");
+            }
+
+            else if (separado[0] == "0")
+            {
+                int numJugadores = Convert.ToInt32(separado[2]);
+                string lista = "";
+                for (int i = 0; i < numJugadores; i++)
+                {
+                    lista = lista + separado[i + 3] + ". ";
+                }
+                MessageBox.Show("Los jugadores que jugaron la partida más larga (duró " + separado[1] + " minutos) son los siguientes: " + lista);
+            }
         }
 
         public void Accion11(string mensaje)

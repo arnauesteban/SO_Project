@@ -129,7 +129,7 @@
             // 
             this.resultadosToolStripMenuItem.Name = "resultadosToolStripMenuItem";
             this.resultadosToolStripMenuItem.Size = new System.Drawing.Size(152, 22);
-            this.resultadosToolStripMenuItem.Text = "Resultados";
+            this.resultadosToolStripMenuItem.Text = "Estadísticas";
             this.resultadosToolStripMenuItem.Click += new System.EventHandler(this.resultadosToolStripMenuItem_Click);
             // 
             // Main
