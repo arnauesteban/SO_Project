@@ -34,6 +34,7 @@
             this.consulta1Btn = new System.Windows.Forms.RadioButton();
             this.jugadorLbl = new System.Windows.Forms.Label();
             this.consulta2Btn = new System.Windows.Forms.RadioButton();
+            this.consulta3Btn = new System.Windows.Forms.RadioButton();
             this.SuspendLayout();
             // 
             // buscarBtn
@@ -96,11 +97,24 @@
             this.consulta2Btn.UseVisualStyleBackColor = true;
             this.consulta2Btn.CheckedChanged += new System.EventHandler(this.consulta2Btn_CheckedChanged);
             // 
+            // consulta3Btn
+            // 
+            this.consulta3Btn.AutoSize = true;
+            this.consulta3Btn.Location = new System.Drawing.Point(13, 59);
+            this.consulta3Btn.Name = "consulta3Btn";
+            this.consulta3Btn.Size = new System.Drawing.Size(239, 17);
+            this.consulta3Btn.TabIndex = 6;
+            this.consulta3Btn.TabStop = true;
+            this.consulta3Btn.Text = "Récord de los perdedores contra otro jugador";
+            this.consulta3Btn.UseVisualStyleBackColor = true;
+            this.consulta3Btn.CheckedChanged += new System.EventHandler(this.consulta3Btn_CheckedChanged);
+            // 
             // consulta_resultados
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(284, 261);
+            this.Controls.Add(this.consulta3Btn);
             this.Controls.Add(this.consulta2Btn);
             this.Controls.Add(this.jugadorLbl);
             this.Controls.Add(this.consulta1Btn);
@@ -123,5 +137,6 @@
         private System.Windows.Forms.RadioButton consulta1Btn;
         private System.Windows.Forms.Label jugadorLbl;
         private System.Windows.Forms.RadioButton consulta2Btn;
+        private System.Windows.Forms.RadioButton consulta3Btn;
     }
 }

@@ -274,7 +274,17 @@ namespace Cliente
 
         public void Accion11(string mensaje)
         {
-            
+            string[] separado = mensaje.Split('/');
+
+            if (separado[0] == "1")
+            {
+                MessageBox.Show("Nadie ha perdido contra este jugador.");
+            }
+
+            else if (separado[0] == "0")
+            {
+                MessageBox.Show("Estos son los récord de los jugadores que han perdido partidas contra el usuario introducido: " + separado[1]);
+            }
         }
 
         public void Accion12(string mensaje)

@@ -24,15 +24,32 @@ namespace Cliente
         {
             if (consulta == 1)
             {
-                string mensaje = "9/" + nombreIn.Text;
-                server.Enviar(mensaje);
+                if (nombreIn.Text != "" && nombreIn.Text != null)
+                {
+                    string mensaje = "9/" + nombreIn.Text;
+                    server.Enviar(mensaje);
+                    this.Close();
+                }
+                else
+                    MessageBox.Show("Error. Debes introducir un nombre para hacer la consulta.");
             }
             else if (consulta == 2)
             {
                 string mensaje = "10/";
                 server.Enviar(mensaje);
+                this.Close();
             }
-            this.Close();
+            else if (consulta == 3)
+            {
+                if (nombreIn.Text != "" && nombreIn.Text != null)
+                {
+                    string mensaje = "11/" + nombreIn.Text;
+                    server.Enviar(mensaje);
+                    this.Close();
+                }
+                else
+                    MessageBox.Show("Error. Debes introducir un nombre para hacer la consulta.");
+            }
         }
 
         private void cancelarBtn_Click(object sender, EventArgs e)
@@ -62,6 +79,16 @@ namespace Cliente
             {
                 consulta = 2;
                 nombreIn.Enabled = false;
+                buscarBtn.Enabled = true;
+            }
+        }
+
+        private void consulta3Btn_CheckedChanged(object sender, EventArgs e)
+        {
+            if (consulta3Btn.Checked)
+            {
+                consulta = 3;
+                nombreIn.Enabled = true;
                 buscarBtn.Enabled = true;
             }
         }

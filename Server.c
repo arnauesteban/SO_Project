@@ -213,75 +213,6 @@ int IniciarSesion(char usuario[20], char clave[20], MYSQL *conn) {
 	return 0;
 }
 
-int PuntuacionPerdedores(char lista[100], MYSQL *conn) {
-	//Funcion que retorna los record de los jugadores que han perdido partidas contra Arnau
-	
-	MYSQL_RES *resultado;
-	MYSQL_ROW row;	
-	int err;
-	
-	//Realizamos la consulta necesaria en MYSQL
-	char consulta [500];
-	strcpy(consulta,"SELECT  DISTINCT JUGADOR.RECORD FROM (PARTIDA,JUGADOR,PARTICIPACION) WHERE PARTIDA.GANADOR = 'Arnau' AND  PARTIDA.ID = PARTICIPACION.ID_P AND PARTICIPACION.ID_J=JUGADOR.ID AND JUGADOR.NOMBRE NOT IN ('Arnau');");
-	err=mysql_query (conn, consulta);
-	if (err!=0) {
-		printf ("Error al consultar datos de la base %u %s\n", mysql_errno(conn), mysql_error(conn));
-		return -1;
-	}
-	resultado = mysql_store_result (conn);
-	row = mysql_fetch_row (resultado);
-	
-	//Si no hay resultados en la consulta significa que nunca nadie ha perdido contra Arnau
-	if (row == NULL) {
-		printf ("No se han obtenido datos en la consulta\n");
-		strcpy(lista, "Nadie ha perdido nunca contra Arnau.");
-	}
-	
-	//Si hay resultados, se crean a la lista que ha entrado a la funcion como parametro
-	else
-		while (row !=NULL) {
-			sprintf(lista, "%s%s/", lista, row[0]);
-			printf("%s\n", lista);
-			row = mysql_fetch_row(resultado);
-		}
-	return 0;
-}
-
-int NombresPartidaLarga(char lista[100], MYSQL *conn) {
-	//Funcion que retorna los nombres de los jugadores que han jugado la partida mas larga
-	
-	int err;
-	MYSQL_RES *resultado;
-	MYSQL_ROW row;
-	
-	//Hacemos la consulta necesaria a la base de datos.
-	char consulta[200];
-	strcpy(consulta, "SELECT JUGADOR.NOMBRE FROM(PARTIDA, JUGADOR, PARTICIPACION) WHERE PARTIDA.DURACION = (SELECT MAX(DURACION) FROM PARTIDA) AND PARTIDA.ID = PARTICIPACION.ID_P AND PARTICIPACION.ID_J = JUGADOR.ID;");
-	err = mysql_query(conn, consulta);
-	if(err != 0){
-		printf ("Error al consultar datos de la base: %u %s\n",
-				mysql_errno(conn), mysql_error(conn));
-		return -1;
-	}
-	resultado = mysql_store_result(conn);
-	row = mysql_fetch_row(resultado);
-	strcpy(lista, "");
-	
-	//Si la consulta no da resultados hay un error, ya que hay partidas en la base
-	if(row == NULL) {
-		printf("No se han obtenido resultados en la consulta.\n");
-		return -2;
-	}
-	
-	//Incorporamos los resultados en la lista que entra a la funcion como parametro
-	else
-	    while(row != NULL){
-			sprintf(lista, "%s%s/", lista, row[0]);
-			row = mysql_fetch_row(resultado);
-		}
-	return 0;
-}
-
 int DameRecord(MYSQL *conn) {
 	//Funcion que devuelve la mayor puntuacion record registrada en la base de datos
 	
@@ -1175,7 +1106,7 @@ void *AtenderCliente (void *socket){
 				//Si la clave es correcta se procede a eliminar el usuario
 				else {
 					char comando[200];
-					sprintf(comando, "DELETE FROM JUGADOR WHERE JUGADOR.NOMBRE = '%s' AND JUGADOR.CONTRASENA = '%s'", lista_conectados.usuario[GetIndexConectado(sock_conn)].nombre, clave);
+					sprintf(comando, "DELETE FROM PARTICIPACION, NOMBRE WHERE PARTICIPACION.ID_J = JUGADOR.ID AND JUGADOR.NOMBRE = '%s' AND JUGADOR.CONTRASENA = '%s'", lista_conectados.usuario[GetIndexConectado(sock_conn)].nombre, clave);
 					err = mysql_query (conn, comando);
 					if (err!=0) {
 						//Si ha habido algun error en la eliminacion se envia mensaje de error al usuario
@@ -1185,10 +1116,21 @@ void *AtenderCliente (void *socket){
 						write(sock_conn, respuesta, strlen(respuesta));
 					}
 					else {
-						//Si todo ha ido bien, se envia confirmacion al usuario
-						char respuesta[100];
-						strcpy(respuesta, "8$0");
-						write(sock_conn, respuesta, strlen(respuesta));
+						sprintf(comando, "DELETE FROM JUGADOR WHERE JUGADOR.NOMBRE = '%s' AND JUGADOR.CONTRASENA = '%s'", lista_conectados.usuario[GetIndexConectado(sock_conn)].nombre, clave);
+						err = mysql_query (conn, comando);
+						if (err!=0) {
+							//Si ha habido algun error en la eliminacion se envia mensaje de error al usuario
+							printf ("Error al eliminar de la base %u %s\n", mysql_errno(conn), mysql_error(conn));
+							char respuesta[200];
+							strcpy(respuesta, "1$Ha habido un problema al contactar con la base de datos. Por favor, comunica el error a los desarrolladores (codigo de error 8).");
+							write(sock_conn, respuesta, strlen(respuesta));
+						}
+						else {
+							//Si todo ha ido bien, se envia confirmacion al usuario
+							char respuesta[100];
+							strcpy(respuesta, "8$0");
+							write(sock_conn, respuesta, strlen(respuesta));
+						}
 					}
 				}
 			}
@@ -1299,10 +1241,49 @@ void *AtenderCliente (void *socket){
 				printf("Se ha enviado %s\n", res);
 			}
 		}
-		//RESERVADO PARA CONSULTA A LA BASE DE DATOS 3
-		//El servidor recibe ...
+		//Quiere saber los récord de los jugadores que han perdido partidas contra el jugador introducido como parámetro
+		//El servidor recibe 11/nombre
 		else if (codigo == 11) {
-			//RESERVADO CODIGO DE ERROR 11 DE COMUNICACION CON BBDD
+			p = strtok(NULL, "/");
+			char name[20];
+			strcpy(name, p);
+			
+			MYSQL_RES *resultado;
+			MYSQL_ROW row;	
+			int err;
+			
+			//Realizamos la consulta necesaria en MYSQL
+			char consulta [500];
+			sprintf(consulta, "SELECT  DISTINCT JUGADOR.RECORD FROM (PARTIDA,JUGADOR,PARTICIPACION) WHERE PARTIDA.GANADOR = '%s' AND  PARTIDA.ID = PARTICIPACION.ID_P AND PARTICIPACION.ID_J=JUGADOR.ID AND JUGADOR.NOMBRE NOT IN ('%s');", name, name);
+			err=mysql_query (conn, consulta);
+			char respuesta[200];
+			if (err!=0) {
+				printf ("Error al consultar datos de la base %u %s\n", mysql_errno(conn), mysql_error(conn));
+				strcpy(respuesta, "1$Ha habido un problema al contactar con la base de datos. Por favor, comunica el error a los desarrolladores (codigo de error 11).");
+				write(sock_conn, respuesta, strlen(respuesta));
+			}
+			resultado = mysql_store_result (conn);
+			row = mysql_fetch_row (resultado);
+			
+			//Si no hay resultados en la consulta significa que nunca nadie ha perdido contra Arnau
+			if (row == NULL) {
+				printf ("No se han obtenido datos en la consulta\n");
+				strcpy(respuesta, "11$1");
+				write(sock_conn, respuesta, strlen(respuesta));
+			}
+			
+			//Si hay resultados, se crean a la lista que ha entrado a la funcion como parametro
+			else {
+				char lista[200];
+				strcpy(lista, "");
+				while (row !=NULL) {
+					sprintf(lista, "%s%s. ", lista, row[0]);
+					row = mysql_fetch_row(resultado);
+				}
+				sprintf(respuesta, "11$0/%s", lista);
+				write(sock_conn, respuesta, strlen(respuesta));
+				printf("Se ha enviado %s\n", respuesta);
+			}
 		}
 		
 		//Quiere recibir los datos de la partida (jugadores, fichas...)
