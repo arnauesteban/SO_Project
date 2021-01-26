@@ -24,7 +24,7 @@ namespace Cliente
 
         //Matriz de los PictureBox [Jugador, PictureBox]
         PictureBox[,] PictureBoxCartas = new PictureBox[8, 6];
-        Label[,] LabelsJugadores = new Label[8, 4];
+        Label[,] LabelsJugadores = new Label[8, 7];
 
         int[] numCartasPorJugador = new int[8];
 
@@ -152,36 +152,57 @@ namespace Cliente
             LabelsJugadores[1, 1] = jugador2FichasLbl;
             LabelsJugadores[1, 2] = jugador2JugadoLbl;
             LabelsJugadores[1, 3] = jugador2PuntosLbl;
+            LabelsJugadores[1, 4] = jugador2FichasTitLbl;
+            LabelsJugadores[1, 5] = jugador2JugadoTitLbl;
+            LabelsJugadores[1, 6] = jugador2PuntosTitLbl;
 
             LabelsJugadores[2, 0] = jugador3NombreLbl;
             LabelsJugadores[2, 1] = jugador3FichasLbl;
             LabelsJugadores[2, 2] = jugador3JugadoLbl;
             LabelsJugadores[2, 3] = jugador3PuntosLbl;
+            LabelsJugadores[2, 4] = jugador3FichasTitLbl;
+            LabelsJugadores[2, 5] = jugador3JugadoTitLbl;
+            LabelsJugadores[2, 6] = jugador3PuntosTitLbl;
 
             LabelsJugadores[3, 0] = jugador4NombreLbl;
             LabelsJugadores[3, 1] = jugador4FichasLbl;
             LabelsJugadores[3, 2] = jugador4JugadoLbl;
             LabelsJugadores[3, 3] = jugador4PuntosLbl;
+            LabelsJugadores[3, 4] = jugador4FichasTitLbl;
+            LabelsJugadores[3, 5] = jugador4JugadoTitLbl;
+            LabelsJugadores[3, 6] = jugador4PuntosTitLbl;
 
             LabelsJugadores[4, 0] = jugador5NombreLbl;
             LabelsJugadores[4, 1] = jugador5FichasLbl;
             LabelsJugadores[4, 2] = jugador5JugadoLbl;
             LabelsJugadores[4, 3] = jugador5PuntosLbl;
+            LabelsJugadores[4, 4] = jugador5FichasTitLbl;
+            LabelsJugadores[4, 5] = jugador5JugadoTitLbl;
+            LabelsJugadores[4, 6] = jugador5PuntosTitLbl;
 
             LabelsJugadores[5, 0] = jugador6NombreLbl;
             LabelsJugadores[5, 1] = jugador6FichasLbl;
             LabelsJugadores[5, 2] = jugador6JugadoLbl;
             LabelsJugadores[5, 3] = jugador6PuntosLbl;
+            LabelsJugadores[5, 4] = jugador6FichasTitLbl;
+            LabelsJugadores[5, 5] = jugador6JugadoTitLbl;
+            LabelsJugadores[5, 6] = jugador6PuntosTitLbl;
 
             LabelsJugadores[6, 0] = jugador7NombreLbl;
             LabelsJugadores[6, 1] = jugador7FichasLbl;
             LabelsJugadores[6, 2] = jugador7JugadoLbl;
             LabelsJugadores[6, 3] = jugador7PuntosLbl;
+            LabelsJugadores[6, 4] = jugador7FichasTitLbl;
+            LabelsJugadores[6, 5] = jugador7JugadoTitLbl;
+            LabelsJugadores[6, 6] = jugador7PuntosTitLbl;
 
             LabelsJugadores[7, 0] = jugador8NombreLbl;
             LabelsJugadores[7, 1] = jugador8FichasLbl;
             LabelsJugadores[7, 2] = jugador8JugadoLbl;
             LabelsJugadores[7, 3] = jugador8PuntosLbl;
+            LabelsJugadores[7, 4] = jugador8FichasTitLbl;
+            LabelsJugadores[7, 5] = jugador8JugadoTitLbl;
+            LabelsJugadores[7, 6] = jugador8PuntosTitLbl;
 
             if (ID == 0)
             {
@@ -192,12 +213,73 @@ namespace Cliente
                     LabelsJugadores[k, 1].Text = "";
                     LabelsJugadores[k, 2].Text = "";
                     LabelsJugadores[k, 3].Text = "";
+                    LabelsJugadores[k, 4].Text = "";
+                    LabelsJugadores[k, 5].Text = "";
+                    LabelsJugadores[k, 6].Text = "";
                     k++;
                 }
             }
 
             string mensaje = "12/" + this.ID;
             server.Enviar(mensaje);
+        }
+
+        private bool ComprobarCaracteres(string cadena, string campo)
+        {
+            //Antes de enviar datos introducidos manualmente por el usuario, llamamos a esta función. Se encarga de verificar que 
+            //no haya ningún carácter dañino para la ejecución del código del servidor en los campos rellenados.
+            //Si se encuentra algún error, devuelve true.
+            int i = 0;
+            bool error = false;
+            //Error en caso de dejar el campo en blanco.
+            if (cadena == null || cadena == "")
+            {
+                error = true;
+                MessageBox.Show("Debes rellenar el campo " + campo);
+            }
+            else
+                //Este bucle buscará en cada carácter de la cadena de entrada letras con tildes, ñ, ç 
+                //y los carácteres '$', '/', '|', '&' y '%'.
+                while (i < cadena.Length && !error)
+                {
+                    if (cadena[i] == '$' || cadena[i] == '/' || cadena[i] == '|' || cadena[i] == '&' || cadena[i] == '%')
+                    {
+                        error = true;
+                        MessageBox.Show("No se puede usar ninguno de los siguientes carácteres: $ / | % & en el campo " + campo);
+                    }
+                    if (cadena[i] == 'á' || cadena[i] == 'Á' || cadena[i] == 'à' || cadena[i] == 'À' || cadena[i] == 'â' || cadena[i] == 'Â')
+                    {
+                        error = true;
+                        MessageBox.Show("No se puede usar tildes en el campo " + campo);
+                    }
+                    if (cadena[i] == 'é' || cadena[i] == 'É' || cadena[i] == 'è' || cadena[i] == 'È' || cadena[i] == 'ê' || cadena[i] == 'Ê')
+                    {
+                        error = true;
+                        MessageBox.Show("No se puede usar tildes en el campo " + campo);
+                    }
+                    if (cadena[i] == 'í' || cadena[i] == 'Í' || cadena[i] == 'ì' || cadena[i] == 'Ì' || cadena[i] == 'î' || cadena[i] == 'Î')
+                    {
+                        error = true;
+                        MessageBox.Show("No se puede usar tildes en el campo " + campo);
+                    }
+                    if (cadena[i] == 'ó' || cadena[i] == 'Ó' || cadena[i] == 'ò' || cadena[i] == 'Ò' || cadena[i] == 'ô' || cadena[i] == 'Ô')
+                    {
+                        error = true;
+                        MessageBox.Show("No se puede usar tildes en el campo " + campo);
+                    }
+                    if (cadena[i] == 'ú' || cadena[i] == 'Ú' || cadena[i] == 'ù' || cadena[i] == 'Ù' || cadena[i] == 'û' || cadena[i] == 'Û')
+                    {
+                        error = true;
+                        MessageBox.Show("No se puede usar tildes en el campo " + campo);
+                    }
+                    if (cadena[i] == 'ç' || cadena[i] == 'ñ' || cadena[i] == 'Ç' || cadena[i] == 'Ñ')
+                    {
+                        error = true;
+                        MessageBox.Show("No se puede usar las letras 'ç' ni 'ñ' en el campo " + campo);
+                    }
+                    i++;
+                }
+            return error;
         }
 
         public int getID()
@@ -376,6 +458,9 @@ namespace Cliente
                         LabelsJugadores[index, 1].Text = "100";
                         LabelsJugadores[index, 2].Text = "0";
                         LabelsJugadores[index, 3].Text = "0";
+                        LabelsJugadores[index, 4].Text = "Fichas:";
+                        LabelsJugadores[index, 5].Text = "Apuesta:";
+                        LabelsJugadores[index, 6].Text = "Puntos:";
                         index++;
                     }
                     i++;
@@ -386,6 +471,9 @@ namespace Cliente
                     LabelsJugadores[i, 1].Text = "";
                     LabelsJugadores[i, 2].Text = "";
                     LabelsJugadores[i, 3].Text = "";
+                    LabelsJugadores[i, 4].Text = "";
+                    LabelsJugadores[i, 5].Text = "";
+                    LabelsJugadores[i, 6].Text = "";
                     i++;
                 }
             }
@@ -398,6 +486,9 @@ namespace Cliente
                     LabelsJugadores[i, 1].Text = "100";
                     LabelsJugadores[i, 2].Text = "0";
                     LabelsJugadores[i, 3].Text = "0";
+                    LabelsJugadores[i, 4].Text = "Fichas:";
+                    LabelsJugadores[i, 5].Text = "Apuesta:";
+                    LabelsJugadores[i, 6].Text = "Puntos:";
                     i++;
                 }
                 while (i < 8)
@@ -406,6 +497,9 @@ namespace Cliente
                     LabelsJugadores[i, 1].Text = "";
                     LabelsJugadores[i, 2].Text = "";
                     LabelsJugadores[i, 3].Text = "";
+                    LabelsJugadores[i, 4].Text = "";
+                    LabelsJugadores[i, 5].Text = "";
+                    LabelsJugadores[i, 6].Text = "";
                     i++;
                 }
             }
@@ -761,9 +855,13 @@ namespace Cliente
         private void enviar_Btn_Click(object sender, EventArgs e)
         {
             //Evento llamado cuando el usuario pulsa el botón "Enviar". Envía el mensaje que ha escrito en el textBox al servidor.
-            string mensaje = "6/" + this.ID + "/" + this.usuario + ": " + chatTextBox.Text;
-            server.Enviar(mensaje);
-            chatTextBox.Text = "Escribe algo";
+            bool error = ComprobarCaracteres(chatTextBox.Text, "chat");
+            if (!error)
+            {
+                string mensaje = "6/" + this.ID + "/" + this.usuario + ": " + chatTextBox.Text;
+                server.Enviar(mensaje);
+                chatTextBox.Text = "Escribe algo";
+            }
         }
 
         private void empezarBtn_Click(object sender, EventArgs e)

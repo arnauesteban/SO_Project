@@ -136,7 +136,7 @@ int Registrarse(char usuario[20], char clave[20], MYSQL *conn) {
 	
 	//Antes de nada, obtenemos el numero de jugadores que hay en la base de datos para dar el identificador correcto al nuevo jugador
 	char consulta [80];
-	err=mysql_query (conn, "SELECT * FROM JUGADOR");
+	err=mysql_query (conn, "SELECT MAX(JUGADOR.ID) FROM JUGADOR");
 	if (err!=0) {
 		printf ("Error al consultar datos de la base %u %s\n",
 				mysql_errno(conn), mysql_error(conn));
@@ -146,11 +146,7 @@ int Registrarse(char usuario[20], char clave[20], MYSQL *conn) {
 	row = mysql_fetch_row (resultado);
 	
 	//Guardaremos el numero de usuarios en el parametro i
-	int i = 0;
-	while(row != NULL) {
-		i++;
-		row = mysql_fetch_row (resultado);
-	}
+	int ID_max = atoi(row[0]);
 	
 	//Ahora pedimos a la base de datos que busque si hay algun nombre con el nombre que ha introducido el usuario.
 	//Si es asi, no se podra registrar y tendra que introducir un nombre distinto
@@ -172,7 +168,7 @@ int Registrarse(char usuario[20], char clave[20], MYSQL *conn) {
 	}
 	
 	// Ahora ya podemos realizar la insercion 
-	sprintf(consulta, "INSERT INTO JUGADOR VALUES (%d,'%s','%s',0, 100);", i + 1, usuario, clave);
+	sprintf(consulta, "INSERT INTO JUGADOR VALUES (%d,'%s','%s',0, 100);", ID_max + 1, usuario, clave);
 	err = mysql_query(conn, consulta);
 	if (err!=0) {
 		printf ("Error al introducir datos la base %u %s\n", 
@@ -1106,7 +1102,7 @@ void *AtenderCliente (void *socket){
 				//Si la clave es correcta se procede a eliminar el usuario
 				else {
 					char comando[200];
-					sprintf(comando, "DELETE FROM PARTICIPACION, NOMBRE WHERE PARTICIPACION.ID_J = JUGADOR.ID AND JUGADOR.NOMBRE = '%s' AND JUGADOR.CONTRASENA = '%s'", lista_conectados.usuario[GetIndexConectado(sock_conn)].nombre, clave);
+					sprintf(comando, "DELETE FROM PARTICIPACION WHERE PARTICIPACION.ID_J = (SELECT JUGADOR.ID FROM JUGADOR WHERE JUGADOR.NOMBRE = '%s' AND JUGADOR.CONTRASENA = '%s')", lista_conectados.usuario[GetIndexConectado(sock_conn)].nombre, clave);
 					err = mysql_query (conn, comando);
 					if (err!=0) {
 						//Si ha habido algun error en la eliminacion se envia mensaje de error al usuario
@@ -1144,9 +1140,7 @@ void *AtenderCliente (void *socket){
 			
 			//Pedimos a la base de datos que nos proporcione resultados del usuario
 			char consulta[200];
-			strcpy(consulta, "SELECT PARTIDA.GANADOR FROM(PARTIDA, JUGADOR, PARTICIPACION) WHERE PARTIDA.ID = PARTICIPACION.ID_P AND PARTICIPACION.ID_J = JUGADOR.ID AND JUGADOR.NOMBRE = '");
-			strcat(consulta, name);
-			strcat(consulta, "'");
+			sprintf(consulta, "SELECT PARTIDA.GANADOR FROM PARTIDA WHERE PARTIDA.ID IN (SELECT DISTINCT PARTIDA.ID FROM PARTIDA,PARTICIPACION,JUGADOR WHERE PARTIDA.ID = PARTICIPACION.ID_P AND PARTICIPACION.ID_J = JUGADOR.ID AND JUGADOR.ID IN (SELECT JUGADOR.ID FROM JUGADOR WHERE JUGADOR.NOMBRE = '%s' OR JUGADOR.NOMBRE = '%s'));", name, lista_conectados.usuario[GetIndexConectado(sock_conn)].nombre);
 			int err = mysql_query (conn, consulta);
 			if (err!=0) {
 				printf ("Error al consultar en la base %u %s\n", mysql_errno(conn), mysql_error(conn));
@@ -1182,9 +1176,9 @@ void *AtenderCliente (void *socket){
 						char var[20];
 						strcpy(var, "");
 						strcpy(var, row[0]);
-						if(strcmp(var, name) == 1)
+						if(strcmp(var, name) == 0)
 							el++;
-						else if(strcmp(var, miNombre) == 1)
+						else if(strcmp(var, miNombre) == 0)
 							yo++;
 						numPartidas++;
 						row = mysql_fetch_row (resultado);

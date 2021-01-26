@@ -71,18 +71,30 @@ namespace Cliente
         }
         public void Enviar(string sentencia)
         {
-            byte[] msg = System.Text.Encoding.ASCII.GetBytes(sentencia);
+            string[] separado = sentencia.Split('/');
             try
             {
-                server.Send(msg);
+                //Extraemos el código de mensaje a enviar. Si el formato es incorrecto, se detecta un FormatException
+                int codigo = Convert.ToInt32(sentencia[0]);
+
+                //Si el formato es correcto, se sigue con el proceso.
+                byte[] msg = System.Text.Encoding.ASCII.GetBytes(sentencia);
+                try
+                {
+                    server.Send(msg);
+                }
+                catch (SocketException)
+                {
+                    conectado = false;
+                }
+                catch (NullReferenceException)
+                {
+                    conectado = false;
+                }
             }
-            catch (SocketException)
+            catch (FormatException)
             {
-                conectado = false;
-            }
-            catch (NullReferenceException)
-            {
-                conectado = false;
+                //Si hay un error en el formato del mensaje a enviar, siemplemente se descarta este mensaje
             }
         }
 
