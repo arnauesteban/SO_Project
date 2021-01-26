@@ -1320,6 +1320,7 @@ namespace Cliente
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
+            this.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink;
             this.BackgroundImage = ((System.Drawing.Image)(resources.GetObject("$this.BackgroundImage")));
             this.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Stretch;
             this.ClientSize = new System.Drawing.Size(999, 574);
@@ -1436,6 +1437,7 @@ namespace Cliente
             this.Controls.Add(this.chatTextBox);
             this.Controls.Add(this.enviar_Btn);
             this.Controls.Add(this.chatLbl);
+            this.MaximizeBox = false;
             this.Name = "NuevaPartida";
             this.Text = "Partida";
             this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.NuevaPartida_FormClosing);

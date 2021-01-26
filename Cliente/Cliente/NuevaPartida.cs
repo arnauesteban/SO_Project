@@ -374,9 +374,8 @@ namespace Cliente
                     break;
 
                 case 12:
-                    //delegado = new DelegadoRespuesta(Accion12);
-                    //this.Invoke(delegado, new object[] { mensaje });
-                    Accion12(mensaje);
+                    delegado = new DelegadoRespuesta(Accion12);
+                    this.Invoke(delegado, new object[] { mensaje });
                     break;
 
                 case 13:
@@ -450,7 +449,7 @@ namespace Cliente
             {
                 int i = 1;
                 int index = 1;
-                while (i < n)
+                while (index < n)
                 {
                     if (separado[i] != this.usuario)
                     {

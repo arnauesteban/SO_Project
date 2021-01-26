@@ -992,8 +992,9 @@ void *AtenderCliente (void *socket){
 				mensaje2[strlen(mensaje2)-1] = '\0';
 				char mensaje2final[200];
 				sprintf(mensaje2final, "12$%d/%d/%s", ID_partida, lista_partidas.partida[l].lista_jugadores.num, mensaje2);
-				for(int j = 0; j < lista_partidas.partida[l].lista_jugadores.num; j++)
+				for(int j = 0; j < lista_partidas.partida[l].lista_jugadores.num; j++) {
 					write(lista_partidas.partida[l].lista_jugadores.usuario[j].sock, mensaje2final, strlen(mensaje2final));
+				}
 				printf("Se ha enviado %s\n", mensaje2final);
 				
 				//Enviamos a los jugadores de la partida un mensaje conforme el jugador ha aceptado la invitacion
