@@ -9,8 +9,7 @@
 #include <mysql.h>
 #include <pthread.h>
 #include <time.h>
-
-//#include <my_global.h>
+#include <my_global.h>
 
 //Estructura usuario
 typedef struct {
