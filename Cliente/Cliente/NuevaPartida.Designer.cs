@@ -143,6 +143,7 @@ namespace Cliente
             this.jugador7PuntosTitLbl = new System.Windows.Forms.Label();
             this.jugador7JugadoTitLbl = new System.Windows.Forms.Label();
             this.jugador7FichasTitLbl = new System.Windows.Forms.Label();
+            this.tableLayoutPanel1 = new System.Windows.Forms.TableLayoutPanel();
             ((System.ComponentModel.ISupportInitialize)(this.apostarNum)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.pictureBox1_MiJugador)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.pictureBox2_MiJugador)).BeginInit();
@@ -192,6 +193,7 @@ namespace Cliente
             ((System.ComponentModel.ISupportInitialize)(this.pictureBox4_Jugador5)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.pictureBox5_Jugador5)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.pictureBox6_Jugador5)).BeginInit();
+            this.tableLayoutPanel1.SuspendLayout();
             this.SuspendLayout();
             // 
             // chatTextBox
@@ -244,12 +246,13 @@ namespace Cliente
             // 
             // pedirBtn
             // 
+            this.pedirBtn.BackColor = System.Drawing.Color.Transparent;
             this.pedirBtn.Location = new System.Drawing.Point(646, 455);
             this.pedirBtn.Name = "pedirBtn";
             this.pedirBtn.Size = new System.Drawing.Size(75, 23);
             this.pedirBtn.TabIndex = 58;
             this.pedirBtn.Text = "Pedir carta";
-            this.pedirBtn.UseVisualStyleBackColor = true;
+            this.pedirBtn.UseVisualStyleBackColor = false;
             this.pedirBtn.Click += new System.EventHandler(this.pedirBtn_Click);
             // 
             // plantarseBtn
@@ -302,27 +305,33 @@ namespace Cliente
             // jugador1PuntosLbl
             // 
             this.jugador1PuntosLbl.AutoSize = true;
-            this.jugador1PuntosLbl.Location = new System.Drawing.Point(840, 527);
+            this.jugador1PuntosLbl.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.jugador1PuntosLbl.ForeColor = System.Drawing.SystemColors.ButtonHighlight;
+            this.jugador1PuntosLbl.Location = new System.Drawing.Point(65, 56);
             this.jugador1PuntosLbl.Name = "jugador1PuntosLbl";
-            this.jugador1PuntosLbl.Size = new System.Drawing.Size(13, 13);
+            this.jugador1PuntosLbl.Size = new System.Drawing.Size(14, 13);
             this.jugador1PuntosLbl.TabIndex = 63;
             this.jugador1PuntosLbl.Text = "0";
             // 
             // jugador1JugadoLbl
             // 
             this.jugador1JugadoLbl.AutoSize = true;
-            this.jugador1JugadoLbl.Location = new System.Drawing.Point(840, 503);
+            this.jugador1JugadoLbl.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.jugador1JugadoLbl.ForeColor = System.Drawing.SystemColors.ButtonHighlight;
+            this.jugador1JugadoLbl.Location = new System.Drawing.Point(65, 28);
             this.jugador1JugadoLbl.Name = "jugador1JugadoLbl";
-            this.jugador1JugadoLbl.Size = new System.Drawing.Size(13, 13);
+            this.jugador1JugadoLbl.Size = new System.Drawing.Size(14, 13);
             this.jugador1JugadoLbl.TabIndex = 20;
             this.jugador1JugadoLbl.Text = "0";
             // 
             // jugador1FichasLbl
             // 
             this.jugador1FichasLbl.AutoSize = true;
-            this.jugador1FichasLbl.Location = new System.Drawing.Point(840, 476);
+            this.jugador1FichasLbl.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.jugador1FichasLbl.ForeColor = System.Drawing.SystemColors.ButtonHighlight;
+            this.jugador1FichasLbl.Location = new System.Drawing.Point(65, 0);
             this.jugador1FichasLbl.Name = "jugador1FichasLbl";
-            this.jugador1FichasLbl.Size = new System.Drawing.Size(13, 13);
+            this.jugador1FichasLbl.Size = new System.Drawing.Size(14, 13);
             this.jugador1FichasLbl.TabIndex = 19;
             this.jugador1FichasLbl.Text = "0";
             // 
@@ -851,27 +860,33 @@ namespace Cliente
             // label1
             // 
             this.label1.AutoSize = true;
-            this.label1.Location = new System.Drawing.Point(785, 476);
+            this.label1.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.label1.ForeColor = System.Drawing.SystemColors.ButtonHighlight;
+            this.label1.Location = new System.Drawing.Point(3, 0);
             this.label1.Name = "label1";
-            this.label1.Size = new System.Drawing.Size(38, 13);
+            this.label1.Size = new System.Drawing.Size(44, 13);
             this.label1.TabIndex = 130;
             this.label1.Text = "Fichas";
             // 
             // label2
             // 
             this.label2.AutoSize = true;
-            this.label2.Location = new System.Drawing.Point(785, 503);
+            this.label2.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.label2.ForeColor = System.Drawing.SystemColors.ButtonHighlight;
+            this.label2.Location = new System.Drawing.Point(3, 28);
             this.label2.Name = "label2";
-            this.label2.Size = new System.Drawing.Size(46, 13);
+            this.label2.Size = new System.Drawing.Size(53, 13);
             this.label2.TabIndex = 131;
             this.label2.Text = "Apuesta";
             // 
             // label3
             // 
             this.label3.AutoSize = true;
-            this.label3.Location = new System.Drawing.Point(783, 527);
+            this.label3.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.label3.ForeColor = System.Drawing.SystemColors.ButtonHighlight;
+            this.label3.Location = new System.Drawing.Point(3, 56);
             this.label3.Name = "label3";
-            this.label3.Size = new System.Drawing.Size(40, 13);
+            this.label3.Size = new System.Drawing.Size(46, 13);
             this.label3.TabIndex = 132;
             this.label3.Text = "Puntos";
             // 
@@ -1316,6 +1331,30 @@ namespace Cliente
             this.jugador7FichasTitLbl.TabIndex = 182;
             this.jugador7FichasTitLbl.Text = "Fichas:";
             // 
+            // tableLayoutPanel1
+            // 
+            this.tableLayoutPanel1.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this.tableLayoutPanel1.BackColor = System.Drawing.Color.DarkRed;
+            this.tableLayoutPanel1.ColumnCount = 2;
+            this.tableLayoutPanel1.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 72.09303F));
+            this.tableLayoutPanel1.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 27.90698F));
+            this.tableLayoutPanel1.Controls.Add(this.label1, 0, 0);
+            this.tableLayoutPanel1.Controls.Add(this.label2, 0, 1);
+            this.tableLayoutPanel1.Controls.Add(this.label3, 0, 2);
+            this.tableLayoutPanel1.Controls.Add(this.jugador1FichasLbl, 1, 0);
+            this.tableLayoutPanel1.Controls.Add(this.jugador1JugadoLbl, 1, 1);
+            this.tableLayoutPanel1.Controls.Add(this.jugador1PuntosLbl, 1, 2);
+            this.tableLayoutPanel1.Location = new System.Drawing.Point(353, 351);
+            this.tableLayoutPanel1.Name = "tableLayoutPanel1";
+            this.tableLayoutPanel1.RowCount = 3;
+            this.tableLayoutPanel1.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 50F));
+            this.tableLayoutPanel1.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 50F));
+            this.tableLayoutPanel1.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 20F));
+            this.tableLayoutPanel1.Size = new System.Drawing.Size(86, 76);
+            this.tableLayoutPanel1.TabIndex = 185;
+            // 
             // NuevaPartida
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -1324,6 +1363,7 @@ namespace Cliente
             this.BackgroundImage = ((System.Drawing.Image)(resources.GetObject("$this.BackgroundImage")));
             this.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Stretch;
             this.ClientSize = new System.Drawing.Size(999, 574);
+            this.Controls.Add(this.tableLayoutPanel1);
             this.Controls.Add(this.jugador7PuntosTitLbl);
             this.Controls.Add(this.jugador7JugadoTitLbl);
             this.Controls.Add(this.jugador7FichasTitLbl);
@@ -1373,9 +1413,6 @@ namespace Cliente
             this.Controls.Add(this.jugador5JugadoLbl);
             this.Controls.Add(this.jugador5FichasLbl);
             this.Controls.Add(this.jugador5NombreLbl);
-            this.Controls.Add(this.label3);
-            this.Controls.Add(this.label2);
-            this.Controls.Add(this.label1);
             this.Controls.Add(this.pictureBox1_Jugador5);
             this.Controls.Add(this.pictureBox2_Jugador5);
             this.Controls.Add(this.pictureBox3_Jugador5);
@@ -1424,14 +1461,11 @@ namespace Cliente
             this.Controls.Add(this.pictureBox3_MiJugador);
             this.Controls.Add(this.pictureBox2_MiJugador);
             this.Controls.Add(this.pictureBox1_MiJugador);
-            this.Controls.Add(this.jugador1PuntosLbl);
             this.Controls.Add(this.rendirseBtn);
             this.Controls.Add(this.apostarNum);
             this.Controls.Add(this.apostarBtn);
             this.Controls.Add(this.plantarseBtn);
             this.Controls.Add(this.pedirBtn);
-            this.Controls.Add(this.jugador1JugadoLbl);
-            this.Controls.Add(this.jugador1FichasLbl);
             this.Controls.Add(this.usuarioLbl);
             this.Controls.Add(this.empezarBtn);
             this.Controls.Add(this.chatTextBox);
@@ -1491,6 +1525,8 @@ namespace Cliente
             ((System.ComponentModel.ISupportInitialize)(this.pictureBox4_Jugador5)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.pictureBox5_Jugador5)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.pictureBox6_Jugador5)).EndInit();
+            this.tableLayoutPanel1.ResumeLayout(false);
+            this.tableLayoutPanel1.PerformLayout();
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -1611,5 +1647,6 @@ namespace Cliente
         private System.Windows.Forms.Label jugador7PuntosTitLbl;
         private System.Windows.Forms.Label jugador7JugadoTitLbl;
         private System.Windows.Forms.Label jugador7FichasTitLbl;
+        private System.Windows.Forms.TableLayoutPanel tableLayoutPanel1;
     }
 }
