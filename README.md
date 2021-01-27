@@ -14,3 +14,6 @@ Versión 4 verificada por Sergi
 
 Versión 5 generada por Sergi
 Versión 5 verificada por Arnau
+
+Version final generada por Joan
+Version final verificada por Sergi
