@@ -307,7 +307,7 @@ namespace Cliente
             this.jugador1PuntosLbl.AutoSize = true;
             this.jugador1PuntosLbl.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.jugador1PuntosLbl.ForeColor = System.Drawing.SystemColors.ButtonHighlight;
-            this.jugador1PuntosLbl.Location = new System.Drawing.Point(65, 56);
+            this.jugador1PuntosLbl.Location = new System.Drawing.Point(85, 56);
             this.jugador1PuntosLbl.Name = "jugador1PuntosLbl";
             this.jugador1PuntosLbl.Size = new System.Drawing.Size(14, 13);
             this.jugador1PuntosLbl.TabIndex = 63;
@@ -318,7 +318,7 @@ namespace Cliente
             this.jugador1JugadoLbl.AutoSize = true;
             this.jugador1JugadoLbl.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.jugador1JugadoLbl.ForeColor = System.Drawing.SystemColors.ButtonHighlight;
-            this.jugador1JugadoLbl.Location = new System.Drawing.Point(65, 28);
+            this.jugador1JugadoLbl.Location = new System.Drawing.Point(85, 28);
             this.jugador1JugadoLbl.Name = "jugador1JugadoLbl";
             this.jugador1JugadoLbl.Size = new System.Drawing.Size(14, 13);
             this.jugador1JugadoLbl.TabIndex = 20;
@@ -329,7 +329,7 @@ namespace Cliente
             this.jugador1FichasLbl.AutoSize = true;
             this.jugador1FichasLbl.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.jugador1FichasLbl.ForeColor = System.Drawing.SystemColors.ButtonHighlight;
-            this.jugador1FichasLbl.Location = new System.Drawing.Point(65, 0);
+            this.jugador1FichasLbl.Location = new System.Drawing.Point(85, 0);
             this.jugador1FichasLbl.Name = "jugador1FichasLbl";
             this.jugador1FichasLbl.Size = new System.Drawing.Size(14, 13);
             this.jugador1FichasLbl.TabIndex = 19;
@@ -1338,8 +1338,8 @@ namespace Cliente
             | System.Windows.Forms.AnchorStyles.Right)));
             this.tableLayoutPanel1.BackColor = System.Drawing.Color.DarkRed;
             this.tableLayoutPanel1.ColumnCount = 2;
-            this.tableLayoutPanel1.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 72.09303F));
-            this.tableLayoutPanel1.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 27.90698F));
+            this.tableLayoutPanel1.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 70.33898F));
+            this.tableLayoutPanel1.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 29.66102F));
             this.tableLayoutPanel1.Controls.Add(this.label1, 0, 0);
             this.tableLayoutPanel1.Controls.Add(this.label2, 0, 1);
             this.tableLayoutPanel1.Controls.Add(this.label3, 0, 2);
@@ -1352,7 +1352,7 @@ namespace Cliente
             this.tableLayoutPanel1.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 50F));
             this.tableLayoutPanel1.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 50F));
             this.tableLayoutPanel1.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 20F));
-            this.tableLayoutPanel1.Size = new System.Drawing.Size(86, 76);
+            this.tableLayoutPanel1.Size = new System.Drawing.Size(118, 76);
             this.tableLayoutPanel1.TabIndex = 185;
             // 
             // NuevaPartida
