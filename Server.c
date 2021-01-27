@@ -736,8 +736,7 @@ void *AtenderCliente (void *socket){
 	}
 	//inicializar la conexion, entrando nuestras claves de acceso y el nombre de la base de datos a la que queremos acceder 
 
-	conn = mysql_real_connect (conn, "localhost","root", "mysql", "TG11",0, NULL, 0);
-	//conn = mysql_real_connect (conn, "shiva2.upc.es", "root", "mysql", "TG11", 0, NULL, 0);
+	conn = mysql_real_connect (conn, "shiva2.upc.es", "root", "mysql", "TG11", 0, NULL, 0);
 
 	if (conn==NULL) {
 		printf ("Error al inicializar la conexion: %u %s\n", mysql_errno(conn), mysql_error(conn));
