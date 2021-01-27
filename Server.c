@@ -1140,7 +1140,7 @@ void *AtenderCliente (void *socket){
 			strcpy(name, p);
 			
 			//Pedimos a la base de datos que nos proporcione resultados del usuario
-			char consulta[200];
+			char consulta[400];
 			sprintf(consulta, "SELECT PARTIDA.GANADOR FROM PARTIDA WHERE PARTIDA.ID IN (SELECT DISTINCT PARTIDA.ID FROM PARTIDA,PARTICIPACION,JUGADOR WHERE PARTIDA.ID = PARTICIPACION.ID_P AND PARTICIPACION.ID_J = JUGADOR.ID AND JUGADOR.ID IN (SELECT JUGADOR.ID FROM JUGADOR WHERE JUGADOR.NOMBRE = '%s' OR JUGADOR.NOMBRE = '%s'));", name, lista_conectados.usuario[GetIndexConectado(sock_conn)].nombre);
 			int err = mysql_query (conn, consulta);
 			if (err!=0) {
@@ -1199,7 +1199,7 @@ void *AtenderCliente (void *socket){
 			MYSQL_ROW row;
 			
 			//Hacemos la consulta necesaria a la base de datos.
-			char consulta[200];
+			char consulta[400];
 			strcpy(consulta, "SELECT JUGADOR.NOMBRE, PARTIDA.DURACION FROM(PARTIDA, JUGADOR, PARTICIPACION) WHERE PARTIDA.DURACION = (SELECT MAX(DURACION) FROM PARTIDA) AND PARTIDA.ID = PARTICIPACION.ID_P AND PARTICIPACION.ID_J = JUGADOR.ID;");
 			err = mysql_query(conn, consulta);
 			if(err != 0){
